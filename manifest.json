@@ -1,0 +1,11 @@
+{
+	"id": "whisper",
+	"name": "Whisper",
+	"version": "0.1.0",
+	"minAppVersion": "0.15.0",
+	"description": "Hands-Free Note-Taking for Obsidian",
+	"author": "Nik Danilov",
+	"authorUrl": "https://github.com/nikdanilov",
+	"fundingUrl": "patreon.com/NikDanilov",
+	"isDesktopOnly": false
+}
