@@ -1,6 +1,6 @@
 # Obsidian Whisper: Hands-Free Note-Taking 🗣️📝
 
-Obsidian Whisper is a plugin that effortlessly turns your speech into written notes. Thanks to the amazing [Whisper](https://openai.com/research/whisper) from OpenAI, this plugin makes it a breeze to transform your spoken ideas into neat and easy-to-find text notes.
+Obsidian Whisper is a plugin that effortlessly turns your speech into written notes. Just speak your mind, and let  [Whisper](https://openai.com/research/whisper) from OpenAI do the rest!
 
 ## ⚙️ Installation
 
