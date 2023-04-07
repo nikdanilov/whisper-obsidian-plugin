@@ -6,14 +6,14 @@ Obsidian Whisper is a plugin that effortlessly turns your speech into written no
 
 1. Download the latest release of the Whisper plugin from the [GitHub repository](https://github.com/nikdanilov/whisper-obsidian-plugin/releases).
 2. Extract `manifest.json`, `main.js`, `styles.css` from the latest release into the `plugins/obsidian-whisper-plugin` folder within your Obsidian vault.
-3. Restart Obsidian and navigate to `Settings > Community plugins`.
+3. Click on `Reload plugins` button inside `Settings > Community plugins`.
 4. Locate the "Obsidian Whisper" plugin and enable it.
 5. In the plugin settings include your OpenAI API key.
 
 ## 🎯 How to Use
 
-1. Click on the ribbon icon to access recording controls interface.
-2. Utilize the "Record", "Pause", "Resume", and "Stop" buttons to manage your audio recordings.
+1. Click on the ribbon button to access recording controls interface.
+2. Use the "Record", "Pause", "Resume", and "Stop" buttons to manage your audio recordings.
 3. Upon stopping a recording, the plugin will promptly transcribe the audio content and generate a new note in the specified folder.
 
 ## 🔧 Settings
