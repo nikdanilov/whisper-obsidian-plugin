@@ -6,7 +6,7 @@ Obsidian Whisper is a plugin that effortlessly turns your speech into written no
 
 1. Download `manifest.json`, `main.js`, `styles.css` from the [GitHub repository](https://github.com/nikdanilov/whisper-obsidian-plugin/releases) into the `plugins/obsidian-whisper-plugin` folder within your Obsidian vault.
 2. Click on `Reload plugins` button inside `Settings > Community plugins`.
-3. Locate the "Obsidian Whisper" plugin and enable it.
+3. Locate the "Whisper" plugin and enable it.
 4. In the plugin settings include your OpenAI API key.
 
 ## 🎯 How to Use
