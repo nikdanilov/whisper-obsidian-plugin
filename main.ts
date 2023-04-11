@@ -22,7 +22,11 @@ export default class Whisper extends Plugin {
 		this.addSettingTab(new WhisperSettingTab(this.app, this));
 	}
 
-	onunload() {}
+	onunload() {
+		if (this.recordingControls) {
+			this.recordingControls.close();
+		}
+	}
 
 	async loadSettings() {
 		this.settings = Object.assign(
