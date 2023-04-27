@@ -137,6 +137,9 @@ export class RecordingControls extends Modal {
 	}
 
 	close() {
+		if (this.recorder && this.recorder.state !== "inactive") {
+			this.recorder.stop();
+		}
 		super.close();
 		this.elapsedTime = 0;
 		this.recorder = null;
