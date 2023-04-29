@@ -1,32 +1,16 @@
-// WhisperSettings.ts
+import Whisper from "main";
 import { App, PluginSettingTab, Setting } from "obsidian";
-import Whisper from "../main";
+import { SettingsManager} from "./SettingsManager";
 
-export interface WhisperSettings {
-	mySetting: string;
-	apiUrl: string;
-	apiKey: string;
-	model: string;
-	language: string;
-	templateFile: string;
-}
+export class WhisperSettingsTab extends PluginSettingTab {
+    private plugin: Whisper;
+    private settingsManager: SettingsManager;
 
-export const DEFAULT_SETTINGS: WhisperSettings = {
-	mySetting: "default",
-	apiKey: "",
-	apiUrl: "https://api.openai.com/v1/audio/transcriptions",
-	model: "whisper-1",
-	language: "en",
-	templateFile: "Transcriptions",
-};
-
-export class WhisperSettingTab extends PluginSettingTab {
-	plugin: Whisper;
-
-	constructor(app: App, plugin: Whisper) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
+    constructor(app: App, plugin: Whisper) {
+        super(app, plugin);
+        this.plugin = plugin;
+        this.settingsManager = plugin.settingsManager;
+    }
 
 	display(): void {
 		let { containerEl } = this;
@@ -44,7 +28,7 @@ export class WhisperSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.apiKey)
 					.onChange(async (value) => {
 						this.plugin.settings.apiKey = value;
-						await this.plugin.saveSettings();
+						await this.settingsManager.saveSettings(this.plugin.settings);
 					})
 			);
 
@@ -57,7 +41,7 @@ export class WhisperSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.apiUrl)
 					.onChange(async (value) => {
 						this.plugin.settings.apiUrl = value;
-						await this.plugin.saveSettings();
+						await this.settingsManager.saveSettings(this.plugin.settings);
 					})
 			);
 
@@ -72,7 +56,7 @@ export class WhisperSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.model)
 					.onChange(async (value) => {
 						this.plugin.settings.model = value;
-						await this.plugin.saveSettings();
+						await this.settingsManager.saveSettings(this.plugin.settings);
 					})
 			);
 
@@ -85,7 +69,7 @@ export class WhisperSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.language)
 					.onChange(async (value) => {
 						this.plugin.settings.language = value;
-						await this.plugin.saveSettings();
+						await this.settingsManager.saveSettings(this.plugin.settings);
 					})
 			);
 
@@ -107,7 +91,7 @@ export class WhisperSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.templateFile)
 					.onChange(async (value) => {
 						this.plugin.settings.templateFile = value;
-						await this.plugin.saveSettings();
+						await this.settingsManager.saveSettings(this.plugin.settings);
 					});
 
 				return text;

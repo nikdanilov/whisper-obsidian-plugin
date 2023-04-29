@@ -1,90 +1,40 @@
-import axios from "axios";
-import { Notice, Plugin } from "obsidian";
-import { RecordingControls } from "src/RecordingControls";
-import {
-	DEFAULT_SETTINGS,
-	WhisperSettings,
-	WhisperSettingTab,
-} from "src/WhisperSettings";
+import { Plugin } from "obsidian";
+import { Timer } from "src/Timer";
+import { Controls } from "src/Controls";
+import { AudioHandler } from "src/AudioHandler";
+import { WhisperSettingsTab } from "src/WhisperSettingsTab";
+import { SettingsManager, WhisperSettings } from "src/SettingsManager";
+import { AudioRecorder } from "src/Recorder";
 
 export default class Whisper extends Plugin {
-	settings: WhisperSettings;
-	recordingControls: RecordingControls;
+    settings: WhisperSettings;
+    settingsManager: SettingsManager;
+    timer: Timer;
+    recorder: AudioRecorder
+    audioHandler: AudioHandler;
+    controls: Controls | null = null;
 
-	async onload() {
-		await this.loadSettings();
-		this.addRibbonIcon("activity", "Open recording controls", (evt) => {
-			if (!this.recordingControls) {
-				this.recordingControls = new RecordingControls(this);
-			}
-			this.recordingControls.open();
-		});
-		this.addSettingTab(new WhisperSettingTab(this.app, this));
-	}
+    async onload() {
+        this.settingsManager = new SettingsManager(this);
+        this.settings = await this.settingsManager.loadSettings();
 
-	onunload() {
-		if (this.recordingControls) {
-			this.recordingControls.close();
-		}
-	}
+        this.addRibbonIcon("activity", "Open recording controls", (evt) => {
+            if (!this.controls) {
+                this.controls = new Controls(this);
+            }
+            this.controls.open();
+        });
 
-	async loadSettings() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			await this.loadData()
-		);
-	}
+        this.addSettingTab(new WhisperSettingsTab(this.app, this));
 
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
+        this.timer = new Timer()
+        this.audioHandler = new AudioHandler(this);
+        this.recorder = new AudioRecorder()
+    }
 
-	async sendAudioData(blob: Blob) {
-		console.log("Audio data size:", blob.size / 1000, "KB");
-
-		if (!this.settings.apiKey) {
-			new Notice(
-				"API key is missing. Please add your API key in the settings."
-			);
-			return;
-		}
-
-		const formData = new FormData();
-		const fileName = `audio-${new Date().toISOString()}.webm`;
-		formData.append("file", blob, fileName);
-		formData.append("model", this.settings.model);
-		formData.append("language", this.settings.language);
-
-		try {
-			const response = await axios.post(this.settings.apiUrl, formData, {
-				headers: {
-					"Content-Type": "multipart/form-data",
-					Authorization: `Bearer ${this.settings.apiKey}`,
-				},
-			});
-
-			if (response.data.error) {
-				console.error("Error sending audio data:", response.data.error);
-				new Notice("Error sending audio data: " + response.data.error);
-				return;
-			}
-
-			console.log("Audio data sent successfully:", response.data.text);
-
-			// Create a new note with the transcribed text
-			const folderPath = this.settings.templateFile
-				? `${this.settings.templateFile}/`
-				: "";
-			const newNoteName = `${folderPath}Transcription-${new Date()
-				.toISOString()
-				.replace(/[:.]/g, "-")}.md`;
-
-			await this.app.vault.create(newNoteName, response.data.text);
-			await this.app.workspace.openLinkText(newNoteName, "", true);
-		} catch (err) {
-			console.error("Error sending audio data:", err);
-			new Notice("Error sending audio data: " + err.message);
-		}
-	}
+    onunload() {
+        if (this.controls) {
+            this.controls.close();
+        }
+    }
 }
