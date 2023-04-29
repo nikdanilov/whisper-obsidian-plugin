@@ -4,13 +4,13 @@ import { Controls } from "src/Controls";
 import { AudioHandler } from "src/AudioHandler";
 import { WhisperSettingsTab } from "src/WhisperSettingsTab";
 import { SettingsManager, WhisperSettings } from "src/SettingsManager";
-import { AudioRecorder } from "src/Recorder";
+import { NativeAudioRecorder } from "src/AudioRecorder";
 
 export default class Whisper extends Plugin {
     settings: WhisperSettings;
     settingsManager: SettingsManager;
     timer: Timer;
-    recorder: AudioRecorder
+    recorder: NativeAudioRecorder
     audioHandler: AudioHandler;
     controls: Controls | null = null;
 
@@ -29,7 +29,7 @@ export default class Whisper extends Plugin {
 
         this.timer = new Timer()
         this.audioHandler = new AudioHandler(this);
-        this.recorder = new AudioRecorder()
+        this.recorder = new NativeAudioRecorder()
     }
 
     onunload() {

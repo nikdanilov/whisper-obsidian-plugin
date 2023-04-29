@@ -7,22 +7,22 @@ export interface AudioRecorder {
 }
 
 function getSupportedMimeType(): string | undefined {
-    const mimeTypes = [
-      "audio/webm; codecs=opus",
-      "audio/mpeg",
-      "audio/ogg; codecs=opus",
-    ];
-  
-    for (const mimeType of mimeTypes) {
-      if (MediaRecorder.isTypeSupported(mimeType)) {
-        return mimeType;
-      }
+  const mimeTypes = [
+    "audio/webm; codecs=opus",
+    "audio/mp4",
+    "audio/mpeg"
+  ];
+
+  for (const mimeType of mimeTypes) {
+    if (MediaRecorder.isTypeSupported(mimeType)) {
+      return mimeType;
     }
-  
-    return undefined;
   }
 
-export class AudioRecorder implements AudioRecorder {
+  return undefined;
+}
+
+export class NativeAudioRecorder implements AudioRecorder {
   private chunks: BlobPart[] = [];
   private recorder: MediaRecorder | null = null;
 
