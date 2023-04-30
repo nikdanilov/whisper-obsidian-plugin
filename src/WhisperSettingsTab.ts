@@ -7,11 +7,11 @@ export class WhisperSettingsTab extends PluginSettingTab {
     private settingsManager: SettingsManager;
     private templateFileInput: TextComponent;
 
-    constructor(app: App, plugin: Whisper) {
-        super(app, plugin);
-        this.plugin = plugin;
-        this.settingsManager = plugin.settingsManager;
-    }
+	constructor(app: App, plugin: Whisper) {
+		super(app, plugin);
+		this.plugin = plugin;
+		this.settingsManager = plugin.settingsManager;
+	}
 
     display(): void {
         const { containerEl } = this;
@@ -150,4 +150,5 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			this.templateFileInput.setValue('');
 		}
 	}
+
 }
