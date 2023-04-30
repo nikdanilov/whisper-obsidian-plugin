@@ -1,16 +1,16 @@
 import Whisper from "main";
 import { App, PluginSettingTab, Setting } from "obsidian";
-import { SettingsManager} from "./SettingsManager";
+import { SettingsManager } from "./SettingsManager";
 
 export class WhisperSettingsTab extends PluginSettingTab {
-    private plugin: Whisper;
-    private settingsManager: SettingsManager;
+	private plugin: Whisper;
+	private settingsManager: SettingsManager;
 
-    constructor(app: App, plugin: Whisper) {
-        super(app, plugin);
-        this.plugin = plugin;
-        this.settingsManager = plugin.settingsManager;
-    }
+	constructor(app: App, plugin: Whisper) {
+		super(app, plugin);
+		this.plugin = plugin;
+		this.settingsManager = plugin.settingsManager;
+	}
 
 	display(): void {
 		let { containerEl } = this;
@@ -96,5 +96,18 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 				return text;
 			});
+		// Add a toggle for your new setting
+		new Setting(containerEl)
+			.setName("Create a new file after recording")
+			.setDesc("If enabled, the plugin will create a new file after recording. Otherwise, the transcription will be inserted at the cursor position.")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.createNewFileAfterRecording)
+					.onChange(async (value) => {
+						this.plugin.settings.createNewFileAfterRecording = value;
+						await this.settingsManager.saveSettings(this.plugin.settings);
+					})
+			);
 	}
+
 }

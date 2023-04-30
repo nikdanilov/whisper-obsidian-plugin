@@ -6,6 +6,7 @@ export interface WhisperSettings {
     model: string;
     language: string;
     templateFile: string;
+    createNewFileAfterRecording: boolean;
 }
 
 export const DEFAULT_SETTINGS: WhisperSettings = {
@@ -14,6 +15,7 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
     model: "whisper-1",
     language: "en",
     templateFile: "",
+    createNewFileAfterRecording: true,
 };
 
 export class SettingsManager {
