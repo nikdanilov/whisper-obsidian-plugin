@@ -6,6 +6,16 @@ import { WhisperSettingsTab } from "src/WhisperSettingsTab";
 import { SettingsManager, WhisperSettings } from "src/SettingsManager";
 import { NativeAudioRecorder } from "src/AudioRecorder";
 
+// ... (other imports)
+
+export enum RecordingStatus {
+    Idle = "idle",
+    Recording = "recording",
+    Processing = "processing",
+}
+
+
+
 export default class Whisper extends Plugin {
     settings: WhisperSettings;
     settingsManager: SettingsManager;
@@ -14,6 +24,7 @@ export default class Whisper extends Plugin {
     audioHandler: AudioHandler;
     controls: Controls | null = null;
     statusBarItem: HTMLElement | null = null;
+    status: RecordingStatus = RecordingStatus.Idle;
 
 
     async onload() {
@@ -35,15 +46,37 @@ export default class Whisper extends Plugin {
 
 
         this.statusBarItem = this.addStatusBarItem();
-        this.updateStatusBarItem(false);
+        this.updateStatusBarItem(); // Call this method to set the initial status bar text and color
         this.addCommands();
     }
-    updateStatusBarItem(recording: boolean) {
+
+    updateStatus(status: RecordingStatus) {
+        this.status = status;
+        this.updateStatusBarItem();
+    }
+
+    updateStatusBarItem() {
         if (this.statusBarItem) {
-            this.statusBarItem.textContent = recording ? "Recording..." : "";
-            this.statusBarItem.style.color = recording ? "red" : "";
+            switch (this.status) {
+                case RecordingStatus.Recording:
+                    this.statusBarItem.textContent = "Recording...";
+                    this.statusBarItem.style.color = "red";
+                    break;
+                case RecordingStatus.Processing:
+                    this.statusBarItem.textContent = "Processing audio...";
+                    this.statusBarItem.style.color = "orange";
+                    break;
+                case RecordingStatus.Idle:
+                default:
+                    this.statusBarItem.textContent = "Whisper Idle";
+                    this.statusBarItem.style.color = "green";
+                    break;
+            }
         }
     }
+
+
+
     onunload() {
         if (this.controls) {
             this.controls.close();
@@ -56,28 +89,26 @@ export default class Whisper extends Plugin {
     }
 
     addCommands() {
-        let recording = false;
 
         this.addCommand({
             id: "start-stop-recording",
             name: "Start/Stop recording",
             callback: async () => {
-                if (!recording) {
-                    recording = true;
+                if (this.status !== RecordingStatus.Recording) {
+                    this.updateStatus(RecordingStatus.Recording);
                     await this.recorder.startRecording();
                 } else {
-                    recording = false;
+                    this.updateStatus(RecordingStatus.Processing);
                     const audioBlob = await this.recorder.stopRecording();
                     // Use audioBlob to send or save the recorded audio as needed
                     await this.audioHandler.sendAudioData(audioBlob);
+                    this.updateStatus(RecordingStatus.Idle);
                 }
-                this.updateStatusBarItem(recording);
-
             },
             hotkeys: [
                 {
                     modifiers: ["Alt"],
-                    key: "`",
+                    key: "Q",
                 },
             ],
         });
