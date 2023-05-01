@@ -45,11 +45,11 @@ export class AudioHandler {
 
 			console.log("Audio data sent successfully:", response.data.text);
 
-
 			// Determine if a new file should be created
-			const activeView = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
-			const shouldCreateNewFile = this.plugin.settings.newFilePostRecording || !activeView;
-
+			const activeView =
+				this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
+			const shouldCreateNewFile =
+				this.plugin.settings.newFilePostRecording || !activeView;
 
 			if (shouldCreateNewFile) {
 				// Create a new note with the transcribed text
@@ -60,17 +60,27 @@ export class AudioHandler {
 					.toISOString()
 					.replace(/[:.]/g, "-")}.md`;
 
-				await this.plugin.app.vault.create(newNoteName, response.data.text);
-				await this.plugin.app.workspace.openLinkText(newNoteName, "", true);
+				await this.plugin.app.vault.create(
+					newNoteName,
+					response.data.text
+				);
+				await this.plugin.app.workspace.openLinkText(
+					newNoteName,
+					"",
+					true
+				);
 			} else {
 				// Insert the transcription at the cursor position
-				const editor = this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
+				const editor =
+					this.plugin.app.workspace.getActiveViewOfType(
+						MarkdownView
+					)?.editor;
 				if (editor) {
 					const cursorPosition = editor.getCursor();
 					editor.replaceRange(response.data.text, cursorPosition);
 				}
 			}
-			
+
 			new Notice("Audio parsed successfully.");
 		} catch (err) {
 			console.error("Error sending audio data:", err);
