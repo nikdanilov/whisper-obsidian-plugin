@@ -1,5 +1,13 @@
 
 
+## [1.3.0](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.2.0...1.3.0) (2023-05-01)
+
+
+### Features
+
+* refactor settings tab ([f25b880](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/f25b88052c3f633249d688954e5a1d6028fcd4dc))
+* refactor status bar ([9f6bfa2](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/9f6bfa214611a771fc30bd14c504064dc90cdb01))
+
 ## 1.2.0 (2023-04-29)
 
 
