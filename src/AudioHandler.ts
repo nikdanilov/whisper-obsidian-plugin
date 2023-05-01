@@ -1,6 +1,6 @@
 import axios from "axios";
 import Whisper from "main";
-import { Notice } from "obsidian";
+import { MarkdownView, Notice } from "obsidian";
 
 export class AudioHandler {
 	private plugin: Whisper;
@@ -45,16 +45,42 @@ export class AudioHandler {
 
 			console.log("Audio data sent successfully:", response.data.text);
 
-			// Create a new note with the transcribed text
-			const folderPath = this.plugin.settings.templateFile
-				? `${this.plugin.settings.templateFile}/`
-				: "";
-			const newNoteName = `${folderPath}Transcription-${new Date()
-				.toISOString()
-				.replace(/[:.]/g, "-")}.md`;
+			// Determine if a new file should be created
+			const activeView =
+				this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
+			const shouldCreateNewFile =
+				this.plugin.settings.newFilePostRecording || !activeView;
 
-			await this.plugin.app.vault.create(newNoteName, response.data.text);
-			await this.plugin.app.workspace.openLinkText(newNoteName, "", true);
+			if (shouldCreateNewFile) {
+				// Create a new note with the transcribed text
+				const folderPath = this.plugin.settings.templateFile
+					? `${this.plugin.settings.templateFile}/`
+					: "";
+				const newNoteName = `${folderPath}Transcription-${new Date()
+					.toISOString()
+					.replace(/[:.]/g, "-")}.md`;
+
+				await this.plugin.app.vault.create(
+					newNoteName,
+					response.data.text
+				);
+				await this.plugin.app.workspace.openLinkText(
+					newNoteName,
+					"",
+					true
+				);
+			} else {
+				// Insert the transcription at the cursor position
+				const editor =
+					this.plugin.app.workspace.getActiveViewOfType(
+						MarkdownView
+					)?.editor;
+				if (editor) {
+					const cursorPosition = editor.getCursor();
+					editor.replaceRange(response.data.text, cursorPosition);
+				}
+			}
+
 			new Notice("Audio parsed successfully.");
 		} catch (err) {
 			console.error("Error sending audio data:", err);
