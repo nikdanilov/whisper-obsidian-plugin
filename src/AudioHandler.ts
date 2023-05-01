@@ -1,5 +1,5 @@
 import axios from "axios";
-import Whisper, { RecordingStatus } from "main";
+import Whisper from "main";
 import { Notice, MarkdownView } from "obsidian";
 
 export class AudioHandler {
@@ -26,8 +26,6 @@ export class AudioHandler {
 		formData.append("language", this.plugin.settings.language);
 
 		try {
-			this.plugin.updateStatus(RecordingStatus.Processing); // Start processing
-
 			const response = await axios.post(
 				this.plugin.settings.apiUrl,
 				formData,
@@ -91,14 +89,9 @@ export class AudioHandler {
 			}
 
 			new Notice("Audio parsed successfully.");
-
-			this.plugin.updateStatus(RecordingStatus.Idle); // End processing
-
 		} catch (err) {
 			console.error("Error sending audio data:", err);
 			new Notice("Error sending audio data: " + err.message);
-			this.plugin.updateStatus(RecordingStatus.Idle); // End processing in case of error
-
 		}
 	}
 }
