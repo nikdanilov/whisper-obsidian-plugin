@@ -1,5 +1,6 @@
 import Whisper from "main";
 import { ButtonComponent, Modal } from "obsidian";
+import { RecordingStatus } from "./StatusBar";
 
 export class Controls extends Modal {
 	private plugin: Whisper;
@@ -55,6 +56,7 @@ export class Controls extends Modal {
 
 	async startRecording() {
 		console.log("start");
+		this.plugin.statusBar.updateStatus(RecordingStatus.Recording);
 		await this.plugin.recorder.startRecording();
 		this.plugin.timer.start();
 		this.resetGUI();
@@ -69,10 +71,12 @@ export class Controls extends Modal {
 
 	async stopRecording() {
 		console.log("stopping recording...");
+		this.plugin.statusBar.updateStatus(RecordingStatus.Processing);
 		const blob = await this.plugin.recorder.stopRecording();
 		this.plugin.timer.reset();
 		this.resetGUI();
 		await this.plugin.audioHandler.sendAudioData(blob);
+		this.plugin.statusBar.updateStatus(RecordingStatus.Idle);
 	}
 
 	updateTimerDisplay() {
