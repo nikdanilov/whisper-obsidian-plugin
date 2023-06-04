@@ -19,10 +19,9 @@ export class Controls extends Modal {
 		this.updateTimerDisplay();
 
 		// Set onUpdate callback for the timer
-        this.plugin.timer.setOnUpdate(() => {
-            this.updateTimerDisplay();
-        });
-    
+		this.plugin.timer.setOnUpdate(() => {
+			this.updateTimerDisplay();
+		});
 
 		// Add button group
 		const buttonGroupEl = this.contentEl.createEl("div", {
@@ -75,7 +74,10 @@ export class Controls extends Modal {
 		const blob = await this.plugin.recorder.stopRecording();
 		this.plugin.timer.reset();
 		this.resetGUI();
-		await this.plugin.audioHandler.sendAudioData(blob);
+		await this.plugin.audioHandler.sendAudioData(
+			blob,
+			this.plugin.recorder.mimeType!
+		);
 		this.plugin.statusBar.updateStatus(RecordingStatus.Idle);
 	}
 
@@ -84,14 +86,16 @@ export class Controls extends Modal {
 	}
 
 	resetGUI() {
-        const recorderState = this.plugin.recorder.getRecordingState();
+		const recorderState = this.plugin.recorder.getRecordingState();
 
-        this.startButton.setDisabled(recorderState === 'recording' || recorderState === 'paused');
-        this.pauseButton.setDisabled(recorderState === 'inactive');
-        this.stopButton.setDisabled(recorderState === 'inactive');
+		this.startButton.setDisabled(
+			recorderState === "recording" || recorderState === "paused"
+		);
+		this.pauseButton.setDisabled(recorderState === "inactive");
+		this.stopButton.setDisabled(recorderState === "inactive");
 
-        this.pauseButton.setButtonText(
-			recorderState === 'paused' ? " Resume" : " Pause"
+		this.pauseButton.setButtonText(
+			recorderState === "paused" ? " Resume" : " Pause"
 		);
 	}
 }
