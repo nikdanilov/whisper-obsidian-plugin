@@ -1,5 +1,12 @@
 
 
+## [1.4.1](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.4.0...1.4.1) (2023-06-12)
+
+
+### Bug Fixes
+
+* release mic after use ([651ed76](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/651ed76a5a57e23419931b9314478093ed597410))
+
 ## [1.4.0](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.3.0...1.4.0) (2023-06-12)
 
 
