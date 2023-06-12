@@ -15,9 +15,9 @@
 }
 
 .recording-controls .button-component {
-    background-color: var(--text-accent);
-    color: var(--text-light);
-    cursor: pointer;
+	background-color: var(--text-accent);
+	color: var(--text-light);
+	cursor: pointer;
 }
 
 .recording-controls .button-component:hover {
@@ -26,8 +26,7 @@
 
 .recording-controls .button-component:disabled {
 	pointer-events: none;
-    background-color: var(--text-accent-muted);
-    color: var(--text-muted);
-    cursor: not-allowed;
+	background-color: var(--text-accent-muted);
+	color: var(--text-muted);
+	cursor: not-allowed;
 }
-
