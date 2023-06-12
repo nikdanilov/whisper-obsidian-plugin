@@ -49,12 +49,12 @@ If you want to install this from this repository, use the following steps:
 
 ## Say Thank You
 
-Are you finding value in this plugin? Great! You can fuel my coding sessions and share your appreciation by buying me a coffee on https://ko-fi/nikdanilov.
+Are you finding value in this plugin? Great! You can fuel my coding sessions and share your appreciation by buying me a coffee [here] (https://ko-fi/nikdanilov).
 
 Help others discover the magic of the Obsidian Whisper Plugin! I'd be thrilled if you could share your experiences on Twitter, Reddit, or your preferred social media platform!
 
 You can find me on Twitter [@nikdanilov_](https://twitter.com/nikdanilov_).
 
-[<img style="float:left" src="https://user-images.githubusercontent.com/14358394/115450238-f39e8100-a21b-11eb-89d0-fa4b82cdbce8.png" width="200">](https://ko-fi.com/zsolt)
+[<img style="float:left" src="https://user-images.githubusercontent.com/14358394/115450238-f39e8100-a21b-11eb-89d0-fa4b82cdbce8.png" width="200">](https://ko-fi.com/nikdanilov)
 
 ---
