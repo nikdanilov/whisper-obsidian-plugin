@@ -25,6 +25,7 @@ export class AudioHandler {
 		formData.append("language", this.plugin.settings.language);
 
 		try {
+			new Notice("Sending audio data:" + fileName);
 			const response = await axios.post(
 				this.plugin.settings.apiUrl,
 				formData,
