@@ -7,7 +7,7 @@ export interface AudioRecorder {
 }
 
 function getSupportedMimeType(): string | undefined {
-	const mimeTypes = ["audio/mp4", "audio/mpeg", "audio/webm; codecs=opus"];
+	const mimeTypes = ["audio/mp4", "audio/mpeg", "audio/webm"];
 
 	for (const mimeType of mimeTypes) {
 		if (MediaRecorder.isTypeSupported(mimeType)) {
@@ -21,10 +21,14 @@ function getSupportedMimeType(): string | undefined {
 export class NativeAudioRecorder implements AudioRecorder {
 	private chunks: BlobPart[] = [];
 	private recorder: MediaRecorder | null = null;
-	public mimeType: string | undefined;
+	private mimeType: string | undefined;
 
 	getRecordingState(): "inactive" | "recording" | "paused" | undefined {
 		return this.recorder?.state;
+	}
+
+	getMimeType(): string | undefined {
+		return this.mimeType;
 	}
 
 	async startRecording(): Promise<void> {
@@ -33,14 +37,13 @@ export class NativeAudioRecorder implements AudioRecorder {
 				const stream = await navigator.mediaDevices.getUserMedia({
 					audio: true,
 				});
-				const longMimeType = getSupportedMimeType();
-				this.mimeType = longMimeType?.split(";")[0];
+				this.mimeType = getSupportedMimeType();
 
 				if (!this.mimeType) {
 					throw new Error("No supported mimeType found");
 				}
 
-				const options = { mimeType: longMimeType };
+				const options = { mimeType: this.mimeType };
 				const recorder = new MediaRecorder(stream, options);
 
 				recorder.addEventListener("dataavailable", (e: BlobEvent) => {
