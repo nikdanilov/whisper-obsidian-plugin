@@ -1,3 +1,12 @@
+
+
+## [1.4.0](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.3.0...1.4.0) (2023-06-12)
+
+
+### Features
+
+* add new alert ([6439e7b](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/6439e7b6e33882e9e2ee87fd85dcfe528bb4afaa))
+
 ## [1.3.0](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.2.0...1.3.0) (2023-05-01)
 
 ### Features
