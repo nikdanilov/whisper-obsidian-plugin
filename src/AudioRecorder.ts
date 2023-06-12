@@ -1,97 +1,106 @@
 import { Notice } from "obsidian";
 
 export interface AudioRecorder {
-  startRecording(): Promise<void>;
-  pauseRecording(): Promise<void>;
-  stopRecording(): Promise<Blob>;
+	startRecording(): Promise<void>;
+	pauseRecording(): Promise<void>;
+	stopRecording(): Promise<Blob>;
 }
 
 function getSupportedMimeType(): string | undefined {
-  const mimeTypes = [
-    "audio/webm; codecs=opus",
-    "audio/mp4",
-    "audio/mpeg"
-  ];
+	const mimeTypes = ["audio/mp4", "audio/mpeg", "audio/webm"];
 
-  for (const mimeType of mimeTypes) {
-    if (MediaRecorder.isTypeSupported(mimeType)) {
-      return mimeType;
-    }
-  }
+	for (const mimeType of mimeTypes) {
+		if (MediaRecorder.isTypeSupported(mimeType)) {
+			return mimeType;
+		}
+	}
 
-  return undefined;
+	return undefined;
 }
 
 export class NativeAudioRecorder implements AudioRecorder {
-  private chunks: BlobPart[] = [];
-  private recorder: MediaRecorder | null = null;
+	private chunks: BlobPart[] = [];
+	private recorder: MediaRecorder | null = null;
+	private mimeType: string | undefined;
 
-  getRecordingState(): "inactive" | "recording" | "paused" | undefined {
-    return this.recorder?.state;
-  }
+	getRecordingState(): "inactive" | "recording" | "paused" | undefined {
+		return this.recorder?.state;
+	}
 
-  async startRecording(): Promise<void> {
-    if (!this.recorder) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mimeType = getSupportedMimeType();
+	getMimeType(): string | undefined {
+		return this.mimeType;
+	}
 
-        if (!mimeType) {
-          throw new Error("No supported mimeType found");
-        }
+	async startRecording(): Promise<void> {
+		if (!this.recorder) {
+			try {
+				const stream = await navigator.mediaDevices.getUserMedia({
+					audio: true,
+				});
+				this.mimeType = getSupportedMimeType();
 
-        const options = { mimeType };
-        const recorder = new MediaRecorder(stream, options);
+				if (!this.mimeType) {
+					throw new Error("No supported mimeType found");
+				}
 
-        recorder.addEventListener("dataavailable", (e: BlobEvent) => {
-          console.log("dataavailable", e.data.size);
-          this.chunks.push(e.data);
-        });
+				const options = { mimeType: this.mimeType };
+				const recorder = new MediaRecorder(stream, options);
 
-        this.recorder = recorder;
-      } catch (err) {
-        new Notice("Error initializing recorder: " + err);
-        console.error("Error initializing recorder:", err);
-        return;
-      }
-    }
+				recorder.addEventListener("dataavailable", (e: BlobEvent) => {
+					console.log("dataavailable", e.data.size);
+					this.chunks.push(e.data);
+				});
 
-    this.recorder.start(100);
-  }
+				this.recorder = recorder;
+			} catch (err) {
+				new Notice("Error initializing recorder: " + err);
+				console.error("Error initializing recorder:", err);
+				return;
+			}
+		}
 
-  async pauseRecording(): Promise<void> {
-    if (!this.recorder) {
-      return;
-    }
+		this.recorder.start(100);
+	}
 
-    if (this.recorder.state === "recording") {
-      this.recorder.pause();
-    } else if (this.recorder.state === "paused") {
-      this.recorder.resume();
-    }
-  }
+	async pauseRecording(): Promise<void> {
+		if (!this.recorder) {
+			return;
+		}
 
-  async stopRecording(): Promise<Blob> {
-    return new Promise((resolve) => {
-      if (!this.recorder || this.recorder.state === "inactive") {
-        const blob = new Blob(this.chunks, { type: "audio/webm" });
-        this.chunks.length = 0;
+		if (this.recorder.state === "recording") {
+			this.recorder.pause();
+		} else if (this.recorder.state === "paused") {
+			this.recorder.resume();
+		}
+	}
 
-        console.log("Stop recording (no active recorder):", blob);
+	async stopRecording(): Promise<Blob> {
+		return new Promise((resolve) => {
+			if (!this.recorder || this.recorder.state === "inactive") {
+				const blob = new Blob(this.chunks, { type: this.mimeType });
+				this.chunks.length = 0;
 
-        resolve(blob);
-      } else {
-        this.recorder.addEventListener("stop", () => {
-          const blob = new Blob(this.chunks, { type: "audio/webm" });
-          this.chunks.length = 0;
+				console.log("Stop recording (no active recorder):", blob);
 
-          console.log("Stop recording (active recorder):", blob);
+				resolve(blob);
+			} else {
+				this.recorder.addEventListener(
+					"stop",
+					() => {
+						const blob = new Blob(this.chunks, {
+							type: this.mimeType,
+						});
+						this.chunks.length = 0;
 
-          resolve(blob);
-        }, { once: true });
+						console.log("Stop recording (active recorder):", blob);
 
-        this.recorder.stop();
-      }
-    });
-  }
+						resolve(blob);
+					},
+					{ once: true }
+				);
+
+				this.recorder.stop();
+			}
+		});
+	}
 }
