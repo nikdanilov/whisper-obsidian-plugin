@@ -94,6 +94,14 @@ export class NativeAudioRecorder implements AudioRecorder {
 
 						console.log("Stop recording (active recorder):", blob);
 
+						// will stop all the tracks associated with the stream, effectively releasing any resources (like the mic) used by them
+						if (this.recorder) {
+							this.recorder.stream
+								.getTracks()
+								.forEach((track) => track.stop());
+							this.recorder = null;
+						}
+
 						resolve(blob);
 					},
 					{ once: true }
