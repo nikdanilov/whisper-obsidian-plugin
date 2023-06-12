@@ -12,27 +12,32 @@
 	"author": "Nik Danilov",
 	"license": "MIT",
 	"devDependencies": {
+		"@commitlint/cli": "^17.6.5",
+		"@commitlint/config-conventional": "^17.6.5",
+		"@release-it/conventional-changelog": "^5.1.1",
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
 		"builtin-modules": "3.3.0",
 		"esbuild": "0.17.3",
+		"husky": "^8.0.3",
+		"lint-staged": "^13.2.2",
 		"obsidian": "latest",
+		"prettier": "^2.8.8",
+		"release-it": "^15.11.0",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4"
 	},
 	"dependencies": {
-		"@commitlint/cli": "^17.6.1",
-		"@commitlint/config-conventional": "^17.6.1",
-		"@release-it/conventional-changelog": "^5.1.1",
-		"axios": "^1.3.4",
-		"husky": "^8.0.3",
-		"lucid-ui": "^8.16.0",
-		"release-it": "^15.10.1"
+		"axios": "^1.3.4"
 	},
 	"release-it": {
 		"hooks": {
-			"after:bump": "node version-bump.mjs"
+			"after:bump": "node version-bump.mjs",
+			"pre-commit": "lint-staged"
+		},
+		"lint-staged": {
+			"*": "prettier --write"
 		},
 		"git": {
 			"commitMessage": "chore: release v${version}",

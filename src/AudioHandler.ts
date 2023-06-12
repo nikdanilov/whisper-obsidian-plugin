@@ -9,7 +9,7 @@ export class AudioHandler {
 		this.plugin = plugin;
 	}
 
-	async sendAudioData(blob: Blob): Promise<void> {
+	async sendAudioData(blob: Blob, fileName: string): Promise<void> {
 		new Notice(`Sending audio data size: ${blob.size / 1000} KB`);
 
 		if (!this.plugin.settings.apiKey) {
@@ -20,12 +20,12 @@ export class AudioHandler {
 		}
 
 		const formData = new FormData();
-		const fileName = `audio-${new Date().toISOString()}.webm`;
 		formData.append("file", blob, fileName);
 		formData.append("model", this.plugin.settings.model);
 		formData.append("language", this.plugin.settings.language);
 
 		try {
+			new Notice("Sending audio data:" + fileName);
 			const response = await axios.post(
 				this.plugin.settings.apiUrl,
 				formData,
