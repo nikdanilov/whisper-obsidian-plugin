@@ -21,7 +21,9 @@
 		"builtin-modules": "3.3.0",
 		"esbuild": "0.17.3",
 		"husky": "^8.0.3",
+		"lint-staged": "^13.2.2",
 		"obsidian": "latest",
+		"prettier": "^2.8.8",
 		"release-it": "^15.11.0",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4"
@@ -31,7 +33,11 @@
 	},
 	"release-it": {
 		"hooks": {
-			"after:bump": "node version-bump.mjs"
+			"after:bump": "node version-bump.mjs",
+			"pre-commit": "lint-staged"
+		},
+		"lint-staged": {
+			"*": "prettier --write"
 		},
 		"git": {
 			"commitMessage": "chore: release v${version}",
