@@ -2,7 +2,7 @@
 
 Obsidian Whisper is a plugin that effortlessly turns your speech into written notes. Just speak your mind, and let [Whisper](https://openai.com/research/whisper) from OpenAI do the rest!
 
-## ⚙️ Installation
+## 🚀 Getting Started
 
 1. This plugin can be installed from "Community Plugins" inside Obsidian.
 2. For this plugin to work, you will need to provide your OpenAI API key. See the Settings section of this README file for more information.
@@ -16,7 +16,7 @@ Obsidian Whisper is a plugin that effortlessly turns your speech into written no
 
 > For further explanation of using this plugin, check out the article ["Speech-to-text in Obsidian using OpenAI Whisper Service"](https://tfthacker.medium.com/speech-to-text-in-obsidian-using-openai-whisper-service-7b2843bf8d64) by [TfT Hacker](https://twitter.com/tfthacker)
 
-## 🔧 Settings
+## ⚙️ Settings
 
 -   **API Key**: Input your OpenAI API key to unlock the advanced transcription capabilities of the Whisper API.
     -   You can get a key from OpenAI at this [link](https://platform.openai.com/overview). If you are not familiar with the concept of an API key, you can learn more about this at this [link](https://tfthacker.medium.com/how-to-get-your-own-api-key-for-using-openai-chatgpt-in-obsidian-41b7dd71f8d3).
@@ -40,14 +40,14 @@ We welcome and appreciate contributions, issue reports, and feature requests fro
 
 ## ⚒️ Manual Installation
 
-If you want to install this from this repository, use the following steps:
+If you want to install this plugin manually, use the following steps:
 
 1. Download `manifest.json`, `main.js`, `styles.css` from the [GitHub repository](https://github.com/nikdanilov/whisper-obsidian-plugin/releases) into the `plugins/whisper` folder within your Obsidian vault.
 2. Click on `Reload plugins` button inside `Settings > Community plugins`.
 3. Locate the "Whisper" plugin and enable it.
 4. In the plugin settings include your OpenAI API key.
 
-## Say Thank You
+## 🤩 Say Thank You
 
 Are you finding value in this plugin? Great! You can fuel my coding sessions and share your appreciation by buying me a coffee [here](https://ko-fi.com/nikdanilov).
 
