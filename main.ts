@@ -56,9 +56,12 @@ export default class Whisper extends Plugin {
 				} else {
 					this.statusBar.updateStatus(RecordingStatus.Processing);
 					const audioBlob = await this.recorder.stopRecording();
-					const mimeType = this.recorder.mimeType!;
+					const extension = this.recorder
+						.getMimeType()
+						?.split("/")[1];
+					const fileName = `audio-${new Date().toISOString()}.${extension}`;
 					// Use audioBlob to send or save the recorded audio as needed
-					await this.audioHandler.sendAudioData(audioBlob, mimeType);
+					await this.audioHandler.sendAudioData(audioBlob, fileName);
 					this.statusBar.updateStatus(RecordingStatus.Idle);
 				}
 			},
