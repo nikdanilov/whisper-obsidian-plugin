@@ -6,6 +6,8 @@ export interface WhisperSettings {
 	model: string;
 	language: string;
 	templateFile: string;
+	saveAudioFile: boolean;
+	saveAudioFilePath: string;
 	newFilePostRecording: boolean;
 }
 
@@ -15,6 +17,8 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	model: "whisper-1",
 	language: "en",
 	templateFile: "",
+	saveAudioFile: true,
+	saveAudioFilePath: "",
 	newFilePostRecording: true,
 };
 

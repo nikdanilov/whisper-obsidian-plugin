@@ -45,6 +45,15 @@ export class AudioHandler {
 
 			console.log("Audio data sent successfully:", response.data.text);
 
+			// If the saveAudioFile setting is true, save the audio file
+			if (this.plugin.settings.saveAudioFile) {
+				const arrayBuffer = await blob.arrayBuffer();
+				await this.plugin.app.vault.adapter.writeBinary(
+					`path/to/save/${fileName}`,
+					new Uint8Array(arrayBuffer)
+				);
+			}
+
 			// Determine if a new file should be created
 			const activeView =
 				this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
