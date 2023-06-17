@@ -59,7 +59,9 @@ export default class Whisper extends Plugin {
 					const extension = this.recorder
 						.getMimeType()
 						?.split("/")[1];
-					const fileName = `audio-${new Date().toISOString()}.${extension}`;
+					const fileName = `${new Date()
+						.toISOString()
+						.replace(/[:.]/g, "-")}.${extension}`;
 					// Use audioBlob to send or save the recorded audio as needed
 					await this.audioHandler.sendAudioData(audioBlob, fileName);
 					this.statusBar.updateStatus(RecordingStatus.Idle);

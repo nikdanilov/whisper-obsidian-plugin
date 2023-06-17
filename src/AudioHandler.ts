@@ -1,6 +1,7 @@
 import axios from "axios";
 import Whisper from "main";
 import { Notice, MarkdownView } from "obsidian";
+import * as path from "path";
 
 export class AudioHandler {
 	private plugin: Whisper;
@@ -10,6 +11,21 @@ export class AudioHandler {
 	}
 
 	async sendAudioData(blob: Blob, fileName: string): Promise<void> {
+		// Get the base file name without extension
+		const baseFileName = path.parse(fileName).name;
+
+		const audioFilePath = `${
+			this.plugin.settings.saveAudioFilePath
+				? `${this.plugin.settings.saveAudioFilePath}/`
+				: ""
+		}${fileName}`;
+
+		const noteFilePath = `${
+			this.plugin.settings.createNewFileAfterRecordingPath
+				? `${this.plugin.settings.createNewFileAfterRecordingPath}/`
+				: ""
+		}${baseFileName}.md`;
+
 		new Notice(`Sending audio data size: ${blob.size / 1000} KB`);
 
 		if (!this.plugin.settings.apiKey) {
@@ -49,32 +65,25 @@ export class AudioHandler {
 			if (this.plugin.settings.saveAudioFile) {
 				const arrayBuffer = await blob.arrayBuffer();
 				await this.plugin.app.vault.adapter.writeBinary(
-					`path/to/save/${fileName}`,
+					audioFilePath,
 					new Uint8Array(arrayBuffer)
 				);
+				console.log("write to ", audioFilePath);
 			}
 
 			// Determine if a new file should be created
 			const activeView =
 				this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
 			const shouldCreateNewFile =
-				this.plugin.settings.newFilePostRecording || !activeView;
+				this.plugin.settings.createNewFileAfterRecording || !activeView;
 
 			if (shouldCreateNewFile) {
-				// Create a new note with the transcribed text
-				const folderPath = this.plugin.settings.templateFile
-					? `${this.plugin.settings.templateFile}/`
-					: "";
-				const newNoteName = `${folderPath}Transcription-${new Date()
-					.toISOString()
-					.replace(/[:.]/g, "-")}.md`;
-
 				await this.plugin.app.vault.create(
-					newNoteName,
-					response.data.text
+					noteFilePath,
+					`![[${audioFilePath}]]\n${response.data.text}`
 				);
 				await this.plugin.app.workspace.openLinkText(
-					newNoteName,
+					noteFilePath,
 					"",
 					true
 				);
