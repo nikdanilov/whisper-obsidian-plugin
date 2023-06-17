@@ -1,17 +1,11 @@
 import Whisper from "main";
-import {
-	App,
-	PluginSettingTab,
-	Setting,
-	TextComponent,
-	TFolder,
-} from "obsidian";
+import { App, PluginSettingTab, Setting, TFolder } from "obsidian";
 import { SettingsManager } from "./SettingsManager";
 
 export class WhisperSettingsTab extends PluginSettingTab {
 	private plugin: Whisper;
 	private settingsManager: SettingsManager;
-	private templateFileInput: Setting;
+	private createNewFileInput: Setting;
 	private saveAudioFileInput: Setting;
 
 	constructor(app: App, plugin: Whisper) {
@@ -173,29 +167,34 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			)
 			.addToggle((toggle) => {
 				toggle
-					.setValue(this.plugin.settings.newFilePostRecording)
+					.setValue(this.plugin.settings.createNewFileAfterRecording)
 					.onChange(async (value) => {
-						this.plugin.settings.newFilePostRecording = value;
+						this.plugin.settings.createNewFileAfterRecording =
+							value;
 						if (!value) {
-							this.plugin.settings.templateFile = "";
+							this.plugin.settings.createNewFileAfterRecordingPath =
+								"";
 						}
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
-						this.templateFileInput.setDisabled(!value);
+						this.createNewFileInput.setDisabled(!value);
 					});
 			});
 	}
 
 	private createNewFilePathSetting(): void {
-		this.templateFileInput = new Setting(this.containerEl)
+		this.createNewFileInput = new Setting(this.containerEl)
 			.setName("Template file location")
 			.setDesc("Choose a folder for your template file")
 			.addText((text) => {
 				text.setPlaceholder("Example: folder/note")
-					.setValue(this.plugin.settings.templateFile)
+					.setValue(
+						this.plugin.settings.createNewFileAfterRecordingPath
+					)
 					.onChange(async (value) => {
-						this.plugin.settings.templateFile = value;
+						this.plugin.settings.createNewFileAfterRecordingPath =
+							value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
