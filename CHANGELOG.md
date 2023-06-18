@@ -1,5 +1,20 @@
 
 
+## [1.5.0](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.4.2...1.5.0) (2023-06-18)
+
+
+### Features
+
+* add preserve audio file ([f8517e4](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/f8517e44219dc8b1b1d2875ec4b0230fe835d95b))
+* add save audio file setting ([d21e4b3](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/d21e4b3a2556a25142b5c748b3734cf519abb689))
+* add upload audio file feature ([c340b22](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/c340b22ff3d1abb9e853b0b2a59ed53025edfc2b))
+
+
+### Bug Fixes
+
+* fix typo ([fcce20d](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/fcce20de8123d34405cfd6bd62578ae05d53a5f0))
+* update settings desc ([7b65bfc](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/7b65bfcdf5a09b0798b704b3cc98c5f9bc8fa664))
+
 ## [1.4.2](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.4.1...1.4.2) (2023-06-12)
 
 ## [1.4.1](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.4.0...1.4.1) (2023-06-12)
