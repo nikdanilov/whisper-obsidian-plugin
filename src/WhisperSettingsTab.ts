@@ -187,7 +187,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createNewFileInput = new Setting(this.containerEl)
 			.setName("Transcriptions folder")
 			.setDesc(
-				"Specify the path in the vault where to save the transcriptions files"
+				"Specify the path in the vault where to save the transcription files"
 			)
 			.addText((text) => {
 				text.setPlaceholder("Example: folder/note")
