@@ -9,25 +9,61 @@ Obsidian Whisper is a plugin that effortlessly turns your speech into written no
 
 ## 🎯 How to Use
 
-1. Click on the ribbon button to access the recording controls interface.
-2. Use the "Start", "Pause/Resume", and "Stop" buttons to manage your audio recordings.
-3. Upon stopping a recording, the plugin will promptly transcribe the audio content and generate a new note in the specified folder.
-4. Alternatively, use the shortcut key `Alt + Q` to start/stop recording without opening the recording controls interface.
+### Access Recording Controls
+Click on the ribbon button to open the recording controls interface.
+
+### Record Audio
+Use the "Start" button to begin recording. You can pause and resume the recording using the "Pause/Resume" button. Click the "Stop" button once you're done. After stopping the recording, the plugin will automatically transcribe the audio and create a new note with the transcribed content and linked audio file in the specified folder.
+
+* Shortcut for Recording
+As an alternative to using the recording controls interface, you can quickly start or stop recording using the `Alt + Q` shortcut.
+
+### Upload Existing Audio File
+You can also transcribe an existing audio file:
+- Open the command palette with `Ctrl/Cmd + P`.
+- Search for "Upload Audio File" and select it.
+- A file dialog will appear. Choose the audio file you want to transcribe.
+- The plugin will transcribe the selected file and create a new note with the content.
+
+### Command Palette for Quick Actions
+Both "Start/Stop recording" and "Upload Audio File" actions can also be accessed quickly through the command palette.
 
 > For further explanation of using this plugin, check out the article ["Speech-to-text in Obsidian using OpenAI Whisper Service"](https://tfthacker.medium.com/speech-to-text-in-obsidian-using-openai-whisper-service-7b2843bf8d64) by [TfT Hacker](https://twitter.com/tfthacker)
 
 ## ⚙️ Settings
 
--   **API Key**: Input your OpenAI API key to unlock the advanced transcription capabilities of the Whisper API.
-    -   You can get a key from OpenAI at this [link](https://platform.openai.com/overview). If you are not familiar with the concept of an API key, you can learn more about this at this [link](https://tfthacker.medium.com/how-to-get-your-own-api-key-for-using-openai-chatgpt-in-obsidian-41b7dd71f8d3).
--   **API URL**: Specify the endpoint that will be used to make requests to the Whisper API.
-    -   Normally this should not be changed unless you understand what you are doing.
--   **Model**: Choose the machine learning model to use for generating text transcriptions.
-    -   Normally this should not be changed unless you understand what you are doing.
--   **Language**: Enter the language of the message being whispered.
-    -   For a list of languages and codes, consult this [link](https://github.com/openai/whisper/blob/main/whisper/tokenizer.py)
--   **Template File Location**: Specify the desired folder for storing your transcribed notes.
-    -   If the designated folder is not found, it will be created automatically. Leave this field blank to have transcriptions saved to the root of the vault.
+### API Key
+Input your OpenAI API key to unlock the advanced transcription capabilities of the Whisper API.
+- You can obtain a key from OpenAI at this [link](https://platform.openai.com/overview). If you are not familiar with the concept of an API key, you can learn more about this at this [link](https://tfthacker.medium.com/how-to-get-your-own-api-key-for-using-openai-chatgpt-in-obsidian-41b7dd71f8d3).
+
+### API URL
+Specify the endpoint that will be used to make requests to the Whisper API.
+- This should not be changed unless you have a specific reason to use a different endpoint.
+
+### Model
+Choose the machine learning model to use for generating text transcriptions.
+- This should not be changed unless you have a specific reason to use a different model.
+
+### Language
+Specify the language of the message being whispered.
+- For a list of languages and codes, consult this [link](https://github.com/openai/whisper/blob/main/whisper/tokenizer.py).
+
+### Save recording
+Toggle this option to save the audio file after sending it to the Whisper API.
+- When enabled, you can specify the path in the vault where the audio files should be saved.
+
+### Recordings folder
+Specify the path in the vault where to save the audio files.
+- Example: `folder/audio`. This option is only available if "Save recording" is enabled.
+
+### Save transcription
+Toggle this option to create a new file for each recording, or leave it off to add transcriptions at your cursor.
+- When enabled, you can specify the path in the vault where the transcriptions should be saved.
+
+### Transcriptions folder
+Specify the path in the vault where to save the transcription files.
+- Example: `folder/note`. This option is only available if "Save transcription" is enabled.
+
 
 ## 🤝 Contributing
 
