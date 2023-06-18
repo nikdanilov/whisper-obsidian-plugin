@@ -74,5 +74,34 @@ export default class Whisper extends Plugin {
 				},
 			],
 		});
+
+		this.addCommand({
+			id: "upload-audio-file",
+			name: "Upload Audio File",
+			callback: () => {
+				// Create an input element for file selection
+				const fileInput = document.createElement("input");
+				fileInput.type = "file";
+				fileInput.accept = "audio/*"; // Accept only audio files
+
+				// Handle file selection
+				fileInput.onchange = async (event) => {
+					const files = (event.target as HTMLInputElement).files;
+					if (files && files.length > 0) {
+						const file = files[0];
+						const fileName = file.name;
+						const audioBlob = file.slice(0, file.size, file.type);
+						// Use audioBlob to send or save the uploaded audio as needed
+						await this.audioHandler.sendAudioData(
+							audioBlob,
+							fileName
+						);
+					}
+				};
+
+				// Programmatically open the file dialog
+				fileInput.click();
+			},
+		});
 	}
 }
