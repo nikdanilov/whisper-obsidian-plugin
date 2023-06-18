@@ -15,15 +15,14 @@ Click on the ribbon button to open the recording controls interface.
 ### Record Audio
 Use the "Start" button to begin recording. You can pause and resume the recording using the "Pause/Resume" button. Click the "Stop" button once you're done. After stopping the recording, the plugin will automatically transcribe the audio and create a new note with the transcribed content and linked audio file in the specified folder.
 
-* Shortcut for Recording
-As an alternative to using the recording controls interface, you can quickly start or stop recording using the `Alt + Q` shortcut.
+> You can quickly start or stop recording using the `Alt + Q` shortcut.
 
 ### Upload Existing Audio File
 You can also transcribe an existing audio file:
 - Open the command palette with `Ctrl/Cmd + P`.
 - Search for "Upload Audio File" and select it.
 - A file dialog will appear. Choose the audio file you want to transcribe.
-- The plugin will transcribe the selected file and create a new note with the content.
+- The plugin will transcribe the selected file and create a new note with the content and linked audio file in the specified folder.
 
 ### Command Palette for Quick Actions
 Both "Start/Stop recording" and "Upload Audio File" actions can also be accessed quickly through the command palette.
