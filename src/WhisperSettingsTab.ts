@@ -119,7 +119,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createSaveAudioFileToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Keep recording")
+			.setName("Save recording")
 			.setDesc(
 				"Turn on to save the audio file after sending it to the Whisper API"
 			)
@@ -141,13 +141,13 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createSaveAudioFilePathSetting(): void {
 		this.saveAudioFileInput = new Setting(this.containerEl)
-			.setName("Keep recording file path")
+			.setName("Recordings folder")
 			.setDesc(
 				"Specify the path in the vault where to save the audio files"
 			)
 			.addText((text) =>
 				text
-					.setPlaceholder("Example: folder/subfolder")
+					.setPlaceholder("Example: folder/audio")
 					.setValue(this.plugin.settings.saveAudioFilePath)
 					.onChange(async (value) => {
 						this.plugin.settings.saveAudioFilePath = value;
@@ -161,7 +161,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createNewFileToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Create a new file after recording")
+			.setName("Save transcription")
 			.setDesc(
 				"Turn on to create a new file for each recording, or leave off to add transcriptions at your cursor"
 			)
@@ -185,8 +185,10 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createNewFilePathSetting(): void {
 		this.createNewFileInput = new Setting(this.containerEl)
-			.setName("Template file location")
-			.setDesc("Choose a folder for your template file")
+			.setName("Transcriptions folder")
+			.setDesc(
+				"Specify the path in the vault where to save the transcriptions files"
+			)
 			.addText((text) => {
 				text.setPlaceholder("Example: folder/note")
 					.setValue(
