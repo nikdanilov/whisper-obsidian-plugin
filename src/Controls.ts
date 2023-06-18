@@ -76,7 +76,9 @@ export class Controls extends Modal {
 		this.resetGUI();
 
 		const extension = this.plugin.recorder.getMimeType()?.split("/")[1];
-		const fileName = `audio-${new Date().toISOString()}.${extension}`;
+		const fileName = `${new Date()
+			.toISOString()
+			.replace(/[:.]/g, "-")}.${extension}`;
 		await this.plugin.audioHandler.sendAudioData(blob, fileName);
 		this.plugin.statusBar.updateStatus(RecordingStatus.Idle);
 	}
