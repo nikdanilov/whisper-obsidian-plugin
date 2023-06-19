@@ -48,7 +48,7 @@ export default class Whisper extends Plugin {
 	addCommands() {
 		this.addCommand({
 			id: "start-stop-recording",
-			name: "Start/Stop recording",
+			name: "Start/stop recording",
 			callback: async () => {
 				if (this.statusBar.status !== RecordingStatus.Recording) {
 					this.statusBar.updateStatus(RecordingStatus.Recording);
@@ -77,7 +77,7 @@ export default class Whisper extends Plugin {
 
 		this.addCommand({
 			id: "upload-audio-file",
-			name: "Upload Audio File",
+			name: "Upload audio file",
 			callback: () => {
 				// Create an input element for file selection
 				const fileInput = document.createElement("input");
