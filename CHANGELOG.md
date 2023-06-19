@@ -1,5 +1,19 @@
 
 
+## [1.5.1](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.0...1.5.1) (2023-06-19)
+
+
+### Features
+
+* set outputdir to env variable ([077c5ee](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/077c5eedda82d71c9a0c2f6d81ab8d5371f4b4b7))
+
+
+### Bug Fixes
+
+* add misc updates ([f3d4906](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/f3d490670a468e39a1872cdc2a3cff01cf0fcd27))
+* replace path module with js function ([bad6dc0](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/bad6dc0db11faca49dedbcda9817fd374f8cbfd8))
+* update manifest ([0d7c236](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/0d7c236942713e5fddf7eb45e9d439e431765f0f))
+
 ## [1.5.0](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.4.2...1.5.0) (2023-06-18)
 
 
