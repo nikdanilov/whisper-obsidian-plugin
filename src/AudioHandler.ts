@@ -1,7 +1,7 @@
 import axios from "axios";
 import Whisper from "main";
 import { Notice, MarkdownView } from "obsidian";
-import * as path from "path";
+import { getBaseFileName } from "./utils";
 
 export class AudioHandler {
 	private plugin: Whisper;
@@ -12,7 +12,7 @@ export class AudioHandler {
 
 	async sendAudioData(blob: Blob, fileName: string): Promise<void> {
 		// Get the base file name without extension
-		const baseFileName = path.parse(fileName).name;
+		const baseFileName = getBaseFileName(fileName);
 
 		const audioFilePath = `${
 			this.plugin.settings.saveAudioFilePath
