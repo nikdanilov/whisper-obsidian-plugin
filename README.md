@@ -10,21 +10,26 @@ Obsidian Whisper is a plugin that effortlessly turns your speech into written no
 ## 🎯 How to Use
 
 ### Access Recording Controls
+
 Click on the ribbon button to open the recording controls interface.
 
 ### Record Audio
+
 Use the "Start" button to begin recording. You can pause and resume the recording using the "Pause/Resume" button. Click the "Stop" button once you're done. After stopping the recording, the plugin will automatically transcribe the audio and create a new note with the transcribed content and linked audio file in the specified folder.
 
 > You can quickly start or stop recording using the `Alt + Q` shortcut.
 
 ### Upload Existing Audio File
+
 You can also transcribe an existing audio file:
-- Open the command palette with `Ctrl/Cmd + P`.
-- Search for "Upload Audio File" and select it.
-- A file dialog will appear. Choose the audio file you want to transcribe.
-- The plugin will transcribe the selected file and create a new note with the content and linked audio file in the specified folder.
+
+-   Open the command palette with `Ctrl/Cmd + P`.
+-   Search for "Upload Audio File" and select it.
+-   A file dialog will appear. Choose the audio file you want to transcribe.
+-   The plugin will transcribe the selected file and create a new note with the content and linked audio file in the specified folder.
 
 ### Command Palette for Quick Actions
+
 Both "Start/Stop recording" and "Upload Audio File" actions can also be accessed quickly through the command palette.
 
 > For further explanation of using this plugin, check out the article ["Speech-to-text in Obsidian using OpenAI Whisper Service"](https://tfthacker.medium.com/speech-to-text-in-obsidian-using-openai-whisper-service-7b2843bf8d64) by [TfT Hacker](https://twitter.com/tfthacker)
@@ -46,7 +51,6 @@ Both "Start/Stop recording" and "Upload Audio File" actions can also be accessed
 -   Save transcription: Toggle this option to create a new file for each recording, or leave it off to add transcriptions at your cursor. When enabled, you can specify the path in the vault where the transcriptions should be saved.
 
 -   Transcriptions folder: Specify the path in the vault where to save the transcription files. Example: `folder/note`. This option is only available if "Save transcription" is enabled.
-
 
 ## 🤝 Contributing
 
@@ -72,7 +76,7 @@ Are you finding value in this plugin? Great! You can fuel my coding sessions and
 
 Help others discover the magic of the Obsidian Whisper Plugin! I'd be thrilled if you could share your experiences on Twitter, Reddit, or your preferred social media platform!
 
-You can find me on Twitter [@nikdanilov_](https://twitter.com/nikdanilov_).
+You can find me on Twitter [@nikdanilov\_](https://twitter.com/nikdanilov_).
 
 [<img style="float:left" src="https://user-images.githubusercontent.com/14358394/115450238-f39e8100-a21b-11eb-89d0-fa4b82cdbce8.png" width="200">](https://ko-fi.com/nikdanilov)
 

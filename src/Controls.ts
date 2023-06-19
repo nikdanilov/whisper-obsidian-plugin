@@ -81,6 +81,7 @@ export class Controls extends Modal {
 			.replace(/[:.]/g, "-")}.${extension}`;
 		await this.plugin.audioHandler.sendAudioData(blob, fileName);
 		this.plugin.statusBar.updateStatus(RecordingStatus.Idle);
+		this.close();
 	}
 
 	updateTimerDisplay() {
