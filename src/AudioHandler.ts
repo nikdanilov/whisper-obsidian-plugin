@@ -41,6 +41,15 @@ export class AudioHandler {
 		formData.append("language", this.plugin.settings.language);
 
 		try {
+			// If the saveAudioFile setting is true, save the audio file
+			if (this.plugin.settings.saveAudioFile) {
+				const arrayBuffer = await blob.arrayBuffer();
+				await this.plugin.app.vault.adapter.writeBinary(
+					audioFilePath,
+					new Uint8Array(arrayBuffer)
+				);
+				console.log("write to ", audioFilePath);
+			}
 			new Notice("Sending audio data:" + fileName);
 			const response = await axios.post(
 				this.plugin.settings.apiUrl,
@@ -60,16 +69,6 @@ export class AudioHandler {
 			}
 
 			console.log("Audio data sent successfully:", response.data.text);
-
-			// If the saveAudioFile setting is true, save the audio file
-			if (this.plugin.settings.saveAudioFile) {
-				const arrayBuffer = await blob.arrayBuffer();
-				await this.plugin.app.vault.adapter.writeBinary(
-					audioFilePath,
-					new Uint8Array(arrayBuffer)
-				);
-				console.log("write to ", audioFilePath);
-			}
 
 			// Determine if a new file should be created
 			const activeView =
