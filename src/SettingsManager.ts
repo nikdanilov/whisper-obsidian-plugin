@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	apiKey: "",
 	apiUrl: "https://api.openai.com/v1/audio/transcriptions",
 	model: "whisper-1",
+	prompt: "",
 	language: "en",
 	saveAudioFile: true,
 	saveAudioFilePath: "",
