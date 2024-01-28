@@ -65,11 +65,15 @@ export class AudioHandler {
 			if (response.data.error) {
 				console.error("Error sending audio data:", response.data.error);
 				new Notice("Error sending audio data: " + response.data.error);
-				return;
 			}
 
 			console.log("Audio data sent successfully:", response.data.text);
+		} catch (err) {
+			console.error("Error sending audio data:", err);
+			new Notice("Error sending audio data: " + err.message);
+		}
 
+		try {
 			// Determine if a new file should be created
 			const activeView =
 				this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
