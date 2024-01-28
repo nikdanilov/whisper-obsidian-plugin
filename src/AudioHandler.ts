@@ -48,9 +48,15 @@ export class AudioHandler {
 					audioFilePath,
 					new Uint8Array(arrayBuffer)
 				);
-				console.log("write to ", audioFilePath);
+				new Notice("Audio saved successfully.");
 			}
-			new Notice("Sending audio data:" + fileName);
+		} catch (err) {
+			console.error("Error saving audio file:", err);
+			new Notice("Error saving audio file: " + err.message);
+		}
+
+		try {
+			new Notice("Parsing audio data:" + fileName);
 			const response = await axios.post(
 				this.plugin.settings.apiUrl,
 				formData,
@@ -62,18 +68,6 @@ export class AudioHandler {
 				}
 			);
 
-			if (response.data.error) {
-				console.error("Error sending audio data:", response.data.error);
-				new Notice("Error sending audio data: " + response.data.error);
-			}
-
-			console.log("Audio data sent successfully:", response.data.text);
-		} catch (err) {
-			console.error("Error sending audio data:", err);
-			new Notice("Error sending audio data: " + err.message);
-		}
-
-		try {
 			// Determine if a new file should be created
 			const activeView =
 				this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
@@ -111,8 +105,8 @@ export class AudioHandler {
 
 			new Notice("Audio parsed successfully.");
 		} catch (err) {
-			console.error("Error sending audio data:", err);
-			new Notice("Error sending audio data: " + err.message);
+			console.error("Error parsing audio:", err);
+			new Notice("Error parsing audio: " + err.message);
 		}
 	}
 }
