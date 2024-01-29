@@ -28,6 +28,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createSaveAudioFilePathSetting();
 		this.createNewFileToggleSetting();
 		this.createNewFilePathSetting();
+		this.createDebugModeToggleSetting();
 	}
 
 	private getUniqueFolders(): TFolder[] {
@@ -211,6 +212,24 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.createNewFileAfterRecordingPath =
 							value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+			});
+	}
+
+	private createDebugModeToggleSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Debug Mode")
+			.setDesc(
+				"Turn on to increase the plugin's verbosity for troubleshooting."
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.debugMode)
+					.onChange(async (value) => {
+						this.plugin.settings.debugMode = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
