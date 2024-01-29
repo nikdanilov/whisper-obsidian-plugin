@@ -8,6 +8,7 @@ export interface WhisperSettings {
 	language: string;
 	saveAudioFile: boolean;
 	saveAudioFilePath: string;
+	debugMode: boolean;
 	createNewFileAfterRecording: boolean;
 	createNewFileAfterRecordingPath: string;
 }
@@ -20,6 +21,7 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	language: "en",
 	saveAudioFile: true,
 	saveAudioFilePath: "",
+	debugMode: false,
 	createNewFileAfterRecording: true,
 	createNewFileAfterRecordingPath: "",
 };

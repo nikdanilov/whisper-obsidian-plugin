@@ -26,7 +26,9 @@ export class AudioHandler {
 				: ""
 		}${baseFileName}.md`;
 
-		new Notice(`Sending audio data size: ${blob.size / 1000} KB`);
+		if (this.plugin.settings.debugMode) {
+			new Notice(`Sending audio data size: ${blob.size / 1000} KB`);
+		}
 
 		if (!this.plugin.settings.apiKey) {
 			new Notice(
@@ -58,7 +60,9 @@ export class AudioHandler {
 		}
 
 		try {
-			new Notice("Parsing audio data:" + fileName);
+			if (this.plugin.settings.debugMode) {
+				new Notice("Parsing audio data:" + fileName);
+			}
 			const response = await axios.post(
 				this.plugin.settings.apiUrl,
 				formData,
