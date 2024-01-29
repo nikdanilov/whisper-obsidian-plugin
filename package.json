@@ -34,7 +34,8 @@
 	},
 	"release-it": {
 		"hooks": {
-			"after:bump": "node version-bump.mjs",
+			"before:release": "npm run build",
+			"after:bump": "node verify-and-update.mjs",
 			"pre-commit": "lint-staged"
 		},
 		"lint-staged": {
