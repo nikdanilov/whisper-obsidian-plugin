@@ -4,6 +4,7 @@ export interface WhisperSettings {
 	apiKey: string;
 	apiUrl: string;
 	model: string;
+	prompt: string;
 	language: string;
 	saveAudioFile: boolean;
 	saveAudioFilePath: string;

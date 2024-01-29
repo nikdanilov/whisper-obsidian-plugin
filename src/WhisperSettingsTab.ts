@@ -108,8 +108,8 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private createPromptSetting(): void {
 		this.createTextSetting(
 			"Prompt",
-			"An optional text parameter to pass a dictionary of the correct spellings. It should match the Language.",
-			"ZyntriQix, Digique Plus, CynapseFive",
+			"Optional: Add words with their correct spellings to help with transcription. Make sure it matches the chosen language.",
+			"Example: ZyntriQix, Digique Plus, CynapseFive",
 			this.plugin.settings.prompt,
 			async (value) => {
 				this.plugin.settings.prompt = value;
