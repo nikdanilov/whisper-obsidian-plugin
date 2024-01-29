@@ -1,5 +1,12 @@
 
 
+## [1.5.5](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.4...1.5.5) (2024-01-29)
+
+
+### Features
+
+* add debug mode ([2d356a1](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/2d356a12ddc2fd24d99c02a73641573c32022b93))
+
 ## [1.5.4](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.3...1.5.4) (2024-01-29)
 
 
