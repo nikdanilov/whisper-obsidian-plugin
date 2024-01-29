@@ -1,5 +1,12 @@
 
 
+## [1.5.4](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.3...1.5.4) (2024-01-29)
+
+
+### Bug Fixes
+
+* update mimeType list and use 'audio/webm' by default if possible ([8e8747c](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/8e8747c3221da8868b7af79b16ba4aef67cc15b2))
+
 ## [1.5.3](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.2...1.5.3) (2024-01-29)
 
 
