@@ -1,5 +1,12 @@
 
 
+## [1.5.2](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.1...1.5.2) (2024-01-29)
+
+
+### Bug Fixes
+
+* update AudioHandler to try...catch 'save_audio' and 'parse_audio' ([89fc56e](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/89fc56e8bcda9ffdfaf255cc3877e82ecc4c297a))
+
 ## [1.5.1](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.0...1.5.1) (2023-06-19)
 
 
