@@ -22,6 +22,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createApiKeySetting();
 		this.createApiUrlSetting();
 		this.createModelSetting();
+		this.createPromptSetting();
 		this.createLanguageSetting();
 		this.createSaveAudioFileToggleSetting();
 		this.createSaveAudioFilePathSetting();
@@ -99,6 +100,19 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			this.plugin.settings.model,
 			async (value) => {
 				this.plugin.settings.model = value;
+				await this.settingsManager.saveSettings(this.plugin.settings);
+			}
+		);
+	}
+
+	private createPromptSetting(): void {
+		this.createTextSetting(
+			"Prompt",
+			"An optional text parameter to pass a dictionary of the correct spellings. It should match the Language.",
+			"ZyntriQix, Digique Plus, CynapseFive",
+			this.plugin.settings.prompt,
+			async (value) => {
+				this.plugin.settings.prompt = value;
 				await this.settingsManager.saveSettings(this.plugin.settings);
 			}
 		);
