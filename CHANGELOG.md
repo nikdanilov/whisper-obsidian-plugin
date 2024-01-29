@@ -1,5 +1,17 @@
 
 
+## [1.5.3](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.2...1.5.3) (2024-01-29)
+
+
+### Features
+
+* add support of prompt parameter ([786644e](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/786644ed939ccc8e4a2b2bcc9beffb21173c38ed))
+
+
+### Bug Fixes
+
+* add prompt type and desc ([d25ea92](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/d25ea9234df339c3b0ee8bf1b15984751576d62e))
+
 ## [1.5.2](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.1...1.5.2) (2024-01-29)
 
 
