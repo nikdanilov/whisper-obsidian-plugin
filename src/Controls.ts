@@ -79,7 +79,7 @@ export class Controls extends Modal {
 		const fileName = `${new Date()
 			.toISOString()
 			.replace(/[:.]/g, "-")}.${extension}`;
-		await this.plugin.audioHandler.sendAudioData(blob, fileName);
+		await this.plugin.transcriber.transcribeAndSaveResults(blob, fileName);
 		this.plugin.statusBar.updateStatus(RecordingStatus.Idle);
 		this.close();
 	}

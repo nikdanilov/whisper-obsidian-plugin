@@ -1,7 +1,7 @@
 import { Plugin } from "obsidian";
 import { Timer } from "src/Timer";
 import { Controls } from "src/Controls";
-import { AudioHandler } from "src/AudioHandler";
+import { Transcriber } from "src/Transcriber";
 import { WhisperSettingsTab } from "src/WhisperSettingsTab";
 import { SettingsManager, WhisperSettings } from "src/SettingsManager";
 import { NativeAudioRecorder } from "src/AudioRecorder";
@@ -11,7 +11,7 @@ export default class Whisper extends Plugin {
 	settingsManager: SettingsManager;
 	timer: Timer;
 	recorder: NativeAudioRecorder;
-	audioHandler: AudioHandler;
+	transcriber: Transcriber;
 	controls: Controls | null = null;
 	statusBar: StatusBar;
 
@@ -29,7 +29,7 @@ export default class Whisper extends Plugin {
 		this.addSettingTab(new WhisperSettingsTab(this.app, this));
 
 		this.timer = new Timer();
-		this.audioHandler = new AudioHandler(this);
+		this.transcriber = new Transcriber(this);
 		this.recorder = new NativeAudioRecorder();
 
 		this.statusBar = new StatusBar(this);
@@ -63,7 +63,10 @@ export default class Whisper extends Plugin {
 						.toISOString()
 						.replace(/[:.]/g, "-")}.${extension}`;
 					// Use audioBlob to send or save the recorded audio as needed
-					await this.audioHandler.sendAudioData(audioBlob, fileName);
+					await this.transcriber.transcribeAndSaveResults(
+						audioBlob,
+						fileName
+					);
 					this.statusBar.updateStatus(RecordingStatus.Idle);
 				}
 			},
@@ -92,7 +95,7 @@ export default class Whisper extends Plugin {
 						const fileName = file.name;
 						const audioBlob = file.slice(0, file.size, file.type);
 						// Use audioBlob to send or save the uploaded audio as needed
-						await this.audioHandler.sendAudioData(
+						await this.transcriber.transcribeAndSaveResults(
 							audioBlob,
 							fileName
 						);
