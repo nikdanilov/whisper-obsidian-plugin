@@ -52,6 +52,28 @@ Both "Start/Stop recording" and "Upload Audio File" actions can also be accessed
 
 -   Transcriptions folder: Specify the path in the vault where to save the transcription files. Example: `folder/note`. This option is only available if "Save transcription" is enabled.
 
+## Offline Usage (Local Whisper Server)
+
+If you want to use this plugin without sending audio to OpenAI, you can run a local Whisper server with Docker and point the plugin to it.
+
+1. Start the local server:
+   - If you have an NVIDIA GPU with CUDA support, run `docker compose -f docker-compose.cuda.yml up -d`.
+   - Otherwise, run `docker compose -f docker-compose.cpu.yml up -d`.
+   - Or just download the appropriate compose file and run the same command from any folder.
+   - Both files expose the server on `http://localhost:8000`.
+2. Configure the plugin settings:
+   - API URL: `http://localhost:8000/v1/audio/transcriptions`
+   - API Key: use any placeholder value like 'local' (the local server does not require a real key).
+   - Model: use a Hugging Face model ID that the server can download (i.e., a faster-whisper/CTranslate2-compatible model).
+3. Record audio as usual. Transcription stays local.
+
+Notes:
+- You need Docker installed on your machine.
+- Only tested on Windows 11.
+- Use `docker-compose.cpu.yml` if you do not have an NVIDIA GPU with CUDA support.
+- The first run will download the model; the Hugging Face cache is persisted in the `hf_hub_cache` volume.
+
+
 ## 🤝 Contributing
 
 We welcome and appreciate contributions, issue reports, and feature requests from the community! Feel free to visit the [Issues](https://github.com/nikdanilov/whisper-obsidian-plugin/issues) page to share your thoughts and suggestions.
