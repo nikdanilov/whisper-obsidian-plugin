@@ -1,0 +1,26 @@
+services:
+  whisper:
+    image: fedirz/faster-whisper-server:latest
+    container_name: whisper-local
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+    environment:
+      # CORS: Obsidian typically uses origin "app://obsidian.md"
+      # (JSON list as a string!)
+      ALLOW_ORIGINS: '["app://obsidian.md"]' # alternatively for testing: '["*"]'
+
+      # Optional: set a default model when the request does not specify one
+      # WHISPER__MODEL: "your-hf-model-id"
+
+      # Default device/compute (CPU)
+      WHISPER__INFERENCE_DEVICE: "cpu" # options: "auto" (default), "cuda", "cpu"
+      WHISPER__COMPUTE_TYPE: "default" # options include: "default", "float16", "float32", "int8", "int8_float16", "int8_float32", "int8_bfloat16", "int16", "bfloat16"
+
+    volumes:
+      # Persistent HF cache as a named volume (works on Windows/macOS/Linux)
+      - hf_hub_cache:/root/.cache/huggingface
+
+volumes:
+  hf_hub_cache:
