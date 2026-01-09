@@ -38,6 +38,8 @@ Both "Start/Stop recording" and "Upload Audio File" actions can also be accessed
 
 -   API Key: Input your OpenAI API key to unlock the advanced transcription capabilities of the Whisper API. You can obtain a key from OpenAI at this [link](https://platform.openai.com/overview). If you are not familiar with the concept of an API key, you can learn more about this at this [link](https://tfthacker.medium.com/how-to-get-your-own-api-key-for-using-openai-chatgpt-in-obsidian-41b7dd71f8d3).
 
+    - If you are using Obsidian version >= [1.11.4](https://obsidian.md/changelog/2026-01-07-desktop-v1.11.4/), you should save your API key in the Obsidian Keychain, and update the *API Key Secret ID* setting with the id of your key.
+
 -   API URL: Specify the endpoint that will be used to make requests to the Whisper API. This should not be changed unless you have a specific reason to use a different endpoint.
 
 -   Model: Choose the machine learning model to use for generating text transcriptions. This should not be changed unless you have a specific reason to use a different model.
