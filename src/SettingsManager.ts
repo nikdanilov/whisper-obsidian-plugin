@@ -2,6 +2,7 @@ import { Plugin } from "obsidian";
 
 export interface WhisperSettings {
 	apiKey: string;
+	apiKeySecretID?: string;
 	apiUrl: string;
 	model: string;
 	prompt: string;
@@ -15,6 +16,7 @@ export interface WhisperSettings {
 
 export const DEFAULT_SETTINGS: WhisperSettings = {
 	apiKey: "",
+	apiKeySecretID: "OPENAI_API_KEY",
 	apiUrl: "https://api.openai.com/v1/audio/transcriptions",
 	model: "whisper-1",
 	prompt: "",

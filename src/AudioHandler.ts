@@ -10,6 +10,14 @@ export class AudioHandler {
 		this.plugin = plugin;
 	}
 
+	private get apiKey() {
+		if (this.plugin.settings.apiKey) {
+			return this.plugin.settings.apiKey;
+		} else if (this.plugin.settings.apiKeySecretID) {
+			return this.plugin.app.secretStorage.getSecret(this.plugin.settings.apiKeySecretID)
+		}
+	}
+
 	async sendAudioData(blob: Blob, fileName: string): Promise<void> {
 		// Get the base file name without extension
 		const baseFileName = getBaseFileName(fileName);
@@ -69,7 +77,7 @@ export class AudioHandler {
 				{
 					headers: {
 						"Content-Type": "multipart/form-data",
-						Authorization: `Bearer ${this.plugin.settings.apiKey}`,
+						Authorization: `Bearer ${this.apiKey}`,
 					},
 				}
 			);
