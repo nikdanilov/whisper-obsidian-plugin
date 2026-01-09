@@ -20,6 +20,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		containerEl.empty();
 		this.createHeader();
 		this.createApiKeySetting();
+		this.createApiKeySecretIDSetting();
 		this.createApiUrlSetting();
 		this.createModelSetting();
 		this.createPromptSetting();
@@ -75,6 +76,19 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			this.plugin.settings.apiKey,
 			async (value) => {
 				this.plugin.settings.apiKey = value;
+				await this.settingsManager.saveSettings(this.plugin.settings);
+			}
+		);
+	}
+
+	private createApiKeySecretIDSetting(): void {
+		this.createTextSetting(
+			"API Key Secret ID",
+			"Obsidian Secret Storage ID with your API key",
+			"OPEN_AI_API_KEY",
+			this.plugin.settings.apiKeySecretID ?? "",
+			async (value) => {
+				this.plugin.settings.apiKeySecretID = value;
 				await this.settingsManager.saveSettings(this.plugin.settings);
 			}
 		);
