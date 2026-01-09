@@ -16,7 +16,7 @@ export interface WhisperSettings {
 
 export const DEFAULT_SETTINGS: WhisperSettings = {
 	apiKey: "",
-	apiKeySecretID: "OPENAI_API_KEY",
+	apiKeySecretID: "openai-api-key",
 	apiUrl: "https://api.openai.com/v1/audio/transcriptions",
 	model: "whisper-1",
 	prompt: "",
