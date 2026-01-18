@@ -44,6 +44,8 @@ Both "Start/Stop recording" and "Upload Audio File" actions can also be accessed
 
 -   Language: Specify the language of the message being whispered. For a list of languages and codes, consult this [link](https://github.com/openai/whisper/blob/main/whisper/tokenizer.py).
 
+-   Audio input device: Select the microphone or audio input device to use for recording. Choose "Default" to use your system's default microphone, or select a specific device from the dropdown list of available audio input devices.
+
 -   Save recording: Toggle this option to save the audio file after sending it to the Whisper API. When enabled, you can specify the path in the vault where the audio files should be saved.
 
 -   Recordings folder: Specify the path in the vault where to save the audio files. Example: `folder/audio`. This option is only available if "Save recording" is enabled.
