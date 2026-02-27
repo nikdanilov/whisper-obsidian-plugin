@@ -8,6 +8,9 @@ export interface WhisperSettings {
 	language: string;
 	saveAudioFile: boolean;
 	saveAudioFilePath: string;
+	embedAudioInCurrentNote: boolean;
+	inlineAudioReferenceType: "embed" | "link";
+	inlineAudioReferencePosition: "above" | "below";
 	debugMode: boolean;
 	createNewFileAfterRecording: boolean;
 	createNewFileAfterRecordingPath: string;
@@ -21,6 +24,9 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	language: "en",
 	saveAudioFile: true,
 	saveAudioFilePath: "",
+	embedAudioInCurrentNote: false,
+	inlineAudioReferenceType: "embed",
+	inlineAudioReferencePosition: "above",
 	debugMode: false,
 	createNewFileAfterRecording: true,
 	createNewFileAfterRecordingPath: "",

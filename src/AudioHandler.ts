@@ -44,6 +44,7 @@ export class AudioHandler {
 		if (this.plugin.settings.prompt)
 			formData.append("prompt", this.plugin.settings.prompt);
 
+		let savedAudioFilePath: string | undefined;
 		try {
 			// If the saveAudioFile setting is true, save the audio file
 			if (this.plugin.settings.saveAudioFile) {
@@ -52,6 +53,7 @@ export class AudioHandler {
 					audioFilePath,
 					new Uint8Array(arrayBuffer)
 				);
+				savedAudioFilePath = audioFilePath;
 				new Notice("Audio saved successfully.");
 			}
 		} catch (err) {
@@ -79,11 +81,25 @@ export class AudioHandler {
 				this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
 			const shouldCreateNewFile =
 				this.plugin.settings.createNewFileAfterRecording || !activeView;
+			const transcriptionText = response.data?.text ?? "";
+			const audioEmbed = savedAudioFilePath
+				? `![[${savedAudioFilePath}]]`
+				: "";
+			const audioLink = savedAudioFilePath
+				? `[[${savedAudioFilePath}]]`
+				: "";
+			const inlineAudioReference =
+				this.plugin.settings.inlineAudioReferenceType === "link"
+					? audioLink
+					: audioEmbed;
 
 			if (shouldCreateNewFile) {
+				const noteContent = audioEmbed
+					? `${audioEmbed}\n${transcriptionText}`
+					: transcriptionText;
 				await this.plugin.app.vault.create(
 					noteFilePath,
-					`![[${audioFilePath}]]\n${response.data.text}`
+					noteContent
 				);
 				await this.plugin.app.workspace.openLinkText(
 					noteFilePath,
@@ -97,13 +113,25 @@ export class AudioHandler {
 						MarkdownView
 					)?.editor;
 				if (editor) {
+					const outputText =
+						this.plugin.settings.embedAudioInCurrentNote &&
+						inlineAudioReference
+							? this.plugin.settings.inlineAudioReferencePosition ===
+							  "below"
+								? `${transcriptionText}\n${inlineAudioReference}`
+								: `${inlineAudioReference}\n${transcriptionText}`
+							: transcriptionText;
 					const cursorPosition = editor.getCursor();
-					editor.replaceRange(response.data.text, cursorPosition);
+					editor.replaceRange(outputText, cursorPosition);
 
 					// Move the cursor to the end of the inserted text
+					const lines = outputText.split("\n");
 					const newPosition = {
-						line: cursorPosition.line,
-						ch: cursorPosition.ch + response.data.text.length,
+						line: cursorPosition.line + lines.length - 1,
+						ch:
+							lines.length === 1
+								? cursorPosition.ch + lines[0].length
+								: lines[lines.length - 1].length,
 					};
 					editor.setCursor(newPosition);
 				}

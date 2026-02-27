@@ -7,6 +7,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private settingsManager: SettingsManager;
 	private createNewFileInput: Setting;
 	private saveAudioFileInput: Setting;
+	private inlineAudioEmbedInput: Setting;
+	private inlineAudioReferenceTypeInput: Setting;
+	private inlineAudioReferencePositionInput: Setting;
 
 	constructor(app: App, plugin: Whisper) {
 		super(app, plugin);
@@ -26,6 +29,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createLanguageSetting();
 		this.createSaveAudioFileToggleSetting();
 		this.createSaveAudioFilePathSetting();
+		this.createInlineAudioEmbedToggleSetting();
+		this.createInlineAudioReferenceTypeSetting();
+		this.createInlineAudioReferencePositionSetting();
 		this.createNewFileToggleSetting();
 		this.createNewFilePathSetting();
 		this.createDebugModeToggleSetting();
@@ -145,11 +151,19 @@ export class WhisperSettingsTab extends PluginSettingTab {
 						this.plugin.settings.saveAudioFile = value;
 						if (!value) {
 							this.plugin.settings.saveAudioFilePath = "";
+							this.plugin.settings.embedAudioInCurrentNote = false;
 						}
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
 						this.saveAudioFileInput.setDisabled(!value);
+						this.inlineAudioEmbedInput.setDisabled(!value);
+						this.inlineAudioReferenceTypeInput.setDisabled(
+							!value || !this.plugin.settings.embedAudioInCurrentNote
+						);
+						this.inlineAudioReferencePositionInput.setDisabled(
+							!value || !this.plugin.settings.embedAudioInCurrentNote
+						);
 					})
 			);
 	}
@@ -172,6 +186,79 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					})
 			)
 			.setDisabled(!this.plugin.settings.saveAudioFile);
+	}
+
+	private createInlineAudioEmbedToggleSetting(): void {
+		this.inlineAudioEmbedInput = new Setting(this.containerEl)
+			.setName("Embed audio in current note")
+			.setDesc(
+				"When 'Save transcription' is off, insert the saved audio embed (![[...]]) with the transcription at your cursor."
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.embedAudioInCurrentNote)
+					.onChange(async (value) => {
+						this.plugin.settings.embedAudioInCurrentNote = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+						const disabled =
+							!this.plugin.settings.saveAudioFile || !value;
+						this.inlineAudioReferenceTypeInput.setDisabled(disabled);
+						this.inlineAudioReferencePositionInput.setDisabled(
+							disabled
+						);
+					});
+			})
+			.setDisabled(!this.plugin.settings.saveAudioFile);
+	}
+
+	private createInlineAudioReferenceTypeSetting(): void {
+		this.inlineAudioReferenceTypeInput = new Setting(this.containerEl)
+			.setName("Audio reference type")
+			.setDesc("Choose whether to insert an embed or a link.")
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOption("embed", "Embed (![[...]] )")
+					.addOption("link", "Link ([[...]] )")
+					.setValue(this.plugin.settings.inlineAudioReferenceType)
+					.onChange(async (value) => {
+						this.plugin.settings.inlineAudioReferenceType = value as
+							| "embed"
+							| "link";
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					})
+			)
+			.setDisabled(
+				!this.plugin.settings.saveAudioFile ||
+					!this.plugin.settings.embedAudioInCurrentNote
+			);
+	}
+
+	private createInlineAudioReferencePositionSetting(): void {
+		this.inlineAudioReferencePositionInput = new Setting(this.containerEl)
+			.setName("Audio reference position")
+			.setDesc("Insert audio reference above or below transcription text.")
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOption("above", "Above transcription")
+					.addOption("below", "Below transcription")
+					.setValue(this.plugin.settings.inlineAudioReferencePosition)
+					.onChange(async (value) => {
+						this.plugin.settings.inlineAudioReferencePosition = value as
+							| "above"
+							| "below";
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					})
+			)
+			.setDisabled(
+				!this.plugin.settings.saveAudioFile ||
+					!this.plugin.settings.embedAudioInCurrentNote
+			);
 	}
 
 	private createNewFileToggleSetting(): void {
