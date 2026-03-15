@@ -1,4 +1,5 @@
 import { Plugin } from "obsidian";
+import { MAX_FILE_SIZE_MB, DEFAULT_API_URL, DEFAULT_MODEL } from "./constants";
 
 export interface WhisperSettings {
 	apiKey: string;
@@ -11,12 +12,13 @@ export interface WhisperSettings {
 	debugMode: boolean;
 	createNewFileAfterRecording: boolean;
 	createNewFileAfterRecordingPath: string;
+	maxFileSizeMB: number;
 }
 
 export const DEFAULT_SETTINGS: WhisperSettings = {
 	apiKey: "",
-	apiUrl: "https://api.openai.com/v1/audio/transcriptions",
-	model: "whisper-1",
+	apiUrl: DEFAULT_API_URL,
+	model: DEFAULT_MODEL,
 	prompt: "",
 	language: "en",
 	saveAudioFile: true,
@@ -24,6 +26,7 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	debugMode: false,
 	createNewFileAfterRecording: true,
 	createNewFileAfterRecordingPath: "",
+	maxFileSizeMB: MAX_FILE_SIZE_MB,
 };
 
 export class SettingsManager {

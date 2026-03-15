@@ -1,11 +1,11 @@
 {
-  "id": "whisper",
-  "name": "Whisper",
-  "version": "1.5.5",
+  "id": "whisper-alive",
+  "name": "Whisper Alive",
+  "version": "1.6.0",
   "minAppVersion": "0.15.0",
-  "description": "Speech-to-text in Obsidian using OpenAI Whisper",
-  "author": "Nik Danilov",
-  "authorUrl": "https://nikdanilov.com",
-  "fundingUrl": "patreon.com/nikdanilov",
+  "description": "Speech-to-text in Obsidian using OpenAI Whisper. Fork of Whisper extension.",
+  "author": "Antavik",
+  "authorUrl": "",
+  "fundingUrl": "",
   "isDesktopOnly": false
 }

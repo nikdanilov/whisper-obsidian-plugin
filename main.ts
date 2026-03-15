@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { Notice, Plugin } from "obsidian";
 import { Timer } from "src/Timer";
 import { Controls } from "src/Controls";
 import { AudioHandler } from "src/AudioHandler";
@@ -7,19 +7,19 @@ import { SettingsManager, WhisperSettings } from "src/SettingsManager";
 import { NativeAudioRecorder } from "src/AudioRecorder";
 import { RecordingStatus, StatusBar } from "src/StatusBar";
 export default class Whisper extends Plugin {
-	settings: WhisperSettings;
-	settingsManager: SettingsManager;
-	timer: Timer;
-	recorder: NativeAudioRecorder;
-	audioHandler: AudioHandler;
+	settings!: WhisperSettings;
+	settingsManager!: SettingsManager;
+	timer!: Timer;
+	recorder!: NativeAudioRecorder;
+	audioHandler!: AudioHandler;
 	controls: Controls | null = null;
-	statusBar: StatusBar;
+	statusBar!: StatusBar;
 
 	async onload() {
 		this.settingsManager = new SettingsManager(this);
 		this.settings = await this.settingsManager.loadSettings();
 
-		this.addRibbonIcon("activity", "Open recording controls", (evt) => {
+		this.addRibbonIcon("audio-lines", "Whisper recording controls", (evt) => {
 			if (!this.controls) {
 				this.controls = new Controls(this);
 			}
@@ -42,6 +42,8 @@ export default class Whisper extends Plugin {
 			this.controls.close();
 		}
 
+		this.timer.reset();
+		this.recorder.stopRecording();
 		this.statusBar.remove();
 	}
 
@@ -49,7 +51,12 @@ export default class Whisper extends Plugin {
 		this.addCommand({
 			id: "start-stop-recording",
 			name: "Start/stop recording",
+			icon: "microphone",
 			callback: async () => {
+				if (this.statusBar.status === RecordingStatus.Processing) {
+					return;
+				}
+
 				if (this.statusBar.status !== RecordingStatus.Recording) {
 					this.statusBar.updateStatus(RecordingStatus.Recording);
 					await this.recorder.startRecording();
@@ -67,17 +74,13 @@ export default class Whisper extends Plugin {
 					this.statusBar.updateStatus(RecordingStatus.Idle);
 				}
 			},
-			hotkeys: [
-				{
-					modifiers: ["Alt"],
-					key: "Q",
-				},
-			],
+			hotkeys: [],
 		});
 
 		this.addCommand({
 			id: "upload-audio-file",
 			name: "Upload audio file",
+			icon: "upload",
 			callback: () => {
 				// Create an input element for file selection
 				const fileInput = document.createElement("input");
@@ -89,9 +92,15 @@ export default class Whisper extends Plugin {
 					const files = (event.target as HTMLInputElement).files;
 					if (files && files.length > 0) {
 						const file = files[0];
+						const maxSizeBytes = this.settings.maxFileSizeMB * 1024 * 1024;
+						if (file.size > maxSizeBytes) {
+							new Notice(
+								`File size (${(file.size / (1024 * 1024)).toFixed(1)} MB) exceeds the maximum allowed size of ${this.settings.maxFileSizeMB} MB.`
+							);
+							return;
+						}
 						const fileName = file.name;
 						const audioBlob = file.slice(0, file.size, file.type);
-						// Use audioBlob to send or save the uploaded audio as needed
 						await this.audioHandler.sendAudioData(
 							audioBlob,
 							fileName

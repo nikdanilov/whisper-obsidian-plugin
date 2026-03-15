@@ -17,8 +17,6 @@ Click on the ribbon button to open the recording controls interface.
 
 Use the "Start" button to begin recording. You can pause and resume the recording using the "Pause/Resume" button. Click the "Stop" button once you're done. After stopping the recording, the plugin will automatically transcribe the audio and create a new note with the transcribed content and linked audio file in the specified folder.
 
-> You can quickly start or stop recording using the `Alt + Q` shortcut.
-
 ### Upload Existing Audio File
 
 You can also transcribe an existing audio file:
@@ -52,6 +50,8 @@ Both "Start/Stop recording" and "Upload Audio File" actions can also be accessed
 
 -   Transcriptions folder: Specify the path in the vault where to save the transcription files. Example: `folder/note`. This option is only available if "Save transcription" is enabled.
 
+-   Max file size (MB): Maximum allowed recording or uploaded file size in megabytes. Files exceeding this limit will be rejected before being sent to the API. The default is 25 MB, which matches the Whisper API limit.
+
 ## 🤝 Contributing
 
 We welcome and appreciate contributions, issue reports, and feature requests from the community! Feel free to visit the [Issues](https://github.com/nikdanilov/whisper-obsidian-plugin/issues) page to share your thoughts and suggestions.
@@ -69,15 +69,5 @@ If you want to install this plugin manually, use the following steps:
 2. Click on `Reload plugins` button inside `Settings > Community plugins`.
 3. Locate the "Whisper" plugin and enable it.
 4. In the plugin settings include your OpenAI API key.
-
-## 🤩 Say Thank You
-
-Are you finding value in this plugin? Great! You can fuel my coding sessions and share your appreciation by buying me a coffee [here](https://ko-fi.com/nikdanilov).
-
-Help others discover the magic of the Obsidian Whisper Plugin! I'd be thrilled if you could share your experiences on Twitter, Reddit, or your preferred social media platform!
-
-You can find me on Twitter [@nikdanilov\_](https://twitter.com/nikdanilov_).
-
-[<img style="float:left" src="https://user-images.githubusercontent.com/14358394/115450238-f39e8100-a21b-11eb-89d0-fa4b82cdbce8.png" width="200">](https://ko-fi.com/nikdanilov)
 
 ---

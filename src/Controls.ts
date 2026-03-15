@@ -1,5 +1,5 @@
 import Whisper from "main";
-import { ButtonComponent, Modal } from "obsidian";
+import { ButtonComponent, Modal, setIcon } from "obsidian";
 import { RecordingStatus } from "./StatusBar";
 
 export class Controls extends Modal {
@@ -8,6 +8,7 @@ export class Controls extends Modal {
 	private pauseButton: ButtonComponent;
 	private stopButton: ButtonComponent;
 	private timerDisplay: HTMLElement;
+	private isStopping = false;
 
 	constructor(plugin: Whisper) {
 		super(plugin.app);
@@ -31,30 +32,33 @@ export class Controls extends Modal {
 		// Add record button
 		this.startButton = new ButtonComponent(buttonGroupEl);
 		this.startButton
-			.setIcon("microphone")
-			.setButtonText(" Record")
 			.onClick(this.startRecording.bind(this))
 			.buttonEl.addClass("button-component");
+		this.setButtonIconAndText(this.startButton.buttonEl, "microphone", "Record");
 
 		// Add pause button
 		this.pauseButton = new ButtonComponent(buttonGroupEl);
 		this.pauseButton
-			.setIcon("pause")
-			.setButtonText(" Pause")
 			.onClick(this.pauseRecording.bind(this))
 			.buttonEl.addClass("button-component");
+		this.setButtonIconAndText(this.pauseButton.buttonEl, "pause", "Pause");
 
 		// Add stop button
 		this.stopButton = new ButtonComponent(buttonGroupEl);
 		this.stopButton
-			.setIcon("square")
-			.setButtonText(" Stop")
 			.onClick(this.stopRecording.bind(this))
 			.buttonEl.addClass("button-component");
+		this.setButtonIconAndText(this.stopButton.buttonEl, "square", "Stop");
 	}
 
 	async startRecording() {
-		console.log("start");
+		if (this.isStopping) {
+			return;
+		}
+
+		if (this.plugin.settings.debugMode) {
+			console.log("start");
+		}
 		this.plugin.statusBar.updateStatus(RecordingStatus.Recording);
 		await this.plugin.recorder.startRecording();
 		this.plugin.timer.start();
@@ -62,14 +66,27 @@ export class Controls extends Modal {
 	}
 
 	async pauseRecording() {
-		console.log("pausing recording...");
+		if (this.isStopping) {
+			return;
+		}
+
+		if (this.plugin.settings.debugMode) {
+			console.log("pausing recording...");
+		}
 		await this.plugin.recorder.pauseRecording();
 		this.plugin.timer.pause();
 		this.resetGUI();
 	}
 
 	async stopRecording() {
-		console.log("stopping recording...");
+		if (this.isStopping) {
+			return;
+		}
+
+		this.isStopping = true;
+		if (this.plugin.settings.debugMode) {
+			console.log("stopping recording...");
+		}
 		this.plugin.statusBar.updateStatus(RecordingStatus.Processing);
 		const blob = await this.plugin.recorder.stopRecording();
 		this.plugin.timer.reset();
@@ -81,6 +98,7 @@ export class Controls extends Modal {
 			.replace(/[:.]/g, "-")}.${extension}`;
 		await this.plugin.audioHandler.sendAudioData(blob, fileName);
 		this.plugin.statusBar.updateStatus(RecordingStatus.Idle);
+		this.isStopping = false;
 		this.close();
 	}
 
@@ -97,8 +115,17 @@ export class Controls extends Modal {
 		this.pauseButton.setDisabled(recorderState === "inactive");
 		this.stopButton.setDisabled(recorderState === "inactive");
 
-		this.pauseButton.setButtonText(
-			recorderState === "paused" ? " Resume" : " Pause"
+		const isPaused = recorderState === "paused";
+		this.setButtonIconAndText(
+			this.pauseButton.buttonEl,
+			isPaused ? "play" : "pause",
+			isPaused ? "Resume" : "Pause"
 		);
+	}
+
+	private setButtonIconAndText(el: HTMLElement, icon: string, text: string) {
+		el.empty();
+		setIcon(el, icon);
+		el.createSpan({ text });
 	}
 }

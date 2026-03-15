@@ -1,12 +1,13 @@
 import Whisper from "main";
-import { App, PluginSettingTab, Setting, TFolder } from "obsidian";
+import { App, Notice, PluginSettingTab, Setting, TFolder } from "obsidian";
+import { DEFAULT_MODEL, MAX_FILE_SIZE_MB } from "./constants";
 import { SettingsManager } from "./SettingsManager";
 
 export class WhisperSettingsTab extends PluginSettingTab {
 	private plugin: Whisper;
 	private settingsManager: SettingsManager;
-	private createNewFileInput: Setting;
-	private saveAudioFileInput: Setting;
+	private createNewFileInput!: Setting;
+	private saveAudioFileInput!: Setting;
 
 	constructor(app: App, plugin: Whisper) {
 		super(app, plugin);
@@ -28,6 +29,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createSaveAudioFilePathSetting();
 		this.createNewFileToggleSetting();
 		this.createNewFilePathSetting();
+		this.createMaxFileSizeSetting();
 		this.createDebugModeToggleSetting();
 	}
 
@@ -68,16 +70,20 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	}
 
 	private createApiKeySetting(): void {
-		this.createTextSetting(
-			"API Key",
-			"Enter your OpenAI API key",
-			"sk-...xxxx",
-			this.plugin.settings.apiKey,
-			async (value) => {
-				this.plugin.settings.apiKey = value;
-				await this.settingsManager.saveSettings(this.plugin.settings);
-			}
-		);
+		new Setting(this.containerEl)
+			.setName("API Key")
+			.setDesc("Enter your OpenAI API key")
+			.addText((text) => {
+				text.setPlaceholder("sk-...xxxx")
+					.setValue(this.plugin.settings.apiKey)
+					.onChange(async (value) => {
+						this.plugin.settings.apiKey = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+				text.inputEl.type = "password";
+			});
 	}
 
 	private createApiUrlSetting(): void {
@@ -94,16 +100,20 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	}
 
 	private createModelSetting(): void {
-		this.createTextSetting(
-			"Model",
-			"Specify the machine learning model to use for generating text",
-			"whisper-1",
-			this.plugin.settings.model,
-			async (value) => {
-				this.plugin.settings.model = value;
-				await this.settingsManager.saveSettings(this.plugin.settings);
-			}
-		);
+		new Setting(this.containerEl)
+			.setName("Model")
+			.setDesc(
+				"Specify the machine learning model to use for generating text."
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder(DEFAULT_MODEL)
+					.setValue(this.plugin.settings.model)
+					.onChange(async (value) => {
+						this.plugin.settings.model = value;
+						await this.settingsManager.saveSettings(this.plugin.settings);
+					})
+			);
 	}
 
 	private createPromptSetting(): void {
@@ -219,6 +229,32 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			});
 	}
 
+	private createMaxFileSizeSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Max file size (MB)")
+			.setDesc(
+				`Maximum allowed recording file size in megabytes. The Whisper API limit is ${MAX_FILE_SIZE_MB} MB.`
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder(String(MAX_FILE_SIZE_MB))
+					.setValue(String(this.plugin.settings.maxFileSizeMB))
+					.onChange(async (value) => {
+						const parsed = Number(value);
+						if (!isNaN(parsed) && parsed > 0 && parsed <= MAX_FILE_SIZE_MB) {
+							this.plugin.settings.maxFileSizeMB = parsed;
+							await this.settingsManager.saveSettings(
+								this.plugin.settings
+							);
+						} else {
+							new Notice(
+								`Invalid file size. Please enter a number between 1 and ${MAX_FILE_SIZE_MB}.`
+							);
+						}
+					})
+			);
+	}
+
 	private createDebugModeToggleSetting(): void {
 		new Setting(this.containerEl)
 			.setName("Debug Mode")
@@ -230,6 +266,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.debugMode)
 					.onChange(async (value) => {
 						this.plugin.settings.debugMode = value;
+						this.plugin.recorder.setDebug(value);
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);

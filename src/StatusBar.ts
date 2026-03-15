@@ -24,19 +24,25 @@ export class StatusBar {
 
 	updateStatusBarItem() {
 		if (this.statusBarItem) {
+			this.statusBarItem.removeClass(
+				"whisper-status--recording",
+				"whisper-status--processing",
+				"whisper-status--idle"
+			);
+
 			switch (this.status) {
 				case RecordingStatus.Recording:
 					this.statusBarItem.textContent = "Recording...";
-					this.statusBarItem.style.color = "red";
+					this.statusBarItem.addClass("whisper-status--recording");
 					break;
 				case RecordingStatus.Processing:
 					this.statusBarItem.textContent = "Processing audio...";
-					this.statusBarItem.style.color = "orange";
+					this.statusBarItem.addClass("whisper-status--processing");
 					break;
 				case RecordingStatus.Idle:
 				default:
 					this.statusBarItem.textContent = "Whisper Idle";
-					this.statusBarItem.style.color = "green";
+					this.statusBarItem.addClass("whisper-status--idle");
 					break;
 			}
 		}

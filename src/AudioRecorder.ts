@@ -22,6 +22,11 @@ export class NativeAudioRecorder implements AudioRecorder {
 	private chunks: BlobPart[] = [];
 	private recorder: MediaRecorder | null = null;
 	private mimeType: string | undefined;
+	private debug = false;
+
+	setDebug(enabled: boolean): void {
+		this.debug = enabled;
+	}
 
 	getRecordingState(): "inactive" | "recording" | "paused" | undefined {
 		return this.recorder?.state;
@@ -47,7 +52,9 @@ export class NativeAudioRecorder implements AudioRecorder {
 				const recorder = new MediaRecorder(stream, options);
 
 				recorder.addEventListener("dataavailable", (e: BlobEvent) => {
-					console.log("dataavailable", e.data.size);
+					if (this.debug) {
+						console.log("dataavailable", e.data.size);
+					}
 					this.chunks.push(e.data);
 				});
 
@@ -80,7 +87,9 @@ export class NativeAudioRecorder implements AudioRecorder {
 				const blob = new Blob(this.chunks, { type: this.mimeType });
 				this.chunks.length = 0;
 
-				console.log("Stop recording (no active recorder):", blob);
+				if (this.debug) {
+					console.log("Stop recording (no active recorder):", blob);
+				}
 
 				resolve(blob);
 			} else {
@@ -92,7 +101,9 @@ export class NativeAudioRecorder implements AudioRecorder {
 						});
 						this.chunks.length = 0;
 
-						console.log("Stop recording (active recorder):", blob);
+						if (this.debug) {
+							console.log("Stop recording (active recorder):", blob);
+						}
 
 						// will stop all the tracks associated with the stream, effectively releasing any resources (like the mic) used by them
 						if (this.recorder) {

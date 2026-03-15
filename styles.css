@@ -11,12 +11,14 @@
 	gap: 10px;
 }
 .recording-controls .button-component {
-	padding: 5px 10px;
-}
-
-.recording-controls .button-component {
+	padding: 8px 16px;
+	min-width: 110px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
 	background-color: var(--text-accent);
-	color: var(--text-light);
+	color: #FFF;
 	cursor: pointer;
 }
 
@@ -29,4 +31,17 @@
 	background-color: var(--text-accent-muted);
 	color: var(--text-muted);
 	cursor: not-allowed;
+}
+
+/* StatusBar status colors */
+.whisper-status--recording {
+	color: var(--text-error);
+}
+
+.whisper-status--processing {
+	color: var(--text-warning);
+}
+
+.whisper-status--idle {
+	color: var(--text-success);
 }
