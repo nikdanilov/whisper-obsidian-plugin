@@ -1,6 +1,7 @@
 import Whisper from "main";
 import { ButtonComponent, Modal, Notice, setIcon } from "obsidian";
 import { RecordingStatus } from "./StatusBar";
+import { bytesToMegabytes, megabytesToBytes } from "./utils";
 
 export class Controls extends Modal {
 	private plugin: Whisper;
@@ -103,11 +104,19 @@ export class Controls extends Modal {
 		this.plugin.timer.reset();
 		this.resetGUI();
 
+		this.stopButton.setDisabled(true);
+		this.setButtonIconAndText(this.stopButton.buttonEl, "clock", "Processing");
+
 		const extension = this.plugin.recorder.getMimeType()?.split("/")[1];
 		const fileName = `${new Date()
 			.toISOString()
 			.replace(/[:.]/g, "-")}.${extension}`;
-		await this.plugin.audioHandler.sendAudioData(blob, fileName);
+		try {
+			await this.plugin.audioHandler.sendAudioData(blob, fileName);
+		} finally {
+			this.stopButton.setDisabled(false);
+			this.setButtonIconAndText(this.stopButton.buttonEl, "square", "Stop");
+		}
 		this.plugin.statusBar.updateStatus(RecordingStatus.Idle);
 		this.isStopping = false;
 		this.close();
@@ -122,11 +131,10 @@ export class Controls extends Modal {
 			const files = (event.target as HTMLInputElement).files;
 			if (files && files.length > 0) {
 				const file = files[0];
-				const maxSizeBytes =
-					this.plugin.settings.maxFileSizeMB * 1024 * 1024;
+				const maxSizeBytes = megabytesToBytes(this.plugin.settings.maxFileSizeMB);
 				if (file.size > maxSizeBytes) {
 					new Notice(
-						`File size (${(file.size / (1024 * 1024)).toFixed(1)} MB) exceeds the maximum allowed size of ${this.plugin.settings.maxFileSizeMB} MB.`
+						`File size (${bytesToMegabytes(file.size)} MB) exceeds the maximum allowed size of ${this.plugin.settings.maxFileSizeMB} MB.`
 					);
 					return;
 				}

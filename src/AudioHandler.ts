@@ -1,6 +1,6 @@
 import Whisper from "main";
 import { Notice, MarkdownView, requestUrl } from "obsidian";
-import { getBaseFileName } from "./utils";
+import { bytesToMegabytes, getBaseFileName, megabytesToBytes } from "./utils";
 
 export class AudioHandler {
 	private plugin: Whisper;
@@ -29,18 +29,16 @@ export class AudioHandler {
 			new Notice(`Sending audio data size: ${blob.size / 1000} KB`);
 		}
 
-		const maxSizeBytes = this.plugin.settings.maxFileSizeMB * 1024 * 1024;
+		const maxSizeBytes = megabytesToBytes(this.plugin.settings.maxFileSizeMB);
 		if (blob.size > maxSizeBytes) {
 			new Notice(
-				`Recording file size (${(blob.size / (1024 * 1024)).toFixed(1)} MB) exceeds the maximum allowed size of ${this.plugin.settings.maxFileSizeMB} MB. Please record a shorter clip.`
+				`Recording file size (${bytesToMegabytes(blob.size)} MB) exceeds the maximum allowed size of ${this.plugin.settings.maxFileSizeMB} MB. Please record a shorter clip.`
 			);
 			return;
 		}
 
 		if (!this.plugin.settings.apiKey) {
-			new Notice(
-				"API key is missing. Please add your API key in the settings."
-			);
+			new Notice("API key is missing. Please add your API key in the settings.");
 			return;
 		}
 
@@ -111,8 +109,7 @@ export class AudioHandler {
 			});
 
 			// Determine if a new file should be created
-			const activeView =
-				this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
+			const activeView = this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
 			const shouldCreateNewFile =
 				this.plugin.settings.createNewFileAfterRecording || !activeView;
 
@@ -127,10 +124,7 @@ export class AudioHandler {
 				await leaf.openFile(file);
 			} else {
 				// Insert the transcription at the cursor position
-				const editor =
-					this.plugin.app.workspace.getActiveViewOfType(
-						MarkdownView
-					)?.editor;
+				const editor = this.plugin.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
 				if (editor) {
 					const cursorPosition = editor.getCursor();
 					editor.replaceRange(transcription, cursorPosition);

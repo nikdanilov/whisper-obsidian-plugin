@@ -28,6 +28,25 @@
 	cursor: pointer;
 }
 
+/* Mobile: move Upload to second row */
+.is-mobile .recording-controls .button-group {
+	flex-wrap: wrap;
+	gap: 8px;
+}
+.is-mobile .recording-controls .button-component {
+	min-width: 0;
+	flex: 1 1 0;
+}
+.is-mobile .recording-controls .button-divider {
+	width: 100%;
+	height: 0;
+	background-color: transparent;
+}
+.is-mobile .recording-controls .button-component:last-child {
+	flex: 0 0 auto;
+	min-width: 110px;
+}
+
 .recording-controls .button-component:hover {
 	background-color: var(--text-accent-hover);
 }

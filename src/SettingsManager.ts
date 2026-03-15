@@ -1,5 +1,5 @@
 import { Plugin } from "obsidian";
-import { MAX_FILE_SIZE_MB, DEFAULT_API_URL, DEFAULT_MODEL } from "./constants";
+import { MAX_FILE_SIZE_MB, DEFAULT_API_URL, DEFAULT_MODEL, DEFAULT_LANGUAGE } from "./constants";
 
 export interface WhisperSettings {
 	apiKey: string;
@@ -20,7 +20,7 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	apiUrl: DEFAULT_API_URL,
 	model: DEFAULT_MODEL,
 	prompt: "",
-	language: "en",
+	language: DEFAULT_LANGUAGE,
 	saveAudioFile: true,
 	saveAudioFilePath: "",
 	debugMode: false,

@@ -6,6 +6,7 @@ import { WhisperSettingsTab } from "src/WhisperSettingsTab";
 import { SettingsManager, WhisperSettings } from "src/SettingsManager";
 import { NativeAudioRecorder } from "src/AudioRecorder";
 import { RecordingStatus, StatusBar } from "src/StatusBar";
+import { bytesToMegabytes, megabytesToBytes } from "src/utils";
 export default class Whisper extends Plugin {
 	settings!: WhisperSettings;
 	settingsManager!: SettingsManager;
@@ -92,10 +93,10 @@ export default class Whisper extends Plugin {
 					const files = (event.target as HTMLInputElement).files;
 					if (files && files.length > 0) {
 						const file = files[0];
-						const maxSizeBytes = this.settings.maxFileSizeMB * 1024 * 1024;
+						const maxSizeBytes = megabytesToBytes(this.settings.maxFileSizeMB);
 						if (file.size > maxSizeBytes) {
 							new Notice(
-								`File size (${(file.size / (1024 * 1024)).toFixed(1)} MB) exceeds the maximum allowed size of ${this.settings.maxFileSizeMB} MB.`
+								`File size (${bytesToMegabytes(file.size)} MB) exceeds the maximum allowed size of ${this.settings.maxFileSizeMB} MB.`
 							);
 							return;
 						}

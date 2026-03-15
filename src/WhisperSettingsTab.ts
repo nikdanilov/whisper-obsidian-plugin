@@ -1,6 +1,6 @@
 import Whisper from "main";
 import { App, Notice, PluginSettingTab, Setting, TFolder } from "obsidian";
-import { DEFAULT_MODEL, MAX_FILE_SIZE_MB } from "./constants";
+import { DEFAULT_LANGUAGE, DEFAULT_MODEL, MAX_FILE_SIZE_MB } from "./constants";
 import { SettingsManager } from "./SettingsManager";
 
 export class WhisperSettingsTab extends PluginSettingTab {
@@ -33,40 +33,8 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createDebugModeToggleSetting();
 	}
 
-	private getUniqueFolders(): TFolder[] {
-		const files = this.app.vault.getMarkdownFiles();
-		const folderSet = new Set<TFolder>();
-
-		for (const file of files) {
-			const parentFolder = file.parent;
-			if (parentFolder && parentFolder instanceof TFolder) {
-				folderSet.add(parentFolder);
-			}
-		}
-
-		return Array.from(folderSet);
-	}
-
 	private createHeader(): void {
 		this.containerEl.createEl("h2", { text: "Settings for Whisper." });
-	}
-
-	private createTextSetting(
-		name: string,
-		desc: string,
-		placeholder: string,
-		value: string,
-		onChange: (value: string) => Promise<void>
-	): void {
-		new Setting(this.containerEl)
-			.setName(name)
-			.setDesc(desc)
-			.addText((text) =>
-				text
-					.setPlaceholder(placeholder)
-					.setValue(value)
-					.onChange(async (value) => await onChange(value))
-			);
 	}
 
 	private createApiKeySetting(): void {
@@ -87,16 +55,20 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	}
 
 	private createApiUrlSetting(): void {
-		this.createTextSetting(
-			"API URL",
-			"Specify the endpoint that will be used to make requests to",
-			"https://api.your-custom-url.com",
-			this.plugin.settings.apiUrl,
-			async (value) => {
-				this.plugin.settings.apiUrl = value;
-				await this.settingsManager.saveSettings(this.plugin.settings);
-			}
-		);
+		new Setting(this.containerEl)
+			.setName("API URL")
+			.setDesc(
+				"Specify the endpoint that will be used to make requests to"
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder("https://api.your-custom-url.com")
+					.setValue(this.plugin.settings.apiUrl)
+					.onChange(async (value) => {
+						this.plugin.settings.apiUrl = value;
+						await this.settingsManager.saveSettings(this.plugin.settings);
+					})
+			);
 	}
 
 	private createModelSetting(): void {
@@ -117,29 +89,35 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	}
 
 	private createPromptSetting(): void {
-		this.createTextSetting(
-			"Prompt",
-			"Optional: Add words with their correct spellings to help with transcription. Make sure it matches the chosen language.",
-			"Example: ZyntriQix, Digique Plus, CynapseFive",
-			this.plugin.settings.prompt,
-			async (value) => {
-				this.plugin.settings.prompt = value;
-				await this.settingsManager.saveSettings(this.plugin.settings);
-			}
-		);
+		new Setting(this.containerEl)
+			.setName("Prompt")
+			.setDesc(
+				"Optional: Add words with their correct spellings to help with transcription. Make sure it matches the chosen language."
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder("Example: ZyntriQix, Digique Plus, CynapseFive")
+					.setValue(this.plugin.settings.prompt)
+					.onChange(async (value) => {
+						this.plugin.settings.prompt = value;
+						await this.settingsManager.saveSettings(this.plugin.settings);
+					})
+			);
 	}
 
 	private createLanguageSetting(): void {
-		this.createTextSetting(
-			"Language",
-			"Specify the language of the message being whispered",
-			"en",
-			this.plugin.settings.language,
-			async (value) => {
-				this.plugin.settings.language = value;
-				await this.settingsManager.saveSettings(this.plugin.settings);
-			}
-		);
+		new Setting(this.containerEl)
+			.setName("Language")
+			.setDesc("Specify the language of the message being whispered")
+			.addText((text) =>
+				text
+					.setPlaceholder(DEFAULT_LANGUAGE)
+					.setValue(this.plugin.settings.language)
+					.onChange(async (value) => {
+						this.plugin.settings.language = value;
+						await this.settingsManager.saveSettings(this.plugin.settings);
+					})
+			);
 	}
 
 	private createSaveAudioFileToggleSetting(): void {
