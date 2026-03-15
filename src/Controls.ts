@@ -1,5 +1,5 @@
 import Whisper from "main";
-import { ButtonComponent, Modal, setIcon } from "obsidian";
+import { ButtonComponent, Modal, Notice, setIcon } from "obsidian";
 import { RecordingStatus } from "./StatusBar";
 
 export class Controls extends Modal {
@@ -7,6 +7,7 @@ export class Controls extends Modal {
 	private startButton: ButtonComponent;
 	private pauseButton: ButtonComponent;
 	private stopButton: ButtonComponent;
+	private uploadButton: ButtonComponent;
 	private timerDisplay: HTMLElement;
 	private isStopping = false;
 
@@ -49,6 +50,16 @@ export class Controls extends Modal {
 			.onClick(this.stopRecording.bind(this))
 			.buttonEl.addClass("button-component");
 		this.setButtonIconAndText(this.stopButton.buttonEl, "square", "Stop");
+
+		// Add divider
+		buttonGroupEl.createEl("div", { cls: "button-divider" });
+
+		// Add upload button
+		this.uploadButton = new ButtonComponent(buttonGroupEl);
+		this.uploadButton
+			.onClick(this.uploadAudio.bind(this))
+			.buttonEl.addClass("button-component");
+		this.setButtonIconAndText(this.uploadButton.buttonEl, "upload", "Upload");
 	}
 
 	async startRecording() {
@@ -100,6 +111,41 @@ export class Controls extends Modal {
 		this.plugin.statusBar.updateStatus(RecordingStatus.Idle);
 		this.isStopping = false;
 		this.close();
+	}
+
+	uploadAudio() {
+		const fileInput = document.createElement("input");
+		fileInput.type = "file";
+		fileInput.accept = "audio/*";
+
+		fileInput.onchange = async (event) => {
+			const files = (event.target as HTMLInputElement).files;
+			if (files && files.length > 0) {
+				const file = files[0];
+				const maxSizeBytes =
+					this.plugin.settings.maxFileSizeMB * 1024 * 1024;
+				if (file.size > maxSizeBytes) {
+					new Notice(
+						`File size (${(file.size / (1024 * 1024)).toFixed(1)} MB) exceeds the maximum allowed size of ${this.plugin.settings.maxFileSizeMB} MB.`
+					);
+					return;
+				}
+				this.plugin.statusBar.updateStatus(RecordingStatus.Processing);
+				this.uploadButton.setDisabled(true);
+				this.setButtonIconAndText(this.uploadButton.buttonEl, "clock", "Processing");
+				try {
+					const audioBlob = file.slice(0, file.size, file.type);
+					await this.plugin.audioHandler.sendAudioData(audioBlob, file.name);
+				} finally {
+					this.uploadButton.setDisabled(false);
+					this.setButtonIconAndText(this.uploadButton.buttonEl, "upload", "Upload");
+					this.plugin.statusBar.updateStatus(RecordingStatus.Idle);
+				}
+				this.close();
+			}
+		};
+
+		fileInput.click();
 	}
 
 	updateTimerDisplay() {

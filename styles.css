@@ -8,7 +8,13 @@
 .recording-controls .button-group {
 	display: flex;
 	justify-content: center;
+	align-items: center;
 	gap: 10px;
+}
+.recording-controls .button-divider {
+	width: 1px;
+	align-self: stretch;
+	background-color: var(--background-modifier-border);
 }
 .recording-controls .button-component {
 	padding: 8px 16px;
