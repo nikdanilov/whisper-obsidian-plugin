@@ -208,7 +208,7 @@ export class AudioHandler {
 				const vars = buildTemplateVariables(
 					outputText,
 					generatedTitle,
-					this.plugin.settings.saveAudioFile ? audioFilePath : ""
+					audioFilePath
 				);
 
 				// Resolve filename template
