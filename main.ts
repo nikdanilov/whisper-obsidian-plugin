@@ -42,6 +42,7 @@ export default class Whisper extends Plugin {
 		this.statusBar = new StatusBar(this);
 
 		this.addCommands();
+		this.registerUriHandler();
 
 		this.registerEvent(
 			this.app.workspace.on('file-menu', (menu, file) => {
@@ -73,6 +74,78 @@ export default class Whisper extends Plugin {
 		}
 
 		this.statusBar.remove();
+	}
+
+	registerUriHandler() {
+		// URI format: obsidian://whisper?action=start|stop|pause|cancel
+		// Default (no action): opens recording controls modal
+		this.registerObsidianProtocolHandler("whisper", async (params) => {
+			const action = params.action;
+
+			if (!action) {
+				// Default: open recording controls
+				if (!this.controls) {
+					this.controls = new Controls(this);
+				}
+				this.controls.open();
+				return;
+			}
+
+			switch (action) {
+				case "start":
+					if (this.statusBar.status === RecordingStatus.Recording ||
+						this.statusBar.status === RecordingStatus.Paused) {
+						new Notice("Already recording");
+						return;
+					}
+					this.statusBar.updateStatus(RecordingStatus.Recording);
+					await this.recorder.startRecording();
+					new Notice("Recording...");
+					break;
+
+				case "stop":
+					if (this.statusBar.status !== RecordingStatus.Recording &&
+						this.statusBar.status !== RecordingStatus.Paused) {
+						return;
+					}
+					this.statusBar.updateStatus(RecordingStatus.Processing);
+					const audioBlob = await this.recorder.stopRecording();
+					const extension = getExtensionFromMimeType(
+						this.recorder.getMimeType()
+					);
+					const fileName = `${new Date()
+						.toISOString()
+						.replace(/[:.]/g, "-")}.${extension}`;
+					await this.audioHandler.sendAudioData(audioBlob, fileName);
+					this.statusBar.updateStatus(RecordingStatus.Idle);
+					break;
+
+				case "pause":
+					if (this.statusBar.status === RecordingStatus.Recording) {
+						await this.recorder.pauseRecording();
+						this.statusBar.updateStatus(RecordingStatus.Paused);
+						new Notice("Recording paused");
+					} else if (this.statusBar.status === RecordingStatus.Paused) {
+						await this.recorder.pauseRecording();
+						this.statusBar.updateStatus(RecordingStatus.Recording);
+						new Notice("Recording resumed");
+					}
+					break;
+
+				case "cancel":
+					if (this.statusBar.status !== RecordingStatus.Recording &&
+						this.statusBar.status !== RecordingStatus.Paused) {
+						return;
+					}
+					await this.recorder.stopRecording();
+					this.statusBar.updateStatus(RecordingStatus.Idle);
+					new Notice("Recording cancelled");
+					break;
+
+				default:
+					new Notice(`✘ Unknown whisper action: ${action}`);
+			}
+		});
 	}
 
 	addCommands() {
