@@ -62,4 +62,17 @@ describe("Timer", () => {
 		vi.advanceTimersByTime(3000);
 		expect(callback).toHaveBeenCalledTimes(3);
 	});
+
+	it("ignores double-start (no duplicate intervals)", () => {
+		timer.start();
+		timer.start(); // should be a no-op
+		vi.advanceTimersByTime(3000);
+		expect(timer.getFormattedTime()).toBe("00:00:03"); // not 00:00:06
+	});
+
+	it("formats hours correctly", () => {
+		timer.start();
+		vi.advanceTimersByTime(3661000); // 1h 1m 1s
+		expect(timer.getFormattedTime()).toBe("01:01:01");
+	});
 });

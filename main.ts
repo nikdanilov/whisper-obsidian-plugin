@@ -48,15 +48,8 @@ export default class Whisper extends Plugin {
 
 				if (!(file instanceof TFile)) return;
 
-				if (!(
-					file.path.endsWith('mp3') ||
-					file.path.endsWith('mp4') ||
-					file.path.endsWith('mpeg') ||
-					file.path.endsWith('mpga') ||
-					file.path.endsWith('m4a') ||
-					file.path.endsWith('wav') ||
-					file.path.endsWith('webm')
-				)) return;
+				const audioExtensions = ['.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm', '.ogg'];
+				if (!audioExtensions.some(ext => file.path.endsWith(ext))) return;
 
 				menu.addItem((item) => {
 					item
