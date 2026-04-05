@@ -32,6 +32,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createResponseFormatSetting();
 		this.createNewFileToggleSetting();
 		this.createNewFilePathSetting();
+		this.createPasteAtCursorSetting();
 		this.createSendCursorContextSetting();
 		this.createDebugModeToggleSetting();
 	}
@@ -328,6 +329,24 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.createNewFileAfterRecordingPath =
 							value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+			});
+	}
+
+	private createPasteAtCursorSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Paste at cursor")
+			.setDesc(
+				"Insert transcription at cursor position in the active note"
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.pasteAtCursor)
+					.onChange(async (value) => {
+						this.plugin.settings.pasteAtCursor = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
