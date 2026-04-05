@@ -127,7 +127,13 @@ export default class Whisper extends Plugin {
 					const files = (event.target as HTMLInputElement).files;
 					if (files && files.length > 0) {
 						const file = files[0];
-						const fileName = file.name;
+						let fileName = file.name;
+						if (this.settings.ignoreUploadFilename) {
+							const extension = file.name.split(".").pop();
+							fileName = `${new Date()
+								.toISOString()
+								.replace(/[:.]/g, "-")}.${extension}`;
+						}
 						const audioBlob = file.slice(0, file.size, file.type);
 						// Use audioBlob to send or save the uploaded audio as needed
 						await this.audioHandler.sendAudioData(

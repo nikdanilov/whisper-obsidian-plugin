@@ -17,6 +17,7 @@ export interface WhisperSettings {
 	sendCursorContext: boolean;
 	audioLinkStyle: "embed" | "link";
 	pasteAtCursor: boolean;
+	ignoreUploadFilename: boolean;
 }
 
 export const DEFAULT_SETTINGS: WhisperSettings = {
@@ -36,6 +37,7 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	sendCursorContext: false,
 	audioLinkStyle: "embed",
 	pasteAtCursor: false,
+	ignoreUploadFilename: false,
 };
 
 export class SettingsManager {
