@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { DEFAULT_SETTINGS, WhisperSettings } from "../src/SettingsManager";
+import { DEFAULT_SETTINGS, PluginSettings } from "../src/SettingsManager";
 
 // We test AudioHandler logic by extracting and testing the key behaviors
 // since the actual class depends heavily on Obsidian + axios
 
-function buildFormData(settings: WhisperSettings, blob: Blob, fileName: string) {
+function buildFormData(settings: PluginSettings, blob: Blob, fileName: string) {
 	const formData = new FormData();
 	formData.append("file", blob, fileName);
 	formData.append("model", settings.model);
@@ -31,7 +31,7 @@ function buildFormData(settings: WhisperSettings, blob: Blob, fileName: string) 
 	return formData;
 }
 
-function buildHeaders(settings: WhisperSettings) {
+function buildHeaders(settings: PluginSettings) {
 	const headers: Record<string, string> = {
 		"Content-Type": "multipart/form-data",
 	};
@@ -42,14 +42,14 @@ function buildHeaders(settings: WhisperSettings) {
 	return headers;
 }
 
-function buildAudioFilePath(settings: WhisperSettings, fileName: string) {
+function buildAudioFilePath(settings: PluginSettings, fileName: string) {
 	return settings.saveAudioFilePath
 		? `${settings.saveAudioFilePath}/${fileName}`
 		: fileName;
 }
 
 function buildNoteContent(
-	settings: WhisperSettings,
+	settings: PluginSettings,
 	audioFilePath: string,
 	transcription: string
 ) {

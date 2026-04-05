@@ -11,6 +11,13 @@ export class AudioHandler {
 		this.plugin = plugin;
 	}
 
+	private getPostProcessingApiKey(): string {
+		const isAnthropic = this.plugin.settings.postProcessingModel.startsWith("claude");
+		return isAnthropic
+			? this.plugin.settings.anthropicApiKey
+			: this.plugin.settings.openAiApiKey || this.plugin.settings.apiKey;
+	}
+
 	private async ensureFolderExists(folderPath: string): Promise<void> {
 		if (
 			folderPath &&
@@ -127,9 +134,10 @@ export class AudioHandler {
 
 			// Post-process with LLM if enabled
 			if (this.plugin.settings.postProcessingEnabled) {
-				const ppApiKey = this.plugin.settings.postProcessingApiKey || this.plugin.settings.apiKey;
+				const ppApiKey = this.getPostProcessingApiKey();
 				if (!ppApiKey) {
-					new Notice("✘ Add a post-processing API key in settings");
+					const isAnthropic = this.plugin.settings.postProcessingModel.startsWith("claude");
+					new Notice(`✘ Add your ${isAnthropic ? "Anthropic" : "OpenAI"} API key in settings`);
 					return;
 				}
 				try {
@@ -157,7 +165,7 @@ export class AudioHandler {
 				this.plugin.settings.autoGenerateTitle &&
 				this.plugin.settings.createNewFileAfterRecording
 			) {
-				const ppApiKey = this.plugin.settings.postProcessingApiKey || this.plugin.settings.apiKey;
+				const ppApiKey = this.getPostProcessingApiKey();
 				if (ppApiKey) {
 					try {
 						const processor = new PostProcessor({

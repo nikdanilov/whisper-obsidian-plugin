@@ -8,7 +8,6 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private createNewFileInput: Setting;
 	private saveAudioFileInput: Setting;
 	private postProcessingModelInput: Setting;
-	private postProcessingApiKeyInput: Setting;
 	private postProcessingPromptInput: Setting;
 	private autoGenerateTitleInput: Setting;
 	private titleGenerationPromptInput: Setting;
@@ -25,42 +24,40 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "API" });
-		this.createApiKeySetting();
+		// --- API Keys ---
+		containerEl.createEl("h2", { text: "API Keys" });
+		this.createWhisperApiKeySetting();
+		this.createOpenAiApiKeySetting();
+		this.createAnthropicApiKeySetting();
+
+		// --- Whisper Settings ---
+		containerEl.createEl("h2", { text: "Whisper Settings" });
 		this.createApiUrlSetting();
 		this.createModelSetting();
-
-		containerEl.createEl("h2", { text: "Transcription" });
 		this.createLanguageSetting();
 		this.createPromptSetting();
 		this.createTemperatureSetting();
 		this.createResponseFormatSetting();
 		this.createSendCursorContextSetting();
-
-		containerEl.createEl("h2", { text: "Recording" });
 		// async — populates device dropdown after enumeration completes
 		void this.createAudioDeviceSetting();
 		this.createSaveAudioFileToggleSetting();
 		this.createSaveAudioFilePathSetting();
-
-		containerEl.createEl("h2", { text: "Output" });
 		this.createNewFileToggleSetting();
 		this.createNewFilePathSetting();
 		this.createPasteAtCursorSetting();
 		this.createAudioLinkStyleSetting();
 		this.createIgnoreUploadFilenameSetting();
+		this.createDebugModeToggleSetting();
 
-		containerEl.createEl("h2", { text: "Post-Processing" });
+		// --- Post-Processing Settings ---
+		containerEl.createEl("h2", { text: "Post-Processing Settings" });
 		this.createPostProcessingToggleSetting();
 		this.createPostProcessingModelSetting();
-		this.createPostProcessingApiKeySetting();
 		this.createPostProcessingPromptSetting();
 		this.createAutoGenerateTitleSetting();
 		this.createTitleGenerationPromptSetting();
 		this.createKeepOriginalTranscriptionSetting();
-
-		containerEl.createEl("h2", { text: "Advanced" });
-		this.createDebugModeToggleSetting();
 	}
 
 	private getUniqueFolders(): TFolder[] {
@@ -95,14 +92,40 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			);
 	}
 
-	private createApiKeySetting(): void {
+	private createWhisperApiKeySetting(): void {
 		this.createTextSetting(
-			"API Key",
-			"Enter your OpenAI API key",
+			"Whisper API Key",
+			"API key for Whisper transcription (OpenAI, Groq, or Azure)",
 			"sk-...xxxx",
 			this.plugin.settings.apiKey,
 			async (value) => {
 				this.plugin.settings.apiKey = value;
+				await this.settingsManager.saveSettings(this.plugin.settings);
+			}
+		);
+	}
+
+	private createOpenAiApiKeySetting(): void {
+		this.createTextSetting(
+			"OpenAI API Key",
+			"API key for GPT post-processing models",
+			"sk-...xxxx",
+			this.plugin.settings.openAiApiKey,
+			async (value) => {
+				this.plugin.settings.openAiApiKey = value;
+				await this.settingsManager.saveSettings(this.plugin.settings);
+			}
+		);
+	}
+
+	private createAnthropicApiKeySetting(): void {
+		this.createTextSetting(
+			"Anthropic API Key",
+			"API key for Claude post-processing models",
+			"sk-ant-...xxxx",
+			this.plugin.settings.anthropicApiKey,
+			async (value) => {
+				this.plugin.settings.anthropicApiKey = value;
 				await this.settingsManager.saveSettings(this.plugin.settings);
 			}
 		);
@@ -124,7 +147,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private createModelSetting(): void {
 		this.createTextSetting(
 			"Model",
-			"Specify the machine learning model to use for generating text",
+			"Model for transcription (whisper-1 for OpenAI, whisper-large-v3 for Groq)",
 			"whisper-1",
 			this.plugin.settings.model,
 			async (value) => {
@@ -414,9 +437,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createPostProcessingToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Enable post-processing")
+			.setName("Use post-processing")
 			.setDesc(
-				"Use an LLM to clean up transcriptions — fix grammar, remove filler words, and improve readability"
+				"Post-process transcriptions with an LLM to fix grammar, remove filler words, and improve readability"
 			)
 			.addToggle((toggle) => {
 				toggle
@@ -427,7 +450,6 @@ export class WhisperSettingsTab extends PluginSettingTab {
 							this.plugin.settings
 						);
 						this.postProcessingModelInput.setDisabled(!value);
-						this.postProcessingApiKeyInput.setDisabled(!value);
 						this.postProcessingPromptInput.setDisabled(!value);
 						this.autoGenerateTitleInput.setDisabled(!value);
 						this.titleGenerationPromptInput.setDisabled(
@@ -461,26 +483,6 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					);
 				});
 			})
-			.setDisabled(!this.plugin.settings.postProcessingEnabled);
-	}
-
-	private createPostProcessingApiKeySetting(): void {
-		this.postProcessingApiKeyInput = new Setting(this.containerEl)
-			.setName("Post-processing API key")
-			.setDesc(
-				"API key for the post-processing model. Leave empty to use the Whisper API key (OpenAI models only)."
-			)
-			.addText((text) =>
-				text
-					.setPlaceholder("sk-... or sk-ant-...")
-					.setValue(this.plugin.settings.postProcessingApiKey)
-					.onChange(async (value) => {
-						this.plugin.settings.postProcessingApiKey = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
-					})
-			)
 			.setDisabled(!this.plugin.settings.postProcessingEnabled);
 	}
 
