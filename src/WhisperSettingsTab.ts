@@ -46,6 +46,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 		containerEl.createEl("h2", { text: "Advanced" });
 		this.createDebugModeToggleSetting();
+
+		containerEl.createEl("h2", { text: "Beta" });
+		this.createRealtimeTranscriptionSetting();
 	}
 
 	private getUniqueFolders(): TFolder[] {
@@ -130,6 +133,24 @@ export class WhisperSettingsTab extends PluginSettingTab {
 				await this.settingsManager.saveSettings(this.plugin.settings);
 			}
 		);
+	}
+
+	private createRealtimeTranscriptionSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Realtime transcription")
+			.setDesc(
+				"Stream audio to OpenAI in real-time for live transcription as you speak"
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.useRealtimeTranscription)
+					.onChange(async (value) => {
+						this.plugin.settings.useRealtimeTranscription = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+			});
 	}
 
 	private createLanguageSetting(): void {

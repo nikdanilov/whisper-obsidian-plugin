@@ -121,50 +121,73 @@ export class AudioHandler {
 				}
 			);
 
-			if (this.plugin.settings.createNewFileAfterRecording) {
-				await this.ensureFolderExists(
-					this.plugin.settings.createNewFileAfterRecordingPath
-				);
-				let noteContent = response.data.text;
-				if (this.plugin.settings.saveAudioFile) {
-					const audioRef =
-						this.plugin.settings.audioLinkStyle === "link"
-							? `[[${audioFilePath}]]`
-							: `![[${audioFilePath}]]`;
-					noteContent = `${audioRef}\n${response.data.text}`;
-				}
-				await this.plugin.app.vault.create(
-					noteFilePath,
-					noteContent
-				);
-				await this.plugin.app.workspace.openLinkText(
-					noteFilePath,
-					"",
-					true
-				);
-			}
-
-			if (this.plugin.settings.pasteAtCursor) {
-				const editor =
-					this.plugin.app.workspace.getActiveViewOfType(
-						MarkdownView
-					)?.editor;
-				if (editor) {
-					const cursorPosition = editor.getCursor();
-					editor.replaceRange(response.data.text, cursorPosition);
-
-					const newPosition = {
-						line: cursorPosition.line,
-						ch: cursorPosition.ch + response.data.text.length,
-					};
-					editor.setCursor(newPosition);
-				}
-			}
-
-			new Notice("Transcription complete");
+			await this.outputTranscription(
+				response.data.text,
+				audioFilePath,
+				noteFilePath
+			);
 		} catch (err) {
 			console.error("Error parsing audio:", err);
 			new Notice("Transcription failed: " + (err instanceof Error ? err.message : String(err)));
 		}
+	}
+
+	async handleTranscription(text: string): Promise<void> {
+		const baseFileName = new Date()
+			.toISOString()
+			.replace(/[:.]/g, "-");
+
+		const noteFilePath = `${
+			this.plugin.settings.createNewFileAfterRecordingPath
+				? `${this.plugin.settings.createNewFileAfterRecordingPath}/`
+				: ""
+		}${baseFileName}.md`;
+
+		await this.outputTranscription(text, null, noteFilePath);
+	}
+
+	private async outputTranscription(
+		text: string,
+		audioFilePath: string | null,
+		noteFilePath: string
+	): Promise<void> {
+		if (this.plugin.settings.createNewFileAfterRecording) {
+			await this.ensureFolderExists(
+				this.plugin.settings.createNewFileAfterRecordingPath
+			);
+			let noteContent = text;
+			if (audioFilePath && this.plugin.settings.saveAudioFile) {
+				const audioRef =
+					this.plugin.settings.audioLinkStyle === "link"
+						? `[[${audioFilePath}]]`
+						: `![[${audioFilePath}]]`;
+				noteContent = `${audioRef}\n${text}`;
+			}
+			await this.plugin.app.vault.create(noteFilePath, noteContent);
+			await this.plugin.app.workspace.openLinkText(
+				noteFilePath,
+				"",
+				true
+			);
+		}
+
+		if (this.plugin.settings.pasteAtCursor) {
+			const editor =
+				this.plugin.app.workspace.getActiveViewOfType(
+					MarkdownView
+				)?.editor;
+			if (editor) {
+				const cursorPosition = editor.getCursor();
+				editor.replaceRange(text, cursorPosition);
+
+				const newPosition = {
+					line: cursorPosition.line,
+					ch: cursorPosition.ch + text.length,
+				};
+				editor.setCursor(newPosition);
+			}
+		}
+
+		new Notice("Transcription complete");
 	}
 }
