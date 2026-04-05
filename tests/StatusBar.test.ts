@@ -5,6 +5,7 @@ describe("RecordingStatus enum", () => {
 	it("has expected values", () => {
 		expect(RecordingStatus.Idle).toBe("idle");
 		expect(RecordingStatus.Recording).toBe("recording");
+		expect(RecordingStatus.Paused).toBe("paused");
 		expect(RecordingStatus.Processing).toBe("processing");
 	});
 });

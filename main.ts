@@ -20,7 +20,7 @@ export default class Whisper extends Plugin {
 		this.settingsManager = new SettingsManager(this);
 		this.settings = await this.settingsManager.loadSettings();
 
-		this.addRibbonIcon("activity", "Open recording controls", (evt) => {
+		this.addRibbonIcon("mic", "Open recording controls", (evt) => {
 			if (!this.controls) {
 				this.controls = new Controls(this);
 			}
@@ -80,7 +80,8 @@ export default class Whisper extends Plugin {
 			id: "start-stop-recording",
 			name: "Start/stop recording",
 			callback: async () => {
-				if (this.statusBar.status !== RecordingStatus.Recording) {
+				if (this.statusBar.status !== RecordingStatus.Recording &&
+					this.statusBar.status !== RecordingStatus.Paused) {
 					this.statusBar.updateStatus(RecordingStatus.Recording);
 					await this.recorder.startRecording();
 					new Notice("Recording...");
@@ -145,9 +146,15 @@ export default class Whisper extends Plugin {
 			id: "pause-resume-recording",
 			name: "Pause/resume recording",
 			callback: async () => {
-				if (this.recorder.getRecordingState() === "recording" ||
-					this.recorder.getRecordingState() === "paused") {
+				const state = this.recorder.getRecordingState();
+				if (state === "recording") {
 					await this.recorder.pauseRecording();
+					this.statusBar.updateStatus(RecordingStatus.Paused);
+					new Notice("Recording paused");
+				} else if (state === "paused") {
+					await this.recorder.pauseRecording();
+					this.statusBar.updateStatus(RecordingStatus.Recording);
+					new Notice("Recording resumed");
 				}
 			},
 		});
