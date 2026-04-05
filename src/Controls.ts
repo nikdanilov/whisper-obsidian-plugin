@@ -202,26 +202,33 @@ export class Controls extends Modal {
 
 	resetGUI() {
 		const isRealtime = this.plugin.settings.useRealtimeTranscription;
+		const isRealtimeRecording = this.pcmRecorder !== null;
+		const recorderState = this.plugin.recorder.getRecordingState();
 
-		if (isRealtime) {
-			const isRecording = this.pcmRecorder !== null;
-			this.startButton.setDisabled(isRecording);
+		const isIdle = isRealtime
+			? !isRealtimeRecording
+			: recorderState === "inactive" || !recorderState;
+		const isRecording = isRealtime
+			? isRealtimeRecording
+			: recorderState === "recording";
+		const isPaused = !isRealtime && recorderState === "paused";
+
+		// Record: only visible when idle
+		this.startButton.buttonEl.style.display = isIdle ? "" : "none";
+
+		// Pause/Resume: visible when recording or paused (batch mode only)
+		if (isRealtime || isIdle) {
 			this.pauseButton.buttonEl.style.display = "none";
-			this.stopButton.setDisabled(!isRecording);
-			this.cancelButton.setDisabled(!isRecording);
 		} else {
-			const recorderState = this.plugin.recorder.getRecordingState();
-			this.startButton.setDisabled(
-				recorderState === "recording" || recorderState === "paused"
-			);
 			this.pauseButton.buttonEl.style.display = "";
-			this.pauseButton.setDisabled(recorderState === "inactive");
-			this.stopButton.setDisabled(recorderState === "inactive");
-			this.cancelButton.setDisabled(recorderState === "inactive");
-
-			this.pauseButton.setButtonText(
-				recorderState === "paused" ? " Resume" : " Pause"
-			);
+			this.pauseButton.setButtonText(isPaused ? " Resume" : " Pause");
+			this.pauseButton.setIcon(isPaused ? "play" : "pause");
 		}
+
+		// Stop: visible when recording or paused
+		this.stopButton.buttonEl.style.display = isIdle ? "none" : "";
+
+		// Cancel: visible when recording or paused
+		this.cancelButton.buttonEl.style.display = isIdle ? "none" : "";
 	}
 }
