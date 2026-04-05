@@ -1,4 +1,4 @@
-import { Plugin, TFile } from "obsidian";
+import { Notice, Plugin, TFile } from "obsidian";
 import { Timer } from "src/Timer";
 import { Controls } from "src/Controls";
 import { AudioHandler } from "src/AudioHandler";
@@ -89,6 +89,7 @@ export default class Whisper extends Plugin {
 				if (this.statusBar.status !== RecordingStatus.Recording) {
 					this.statusBar.updateStatus(RecordingStatus.Recording);
 					await this.recorder.startRecording();
+					new Notice("Recording started");
 				} else {
 					this.statusBar.updateStatus(RecordingStatus.Processing);
 					const audioBlob = await this.recorder.stopRecording();

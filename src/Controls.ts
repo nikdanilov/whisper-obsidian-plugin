@@ -1,5 +1,5 @@
 import Whisper from "main";
-import { ButtonComponent, Modal } from "obsidian";
+import { ButtonComponent, Modal, Notice } from "obsidian";
 import { RecordingStatus } from "./StatusBar";
 
 export class Controls extends Modal {
@@ -67,6 +67,7 @@ export class Controls extends Modal {
 		this.plugin.statusBar.updateStatus(RecordingStatus.Recording);
 		await this.plugin.recorder.startRecording();
 		this.plugin.timer.start();
+		new Notice("Recording started");
 		this.resetGUI();
 	}
 
