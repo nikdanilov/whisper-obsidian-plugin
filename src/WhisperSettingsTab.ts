@@ -186,8 +186,8 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private async createAudioDeviceSetting(): Promise<void> {
 		const setting = new Setting(this.containerEl)
-			.setName("Audio input device")
-			.setDesc("Select the microphone or audio input device to use for recording");
+			.setName("Microphone")
+			.setDesc("Select the audio input device to use for recording");
 
 		// Request permission first to get device labels (some browsers hide labels until permission is granted)
 		try {
@@ -246,9 +246,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createSaveAudioFileToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Save recording")
+			.setName("Save audio file")
 			.setDesc(
-				"Turn on to save the audio file after sending it to the Whisper API"
+				"Save the audio recording to the vault"
 			)
 			.addToggle((toggle) =>
 				toggle
@@ -268,9 +268,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createSaveAudioFilePathSetting(): void {
 		this.saveAudioFileInput = new Setting(this.containerEl)
-			.setName("Recordings folder")
+			.setName("Audio save path")
 			.setDesc(
-				"Specify the path in the vault where to save the audio files"
+				"Folder in the vault where audio files are saved"
 			)
 			.addText((text) =>
 				text
@@ -339,9 +339,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createNewFileToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Save transcription")
+			.setName("Create note file")
 			.setDesc(
-				"Turn on to create a new file for each recording, or leave off to add transcriptions at your cursor"
+				"Create a new note file for each transcription"
 			)
 			.addToggle((toggle) => {
 				toggle
@@ -363,9 +363,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createNewFilePathSetting(): void {
 		this.createNewFileInput = new Setting(this.containerEl)
-			.setName("Transcriptions folder")
+			.setName("Note save path")
 			.setDesc(
-				"Specify the path in the vault where to save the transcription files"
+				"Folder in the vault where note files are saved"
 			)
 			.addText((text) => {
 				text.setPlaceholder("Example: folder/note")
@@ -423,9 +423,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createSendCursorContextSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Send cursor context")
+			.setName("Cursor context")
 			.setDesc(
-				"Send text around the cursor as context to Whisper for better transcription accuracy"
+				"Send text around the cursor to Whisper for better transcription accuracy"
 			)
 			.addToggle((toggle) => {
 				toggle
@@ -441,9 +441,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createIgnoreUploadFilenameSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Ignore upload filename")
+			.setName("Use timestamp filename")
 			.setDesc(
-				"Use a timestamp-based filename instead of the original file name when uploading"
+				"Replace the original filename with a timestamp when uploading audio files"
 			)
 			.addToggle((toggle) => {
 				toggle
@@ -459,9 +459,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createPostProcessingToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Use post-processing")
+			.setName("Post-processing")
 			.setDesc(
-				"Post-process transcriptions with an LLM to fix grammar, remove filler words, and improve readability"
+				"Clean up transcriptions with an LLM — fix grammar, remove filler words, improve readability"
 			)
 			.addToggle((toggle) => {
 				toggle
@@ -531,9 +531,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createAutoGenerateTitleSetting(): void {
 		this.autoGenerateTitleInput = new Setting(this.containerEl)
-			.setName("Auto-generate title")
+			.setName("Generate title")
 			.setDesc(
-				"Use the LLM to generate a descriptive filename for transcription notes"
+				"Use the LLM to generate a descriptive filename for notes"
 			)
 			.addToggle((toggle) => {
 				toggle
@@ -573,9 +573,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createKeepOriginalTranscriptionSetting(): void {
 		this.keepOriginalInput = new Setting(this.containerEl)
-			.setName("Keep original transcription")
+			.setName("Keep original")
 			.setDesc(
-				"Append the raw Whisper transcription below the post-processed text"
+				"Append the raw Whisper transcription below the polished text"
 			)
 			.addToggle((toggle) => {
 				toggle
@@ -592,9 +592,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createDebugModeToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Debug Mode")
+			.setName("Debug mode")
 			.setDesc(
-				"Turn on to increase the plugin's verbosity for troubleshooting."
+				"Increase the plugin's verbosity for troubleshooting"
 			)
 			.addToggle((toggle) => {
 				toggle
