@@ -1,5 +1,37 @@
 
 
+## [1.6.0](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.5...1.6.0) (2026-04-05)
+
+
+### Features
+
+* accept video files for upload/transcription ([#63](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/63)) ([8d8b1f9](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/8d8b1f9f10577a65fca2476c53adbd71a73c6272))
+* add audio device selection to settings ([5492d49](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/5492d4901fe32effb4c7fa7f9712de3f11a5548f))
+* add cancel recording button ([#46](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/46)) ([c3f0c46](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/c3f0c46794f77e87a9a194cdd8fddff8977be1f2))
+* add test infrastructure and feature plan ([1b12bda](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/1b12bda5b00789d376c3cd93b668ba30fae047d5))
+* add transcribe action to file menu ([816606f](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/816606fad873a97562d5e3e00cfb9b2727594f9b))
+* auto-detect language when left empty ([#47](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/47)) ([3b82849](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/3b828498d8d584c60f4d755b49c6fa47f243037b))
+* expose pause/resume and open controls as commands ([#77](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/77), [#29](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/29)) ([8e0cc4e](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/8e0cc4e6fbe65839a270e6d74f5249fa7d5ba852))
+* expose temperature and response_format settings ([#35](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/35)) ([fcd97e8](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/fcd97e88a82f0b500f789f04c63501ddf85770b8))
+* independent paste-at-cursor and save-to-file toggles ([#64](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/64)) ([6147aeb](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/6147aeb936e0d9ceba8676857ed986500189e9a4))
+* option to ignore original filename on upload ([#68](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/68)) ([bb02e25](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/bb02e250842a88e24560acc66a83bb74f9eb1f0b))
+* send surrounding text as Whisper prompt context ([#71](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/71)) ([f9e27b2](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/f9e27b2fde6156b2c76450456bf83a6201b39641))
+* show notice when recording starts ([#41](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/41)) ([71f5a29](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/71f5a297d5e22c7dbaf89bd403fa3bf6e93b1659))
+* support custom API endpoints without API key ([#2](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/2), [#61](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/61), [#74](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/74)) ([7850f12](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/7850f123953395d8ba576db57327eae30661e36c))
+* toggle between embed and link for audio file reference ([#26](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/26)) ([257c10a](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/257c10a892e23d9009bdeca4f0ad17c254a0933c))
+
+
+### Bug Fixes
+
+* auto-create folders when they don't exist ([#40](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/40)) ([91ccc2a](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/91ccc2a3aad0cba69cb22f821a0cf33bded7ec7e))
+* bugs found during codebase audit ([efec1af](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/efec1af15c68b445c2457026c15d6ff84e7f47de))
+* **build:** default OUTPUT_PATH to current directory when undefined ([167bfb3](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/167bfb30d1416067db08409d8d7eebb1ceabda6f))
+* don't link to nonexistent audio file when save is off ([#52](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/52)) ([2a38144](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/2a381448ab8e152d11c480177232c1f1f6e7631d))
+* improve mobile audio compatibility ([#76](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/76), [#73](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/73), [#60](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/60)) ([ef6a016](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/ef6a0166a8c933fcf0c99644e1459e3ff1febc43))
+* improve notification copy ([a1d8aca](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/a1d8aca02be9ffaf2f0834dde58156c5074a8316))
+* organize settings into sections, remove redundant title ([24e5396](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/24e539656b99bc77e5211cf6c4f385099621dbe7))
+* skip transcription for silent/too-short recordings ([#65](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/65), [#56](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/56)) ([7a5092d](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/7a5092da56163fa35fb2b944f5b1976cf7f92662))
+
 ## [1.5.5](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.4...1.5.5) (2024-01-29)
 
 
