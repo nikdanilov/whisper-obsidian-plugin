@@ -205,16 +205,10 @@ export class AudioHandler {
 					this.plugin.settings.noteSavePath
 				);
 
-				const audioRef = this.plugin.settings.saveAudioFile
-					? (this.plugin.settings.audioLinkStyle === "link"
-						? `[[${audioFilePath}]]`
-						: `![[${audioFilePath}]]`)
-					: "";
-
 				const vars = buildTemplateVariables(
 					outputText,
 					generatedTitle,
-					audioRef
+					this.plugin.settings.saveAudioFile ? audioFilePath : ""
 				);
 
 				// Resolve filename template

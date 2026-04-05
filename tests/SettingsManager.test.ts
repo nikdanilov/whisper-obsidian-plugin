@@ -29,10 +29,6 @@ describe("DEFAULT_SETTINGS", () => {
 		expect(DEFAULT_SETTINGS.responseFormat).toBe("json");
 	});
 
-	it("defaults to embed audio link style", () => {
-		expect(DEFAULT_SETTINGS.audioLinkStyle).toBe("embed");
-	});
-
 	it("defaults to system audio device", () => {
 		expect(DEFAULT_SETTINGS.audioDeviceId).toBe("default");
 	});

@@ -24,7 +24,6 @@ export interface WhisperSettings {
 	noteSavePath: string;
 	noteFilenameTemplate: string;
 	noteTemplate: string;
-	audioLinkStyle: "embed" | "link";
 	// Advanced
 	debugMode: boolean;
 }
@@ -63,8 +62,7 @@ export const DEFAULT_WHISPER: WhisperSettings = {
 	createNoteFile: false,
 	noteSavePath: "",
 	noteFilenameTemplate: "{{datetime}}",
-	noteTemplate: "{{audio}}\n{{transcription}}",
-	audioLinkStyle: "embed",
+	noteTemplate: "![[{{audioFile}}]]\n{{transcription}}",
 	debugMode: false,
 };
 

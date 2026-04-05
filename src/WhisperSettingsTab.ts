@@ -48,7 +48,6 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createNewFilePathSetting();
 		this.createNoteFilenameTemplateSetting();
 		this.createNoteTemplateSetting();
-		this.createAudioLinkStyleSetting();
 		this.createDebugModeToggleSetting();
 
 		// --- Post-Processing Settings ---
@@ -287,28 +286,6 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			.setDisabled(!this.plugin.settings.saveAudioFile);
 	}
 
-	private createAudioLinkStyleSetting(): void {
-		new Setting(this.containerEl)
-			.setName("Audio link style")
-			.setDesc(
-				"Choose how the audio file is referenced in notes: embed (playable) or link"
-			)
-			.addDropdown((dropdown) => {
-				dropdown
-					.addOption("embed", "Embed (![[file]])")
-					.addOption("link", "Link ([[file]])")
-					.setValue(this.plugin.settings.audioLinkStyle)
-					.onChange(async (value) => {
-						this.plugin.settings.audioLinkStyle = value as
-							| "embed"
-							| "link";
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
-					});
-			});
-	}
-
 	private createTemperatureSetting(): void {
 		this.createTextSetting(
 			"Temperature",
@@ -406,10 +383,10 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		new Setting(this.containerEl)
 			.setName("Note template")
 			.setDesc(
-				"Template for note content. Variables: {{transcription}}, {{audio}}, {{date}}, {{time}}, {{datetime}}, {{title}}"
+				"Template for note content. Variables: {{transcription}}, {{audioFile}}, {{date}}, {{time}}, {{datetime}}, {{title}}. Use ![[{{audioFile}}]] to embed or [[{{audioFile}}]] to link."
 			)
 			.addTextArea((text) => {
-				text.setPlaceholder("{{audio}}\n{{transcription}}")
+				text.setPlaceholder("![[{{audioFile}}]]\n{{transcription}}")
 					.setValue(this.plugin.settings.noteTemplate)
 					.onChange(async (value) => {
 						this.plugin.settings.noteTemplate = value;
