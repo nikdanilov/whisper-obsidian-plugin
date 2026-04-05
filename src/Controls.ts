@@ -7,6 +7,7 @@ export class Controls extends Modal {
 	private startButton: ButtonComponent;
 	private pauseButton: ButtonComponent;
 	private stopButton: ButtonComponent;
+	private cancelButton: ButtonComponent;
 	private timerDisplay: HTMLElement;
 
 	constructor(plugin: Whisper) {
@@ -51,6 +52,14 @@ export class Controls extends Modal {
 			.setButtonText(" Stop")
 			.onClick(this.stopRecording.bind(this))
 			.buttonEl.addClass("button-component");
+
+		// Add cancel button
+		this.cancelButton = new ButtonComponent(buttonGroupEl);
+		this.cancelButton
+			.setIcon("x")
+			.setButtonText(" Cancel")
+			.onClick(this.cancelRecording.bind(this))
+			.buttonEl.addClass("button-component");
 	}
 
 	async startRecording() {
@@ -84,6 +93,15 @@ export class Controls extends Modal {
 		this.close();
 	}
 
+	async cancelRecording() {
+		console.log("cancelling recording...");
+		await this.plugin.recorder.stopRecording();
+		this.plugin.timer.reset();
+		this.plugin.statusBar.updateStatus(RecordingStatus.Idle);
+		this.resetGUI();
+		this.close();
+	}
+
 	updateTimerDisplay() {
 		this.timerDisplay.textContent = this.plugin.timer.getFormattedTime();
 	}
@@ -96,6 +114,7 @@ export class Controls extends Modal {
 		);
 		this.pauseButton.setDisabled(recorderState === "inactive");
 		this.stopButton.setDisabled(recorderState === "inactive");
+		this.cancelButton.setDisabled(recorderState === "inactive");
 
 		this.pauseButton.setButtonText(
 			recorderState === "paused" ? " Resume" : " Pause"
