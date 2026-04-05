@@ -24,7 +24,8 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createModelSetting();
 		this.createPromptSetting();
 		this.createLanguageSetting();
-		this.createAudioDeviceSetting();
+		// async — populates device dropdown after enumeration completes
+		void this.createAudioDeviceSetting();
 		this.createSaveAudioFileToggleSetting();
 		this.createSaveAudioFilePathSetting();
 		this.createAudioLinkStyleSetting();
