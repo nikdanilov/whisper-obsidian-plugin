@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { Plugin, TFile } from "obsidian";
 import { Timer } from "src/Timer";
 import { Controls } from "src/Controls";
 import { AudioHandler } from "src/AudioHandler";
@@ -35,6 +35,36 @@ export default class Whisper extends Plugin {
 		this.statusBar = new StatusBar(this);
 
 		this.addCommands();
+
+		this.registerEvent(
+			this.app.workspace.on('file-menu', (menu, file) => {
+
+				if (!(file instanceof TFile)) return;
+
+				if (!(
+					file.path.endsWith('mp3') ||
+					file.path.endsWith('mp4') ||
+					file.path.endsWith('mpeg') ||
+					file.path.endsWith('mpga') ||
+					file.path.endsWith('m4a') ||
+					file.path.endsWith('wav') ||
+					file.path.endsWith('webm')
+				)) return;
+
+				menu.addItem((item) => {
+					item
+						.setTitle('Transcribe audio file 🔊')
+						.setIcon('document')
+						.onClick(async () => {
+							const audioBlob = new Blob([await file.vault.readBinary(file)]);
+							await this.audioHandler.sendAudioData(
+								audioBlob,
+								file.name
+							);
+						});
+				});
+			})
+		);
 	}
 
 	onunload() {
