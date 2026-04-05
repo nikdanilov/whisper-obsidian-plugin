@@ -21,7 +21,6 @@ describe("DEFAULT_SETTINGS", () => {
 
 	it("disables optional features by default", () => {
 		expect(DEFAULT_SETTINGS.cursorContext).toBe(false);
-		expect(DEFAULT_SETTINGS.useTimestampFilename).toBe(false);
 		expect(DEFAULT_SETTINGS.debugMode).toBe(false);
 	});
 

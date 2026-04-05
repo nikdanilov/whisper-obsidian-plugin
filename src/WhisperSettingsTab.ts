@@ -49,7 +49,6 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createNoteFilenameTemplateSetting();
 		this.createNoteTemplateSetting();
 		this.createAudioLinkStyleSetting();
-		this.createIgnoreUploadFilenameSetting();
 		this.createDebugModeToggleSetting();
 
 		// --- Post-Processing Settings ---
@@ -434,24 +433,6 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.cursorContext)
 					.onChange(async (value) => {
 						this.plugin.settings.cursorContext = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
-					});
-			});
-	}
-
-	private createIgnoreUploadFilenameSetting(): void {
-		new Setting(this.containerEl)
-			.setName("Use timestamp filename")
-			.setDesc(
-				"Replace the original filename with a timestamp when uploading audio files"
-			)
-			.addToggle((toggle) => {
-				toggle
-					.setValue(this.plugin.settings.useTimestampFilename)
-					.onChange(async (value) => {
-						this.plugin.settings.useTimestampFilename = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);

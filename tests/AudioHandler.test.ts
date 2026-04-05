@@ -195,39 +195,6 @@ describe("#26 — Audio link style", () => {
 	});
 });
 
-describe("#68 — Ignore upload filename", () => {
-	it("generates timestamp filename when useTimestampFilename is true", () => {
-		const originalName = "my-important-meeting.mp3";
-		const useTimestampFilename = true;
-
-		let fileName: string;
-		if (useTimestampFilename) {
-			const extension = originalName.split(".").pop();
-			fileName = `${new Date().toISOString().replace(/[:.]/g, "-")}.${extension}`;
-		} else {
-			fileName = originalName;
-		}
-
-		expect(fileName).not.toBe(originalName);
-		expect(fileName).toMatch(/\.mp3$/);
-	});
-
-	it("keeps original filename when useTimestampFilename is false", () => {
-		const originalName = "my-important-meeting.mp3";
-		const useTimestampFilename = false;
-
-		let fileName: string;
-		if (useTimestampFilename) {
-			const extension = originalName.split(".").pop();
-			fileName = `${new Date().toISOString().replace(/[:.]/g, "-")}.${extension}`;
-		} else {
-			fileName = originalName;
-		}
-
-		expect(fileName).toBe(originalName);
-	});
-});
-
 describe("#35 — Whisper API params in formData", () => {
 	const blob = new Blob(["test"], { type: "audio/webm" });
 
