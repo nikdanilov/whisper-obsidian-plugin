@@ -176,16 +176,61 @@ describe("#65 — Silence/hallucination guard", () => {
 	});
 });
 
-describe("#64 — Paste and save simultaneously", () => {
-	it("setting allows both paste and save", () => {
-		const settings = {
-			...DEFAULT_SETTINGS,
+// Simulates the dispatch logic in AudioHandler.sendAudioData
+function getTranscriptionActions(settings: {
+	createNewFileAfterRecording: boolean;
+	pasteAtCursor: boolean;
+}): { createsFile: boolean; pastesAtCursor: boolean } {
+	return {
+		createsFile: settings.createNewFileAfterRecording,
+		pastesAtCursor: settings.pasteAtCursor,
+	};
+}
+
+describe("#64 — Paste and save as independent toggles", () => {
+	it("only creates file when createNewFileAfterRecording is on", () => {
+		const actions = getTranscriptionActions({
 			createNewFileAfterRecording: true,
-			pasteAtCursor: true, // new setting
-		};
-		// Both should be true simultaneously
-		expect(settings.createNewFileAfterRecording).toBe(true);
-		expect(settings.pasteAtCursor).toBe(true);
+			pasteAtCursor: false,
+		});
+		expect(actions.createsFile).toBe(true);
+		expect(actions.pastesAtCursor).toBe(false);
+	});
+
+	it("only pastes at cursor when pasteAtCursor is on", () => {
+		const actions = getTranscriptionActions({
+			createNewFileAfterRecording: false,
+			pasteAtCursor: true,
+		});
+		expect(actions.createsFile).toBe(false);
+		expect(actions.pastesAtCursor).toBe(true);
+	});
+
+	it("does both when both are on", () => {
+		const actions = getTranscriptionActions({
+			createNewFileAfterRecording: true,
+			pasteAtCursor: true,
+		});
+		expect(actions.createsFile).toBe(true);
+		expect(actions.pastesAtCursor).toBe(true);
+	});
+
+	it("does neither when both are off", () => {
+		const actions = getTranscriptionActions({
+			createNewFileAfterRecording: false,
+			pasteAtCursor: false,
+		});
+		expect(actions.createsFile).toBe(false);
+		expect(actions.pastesAtCursor).toBe(false);
+	});
+
+	it("default settings: creates file, does not paste", () => {
+		const actions = getTranscriptionActions({
+			createNewFileAfterRecording: DEFAULT_SETTINGS.createNewFileAfterRecording,
+			pasteAtCursor: (DEFAULT_SETTINGS as any).pasteAtCursor ?? false,
+		});
+		expect(actions.createsFile).toBe(true);
+		expect(actions.pastesAtCursor).toBe(false);
 	});
 });
 
