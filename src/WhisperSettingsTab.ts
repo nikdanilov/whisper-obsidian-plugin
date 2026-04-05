@@ -27,6 +27,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createAudioDeviceSetting();
 		this.createSaveAudioFileToggleSetting();
 		this.createSaveAudioFilePathSetting();
+		this.createAudioLinkStyleSetting();
 		this.createTemperatureSetting();
 		this.createResponseFormatSetting();
 		this.createNewFileToggleSetting();
@@ -236,6 +237,28 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					})
 			)
 			.setDisabled(!this.plugin.settings.saveAudioFile);
+	}
+
+	private createAudioLinkStyleSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Audio link style")
+			.setDesc(
+				"Choose how the audio file is referenced in notes: embed (playable) or link"
+			)
+			.addDropdown((dropdown) => {
+				dropdown
+					.addOption("embed", "Embed (![[file]])")
+					.addOption("link", "Link ([[file]])")
+					.setValue(this.plugin.settings.audioLinkStyle)
+					.onChange(async (value) => {
+						this.plugin.settings.audioLinkStyle = value as
+							| "embed"
+							| "link";
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+			});
 	}
 
 	private createTemperatureSetting(): void {

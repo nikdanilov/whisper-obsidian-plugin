@@ -15,6 +15,7 @@ export interface WhisperSettings {
 	temperature: number;
 	responseFormat: string;
 	sendCursorContext: boolean;
+	audioLinkStyle: "embed" | "link";
 }
 
 export const DEFAULT_SETTINGS: WhisperSettings = {
@@ -32,6 +33,7 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	temperature: 0,
 	responseFormat: "json",
 	sendCursorContext: false,
+	audioLinkStyle: "embed",
 };
 
 export class SettingsManager {
