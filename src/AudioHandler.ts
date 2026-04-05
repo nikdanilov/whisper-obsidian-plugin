@@ -40,7 +40,12 @@ export class AudioHandler {
 		const formData = new FormData();
 		formData.append("file", blob, fileName);
 		formData.append("model", this.plugin.settings.model);
-		formData.append("language", this.plugin.settings.language);
+		if (
+			this.plugin.settings.language &&
+			this.plugin.settings.language !== "auto"
+		) {
+			formData.append("language", this.plugin.settings.language);
+		}
 		if (this.plugin.settings.prompt)
 			formData.append("prompt", this.plugin.settings.prompt);
 
