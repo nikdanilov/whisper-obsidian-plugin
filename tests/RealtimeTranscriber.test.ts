@@ -3,90 +3,84 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // Test the extracted logic from RealtimeTranscriber without WebSocket dependency
 
 describe("RealtimeTranscriber — session config", () => {
-	function buildSessionConfig(settings: {
+	function buildSessionUpdate(settings: {
 		model: string;
 		language: string;
 		prompt: string;
 	}) {
-		const session: Record<string, any> = {
-			input_audio_format: "pcm16",
-			input_audio_transcription: {
-				model: settings.model,
-			},
-			turn_detection: {
-				type: "server_vad",
-				threshold: 0.5,
-				silence_duration_ms: 500,
-			},
+		const transcription: Record<string, any> = {
+			model: settings.model,
 		};
 
 		if (settings.language && settings.language !== "auto") {
-			session.input_audio_transcription.language = settings.language;
+			transcription.language = settings.language;
 		}
 
 		if (settings.prompt) {
-			session.input_audio_transcription.prompt = settings.prompt;
+			transcription.prompt = settings.prompt;
 		}
 
-		return session;
+		return {
+			type: "session.update",
+			session: {
+				type: "transcription",
+				audio: {
+					input: {
+						format: { type: "audio/pcm", rate: 24000 },
+						noise_reduction: { type: "near_field" },
+						transcription,
+						turn_detection: {
+							type: "server_vad",
+							threshold: 0.5,
+							prefix_padding_ms: 300,
+							silence_duration_ms: 500,
+						},
+					},
+				},
+			},
+		};
 	}
 
+	it("uses session.update event type", () => {
+		const event = buildSessionUpdate({ model: "gpt-4o-transcribe", language: "", prompt: "" });
+		expect(event.type).toBe("session.update");
+		expect(event.session.type).toBe("transcription");
+	});
+
 	it("includes model in transcription config", () => {
-		const session = buildSessionConfig({
-			model: "gpt-4o-transcribe",
-			language: "",
-			prompt: "",
-		});
-		expect(session.input_audio_transcription.model).toBe(
-			"gpt-4o-transcribe"
-		);
+		const event = buildSessionUpdate({ model: "gpt-4o-transcribe", language: "", prompt: "" });
+		expect(event.session.audio.input.transcription.model).toBe("gpt-4o-transcribe");
+	});
+
+	it("sets PCM 24kHz audio format", () => {
+		const event = buildSessionUpdate({ model: "gpt-4o-transcribe", language: "", prompt: "" });
+		expect(event.session.audio.input.format).toEqual({ type: "audio/pcm", rate: 24000 });
 	});
 
 	it("includes language when explicitly set", () => {
-		const session = buildSessionConfig({
-			model: "gpt-4o-transcribe",
-			language: "ja",
-			prompt: "",
-		});
-		expect(session.input_audio_transcription.language).toBe("ja");
+		const event = buildSessionUpdate({ model: "gpt-4o-transcribe", language: "ja", prompt: "" });
+		expect(event.session.audio.input.transcription.language).toBe("ja");
 	});
 
 	it("omits language when empty (auto-detect)", () => {
-		const session = buildSessionConfig({
-			model: "gpt-4o-transcribe",
-			language: "",
-			prompt: "",
-		});
-		expect(session.input_audio_transcription.language).toBeUndefined();
+		const event = buildSessionUpdate({ model: "gpt-4o-transcribe", language: "", prompt: "" });
+		expect(event.session.audio.input.transcription.language).toBeUndefined();
 	});
 
 	it("omits language when set to auto", () => {
-		const session = buildSessionConfig({
-			model: "gpt-4o-transcribe",
-			language: "auto",
-			prompt: "",
-		});
-		expect(session.input_audio_transcription.language).toBeUndefined();
+		const event = buildSessionUpdate({ model: "gpt-4o-transcribe", language: "auto", prompt: "" });
+		expect(event.session.audio.input.transcription.language).toBeUndefined();
 	});
 
 	it("includes prompt when set", () => {
-		const session = buildSessionConfig({
-			model: "gpt-4o-transcribe",
-			language: "",
-			prompt: "technical terms: Kubernetes, gRPC",
-		});
-		expect(session.input_audio_transcription.prompt).toBe(
-			"technical terms: Kubernetes, gRPC"
-		);
+		const event = buildSessionUpdate({ model: "gpt-4o-transcribe", language: "", prompt: "Kubernetes, gRPC" });
+		expect(event.session.audio.input.transcription.prompt).toBe("Kubernetes, gRPC");
 	});
 
-	it("uses server VAD by default", () => {
-		const session = buildSessionConfig({
-			model: "gpt-4o-transcribe",
-			language: "",
-			prompt: "",
-		});
-		expect(session.turn_detection.type).toBe("server_vad");
+	it("uses server VAD with near_field noise reduction", () => {
+		const event = buildSessionUpdate({ model: "gpt-4o-transcribe", language: "", prompt: "" });
+		expect(event.session.audio.input.turn_detection.type).toBe("server_vad");
+		expect(event.session.audio.input.noise_reduction.type).toBe("near_field");
 	});
 });
 

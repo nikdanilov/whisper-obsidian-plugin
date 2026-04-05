@@ -61,29 +61,41 @@ export class RealtimeTranscriber {
 	private sendSessionUpdate(): void {
 		if (!this.ws) return;
 
-		const session: Record<string, any> = {
-			input_audio_format: "pcm16",
-			input_audio_transcription: {
-				model: this.config.model,
-			},
-			turn_detection: {
-				type: "server_vad",
-				threshold: 0.5,
-				silence_duration_ms: 500,
-			},
+		const transcription: Record<string, any> = {
+			model: this.config.model,
 		};
 
 		if (this.config.language && this.config.language !== "auto") {
-			session.input_audio_transcription.language = this.config.language;
+			transcription.language = this.config.language;
 		}
 
 		if (this.config.prompt) {
-			session.input_audio_transcription.prompt = this.config.prompt;
+			transcription.prompt = this.config.prompt;
 		}
 
 		this.send({
-			type: "transcription_session.update",
-			session,
+			type: "session.update",
+			session: {
+				type: "transcription",
+				audio: {
+					input: {
+						format: {
+							type: "audio/pcm",
+							rate: 24000,
+						},
+						noise_reduction: {
+							type: "near_field",
+						},
+						transcription,
+						turn_detection: {
+							type: "server_vad",
+							threshold: 0.5,
+							prefix_padding_ms: 300,
+							silence_duration_ms: 500,
+						},
+					},
+				},
+			},
 		});
 	}
 
