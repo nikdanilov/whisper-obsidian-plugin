@@ -99,7 +99,7 @@ export class Controls extends Modal {
 			{
 				apiKey: this.plugin.settings.apiKey,
 				apiUrl: this.plugin.settings.apiUrl,
-				model: this.plugin.settings.realtimeModel,
+				model: this.plugin.settings.model,
 				language: this.plugin.settings.language,
 				prompt: this.plugin.settings.prompt,
 			},

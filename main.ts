@@ -93,7 +93,7 @@ export default class Whisper extends Plugin {
 							{
 								apiKey: this.settings.apiKey,
 								apiUrl: this.settings.apiUrl,
-								model: this.settings.realtimeModel,
+								model: this.settings.model,
 								language: this.settings.language,
 								prompt: this.settings.prompt,
 							},
