@@ -7,7 +7,17 @@ export interface AudioRecorder {
 }
 
 function getSupportedMimeType(): string | undefined {
-	const mimeTypes = ["audio/webm", "audio/ogg", "audio/mp3", "audio/mp4"];
+	const mimeTypes = [
+		"audio/webm",
+		"audio/webm;codecs=opus",
+		"audio/ogg",
+		"audio/ogg;codecs=opus",
+		"audio/mp4",
+		"audio/mp4;codecs=mp4a.40.2",
+		"audio/aac",
+		"audio/wav",
+		"audio/mp3",
+	];
 
 	for (const mimeType of mimeTypes) {
 		if (MediaRecorder.isTypeSupported(mimeType)) {
