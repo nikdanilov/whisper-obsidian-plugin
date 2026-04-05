@@ -37,14 +37,14 @@ export class AudioHandler {
 		const baseFileName = getBaseFileName(fileName);
 
 		const audioFilePath = `${
-			this.plugin.settings.saveAudioFilePath
-				? `${this.plugin.settings.saveAudioFilePath}/`
+			this.plugin.settings.audioSavePath
+				? `${this.plugin.settings.audioSavePath}/`
 				: ""
 		}${fileName}`;
 
 		const noteFilePath = `${
-			this.plugin.settings.createNewFileAfterRecordingPath
-				? `${this.plugin.settings.createNewFileAfterRecordingPath}/`
+			this.plugin.settings.noteSavePath
+				? `${this.plugin.settings.noteSavePath}/`
 				: ""
 		}${baseFileName}.md`;
 
@@ -76,7 +76,7 @@ export class AudioHandler {
 		}
 
 		let prompt = this.plugin.settings.prompt || "";
-		if (this.plugin.settings.sendCursorContext) {
+		if (this.plugin.settings.cursorContext) {
 			const editor =
 				this.plugin.app.workspace.getActiveViewOfType(
 					MarkdownView
@@ -103,7 +103,7 @@ export class AudioHandler {
 			// If the saveAudioFile setting is true, save the audio file
 			if (this.plugin.settings.saveAudioFile) {
 				await this.ensureFolderExists(
-					this.plugin.settings.saveAudioFilePath
+					this.plugin.settings.audioSavePath
 				);
 				const arrayBuffer = await blob.arrayBuffer();
 				await this.plugin.app.vault.adapter.writeBinary(
@@ -138,7 +138,7 @@ export class AudioHandler {
 			let finalText = originalText;
 
 			// Post-process with LLM if enabled
-			if (this.plugin.settings.postProcessingEnabled) {
+			if (this.plugin.settings.postProcessing) {
 				const ppApiKey = this.getPostProcessingApiKey();
 				if (!ppApiKey) {
 					const isAnthropic = this.plugin.settings.postProcessingModel.startsWith("claude");
@@ -168,7 +168,7 @@ export class AudioHandler {
 			let generatedTitle = baseFileName;
 			if (
 				this.plugin.settings.autoGenerateTitle &&
-				this.plugin.settings.createNewFileAfterRecording
+				this.plugin.settings.createNoteFile
 			) {
 				const ppApiKey = this.getPostProcessingApiKey();
 				if (ppApiKey) {
@@ -198,9 +198,9 @@ export class AudioHandler {
 				? `${finalText}\n\n---\n\n*Original transcription:*\n${originalText}`
 				: finalText;
 
-			if (this.plugin.settings.createNewFileAfterRecording) {
+			if (this.plugin.settings.createNoteFile) {
 				await this.ensureFolderExists(
-					this.plugin.settings.createNewFileAfterRecordingPath
+					this.plugin.settings.noteSavePath
 				);
 
 				const audioRef = this.plugin.settings.saveAudioFile
@@ -221,7 +221,7 @@ export class AudioHandler {
 					vars
 				).replace(/[/\\?%*:|"<>\n]/g, "-").trim() || baseFileName;
 
-				const folder = this.plugin.settings.createNewFileAfterRecordingPath;
+				const folder = this.plugin.settings.noteSavePath;
 				const resolvedNoteFilePath = `${
 					folder ? `${folder}/` : ""
 				}${resolvedFilename}.md`;
@@ -243,21 +243,20 @@ export class AudioHandler {
 				);
 			}
 
-			if (this.plugin.settings.pasteAtCursor) {
-				const editor =
-					this.plugin.app.workspace.getActiveViewOfType(
-						MarkdownView
-					)?.editor;
-				if (editor) {
-					const cursorPosition = editor.getCursor();
-					editor.replaceRange(outputText, cursorPosition);
+			// Always paste at cursor if there's an active editor
+			const editor =
+				this.plugin.app.workspace.getActiveViewOfType(
+					MarkdownView
+				)?.editor;
+			if (editor) {
+				const cursorPosition = editor.getCursor();
+				editor.replaceRange(outputText, cursorPosition);
 
-					const newPosition = {
-						line: cursorPosition.line,
-						ch: cursorPosition.ch + outputText.length,
-					};
-					editor.setCursor(newPosition);
-				}
+				const newPosition = {
+					line: cursorPosition.line,
+					ch: cursorPosition.ch + outputText.length,
+				};
+				editor.setCursor(newPosition);
 			}
 
 			new Notice("Transcription complete");
