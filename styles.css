@@ -30,3 +30,17 @@
 	color: var(--text-muted);
 	cursor: not-allowed;
 }
+
+.recording-controls .transcript-preview {
+	max-height: 200px;
+	overflow-y: auto;
+	padding: 12px;
+	background-color: var(--background-secondary);
+	border-radius: 6px;
+	font-size: var(--font-ui-small);
+	line-height: 1.5;
+	color: var(--text-normal);
+	width: 100%;
+	white-space: pre-wrap;
+	word-break: break-word;
+}

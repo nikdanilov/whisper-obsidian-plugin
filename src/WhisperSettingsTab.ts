@@ -25,6 +25,8 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createModelSetting();
 
 		containerEl.createEl("h2", { text: "Transcription" });
+		this.createRealtimeTranscriptionSetting();
+		this.createRealtimeModelSetting();
 		this.createLanguageSetting();
 		this.createPromptSetting();
 		this.createTemperatureSetting();
@@ -130,6 +132,47 @@ export class WhisperSettingsTab extends PluginSettingTab {
 				await this.settingsManager.saveSettings(this.plugin.settings);
 			}
 		);
+	}
+
+	private createRealtimeTranscriptionSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Realtime transcription")
+			.setDesc(
+				"Stream audio to OpenAI in real-time for live transcription as you speak"
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.useRealtimeTranscription)
+					.onChange(async (value) => {
+						this.plugin.settings.useRealtimeTranscription = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+			});
+	}
+
+	private createRealtimeModelSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Realtime model")
+			.setDesc(
+				"Model to use for realtime transcription"
+			)
+			.addDropdown((dropdown) => {
+				dropdown
+					.addOption("gpt-4o-transcribe", "gpt-4o-transcribe")
+					.addOption(
+						"gpt-4o-mini-transcribe",
+						"gpt-4o-mini-transcribe"
+					)
+					.setValue(this.plugin.settings.realtimeModel)
+					.onChange(async (value) => {
+						this.plugin.settings.realtimeModel = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+			});
 	}
 
 	private createLanguageSetting(): void {

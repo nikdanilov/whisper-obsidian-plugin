@@ -7,6 +7,8 @@ import { SettingsManager, WhisperSettings } from "src/SettingsManager";
 import { NativeAudioRecorder } from "src/AudioRecorder";
 import { RecordingStatus, StatusBar } from "src/StatusBar";
 import { getExtensionFromMimeType } from "src/utils";
+import { RealtimeTranscriber } from "src/RealtimeTranscriber";
+import { PCMAudioRecorder } from "src/PCMAudioRecorder";
 export default class Whisper extends Plugin {
 	settings: WhisperSettings;
 	settingsManager: SettingsManager;
@@ -15,6 +17,8 @@ export default class Whisper extends Plugin {
 	audioHandler: AudioHandler;
 	controls: Controls | null = null;
 	statusBar: StatusBar;
+	private realtimeTranscriber: RealtimeTranscriber | null = null;
+	private pcmRecorder: PCMAudioRecorder | null = null;
 
 	async onload() {
 		this.settingsManager = new SettingsManager(this);
@@ -82,19 +86,59 @@ export default class Whisper extends Plugin {
 			callback: async () => {
 				if (this.statusBar.status !== RecordingStatus.Recording) {
 					this.statusBar.updateStatus(RecordingStatus.Recording);
-					await this.recorder.startRecording();
 					new Notice("Recording...");
+
+					if (this.settings.useRealtimeTranscription) {
+						this.realtimeTranscriber = new RealtimeTranscriber(
+							{
+								apiKey: this.settings.apiKey,
+								apiUrl: this.settings.apiUrl,
+								model: this.settings.realtimeModel,
+								language: this.settings.language,
+								prompt: this.settings.prompt,
+							},
+							{
+								onDelta: () => {},
+								onCompleted: () => {},
+								onError: (err) => new Notice("Transcription error: " + err),
+							}
+						);
+						this.realtimeTranscriber.connect();
+
+						this.pcmRecorder = new PCMAudioRecorder();
+						const deviceId = this.settings.audioDeviceId === "default"
+							? null : this.settings.audioDeviceId;
+						this.pcmRecorder.setDeviceId(deviceId);
+						this.pcmRecorder.setOnAudioData((pcm16) => {
+							this.realtimeTranscriber?.sendAudio(pcm16);
+						});
+						await this.pcmRecorder.start();
+					} else {
+						await this.recorder.startRecording();
+					}
 				} else {
 					this.statusBar.updateStatus(RecordingStatus.Processing);
-					const audioBlob = await this.recorder.stopRecording();
-					const extension = getExtensionFromMimeType(
-						this.recorder.getMimeType()
-					);
-					const fileName = `${new Date()
-						.toISOString()
-						.replace(/[:.]/g, "-")}.${extension}`;
-					// Use audioBlob to send or save the recorded audio as needed
-					await this.audioHandler.sendAudioData(audioBlob, fileName);
+
+					if (this.realtimeTranscriber) {
+						await this.pcmRecorder?.stop();
+						this.pcmRecorder = null;
+						const transcript = this.realtimeTranscriber.getTranscript();
+						this.realtimeTranscriber.disconnect();
+						this.realtimeTranscriber = null;
+						if (transcript) {
+							await this.audioHandler.handleTranscription(transcript);
+						}
+					} else {
+						const audioBlob = await this.recorder.stopRecording();
+						const extension = getExtensionFromMimeType(
+							this.recorder.getMimeType()
+						);
+						const fileName = `${new Date()
+							.toISOString()
+							.replace(/[:.]/g, "-")}.${extension}`;
+						await this.audioHandler.sendAudioData(audioBlob, fileName);
+					}
+
 					this.statusBar.updateStatus(RecordingStatus.Idle);
 				}
 			},

@@ -18,6 +18,8 @@ export interface WhisperSettings {
 	audioLinkStyle: "embed" | "link";
 	pasteAtCursor: boolean;
 	ignoreUploadFilename: boolean;
+	useRealtimeTranscription: boolean;
+	realtimeModel: string;
 }
 
 export const DEFAULT_SETTINGS: WhisperSettings = {
@@ -38,6 +40,8 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	audioLinkStyle: "embed",
 	pasteAtCursor: false,
 	ignoreUploadFilename: false,
+	useRealtimeTranscription: false,
+	realtimeModel: "gpt-4o-transcribe",
 };
 
 export class SettingsManager {
