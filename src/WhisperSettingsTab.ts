@@ -18,24 +18,33 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty();
-		this.createHeader();
+
+		containerEl.createEl("h2", { text: "API" });
 		this.createApiKeySetting();
 		this.createApiUrlSetting();
 		this.createModelSetting();
-		this.createPromptSetting();
+
+		containerEl.createEl("h2", { text: "Transcription" });
 		this.createLanguageSetting();
+		this.createPromptSetting();
+		this.createTemperatureSetting();
+		this.createResponseFormatSetting();
+		this.createSendCursorContextSetting();
+
+		containerEl.createEl("h2", { text: "Recording" });
 		// async — populates device dropdown after enumeration completes
 		void this.createAudioDeviceSetting();
 		this.createSaveAudioFileToggleSetting();
 		this.createSaveAudioFilePathSetting();
-		this.createAudioLinkStyleSetting();
-		this.createTemperatureSetting();
-		this.createResponseFormatSetting();
+
+		containerEl.createEl("h2", { text: "Output" });
 		this.createNewFileToggleSetting();
 		this.createNewFilePathSetting();
 		this.createPasteAtCursorSetting();
-		this.createSendCursorContextSetting();
+		this.createAudioLinkStyleSetting();
 		this.createIgnoreUploadFilenameSetting();
+
+		containerEl.createEl("h2", { text: "Advanced" });
 		this.createDebugModeToggleSetting();
 	}
 
@@ -51,10 +60,6 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		}
 
 		return Array.from(folderSet);
-	}
-
-	private createHeader(): void {
-		this.containerEl.createEl("h2", { text: "Settings for Whisper." });
 	}
 
 	private createTextSetting(
