@@ -27,6 +27,8 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createAudioDeviceSetting();
 		this.createSaveAudioFileToggleSetting();
 		this.createSaveAudioFilePathSetting();
+		this.createTemperatureSetting();
+		this.createResponseFormatSetting();
 		this.createNewFileToggleSetting();
 		this.createNewFilePathSetting();
 		this.createDebugModeToggleSetting();
@@ -233,6 +235,35 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					})
 			)
 			.setDisabled(!this.plugin.settings.saveAudioFile);
+	}
+
+	private createTemperatureSetting(): void {
+		this.createTextSetting(
+			"Temperature",
+			"Sampling temperature (0 to 1). Higher values produce more random output.",
+			"0",
+			String(this.plugin.settings.temperature),
+			async (value) => {
+				const num = parseFloat(value);
+				this.plugin.settings.temperature = isNaN(num)
+					? 0
+					: Math.max(0, Math.min(1, num));
+				await this.settingsManager.saveSettings(this.plugin.settings);
+			}
+		);
+	}
+
+	private createResponseFormatSetting(): void {
+		this.createTextSetting(
+			"Response format",
+			"Output format: json, text, srt, verbose_json, or vtt",
+			"json",
+			this.plugin.settings.responseFormat,
+			async (value) => {
+				this.plugin.settings.responseFormat = value;
+				await this.settingsManager.saveSettings(this.plugin.settings);
+			}
+		);
 	}
 
 	private createNewFileToggleSetting(): void {

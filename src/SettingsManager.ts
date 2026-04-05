@@ -12,6 +12,8 @@ export interface WhisperSettings {
 	createNewFileAfterRecording: boolean;
 	createNewFileAfterRecordingPath: string;
 	audioDeviceId: string;
+	temperature: number;
+	responseFormat: string;
 }
 
 export const DEFAULT_SETTINGS: WhisperSettings = {
@@ -26,6 +28,8 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	createNewFileAfterRecording: true,
 	createNewFileAfterRecordingPath: "",
 	audioDeviceId: "default",
+	temperature: 0,
+	responseFormat: "json",
 };
 
 export class SettingsManager {
