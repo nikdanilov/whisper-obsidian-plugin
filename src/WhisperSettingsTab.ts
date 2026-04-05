@@ -47,7 +47,6 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createNewFilePathSetting();
 		this.createNoteFilenameTemplateSetting();
 		this.createNoteTemplateSetting();
-		this.createPasteAtCursorSetting();
 		this.createAudioLinkStyleSetting();
 		this.createIgnoreUploadFilenameSetting();
 		this.createDebugModeToggleSetting();
@@ -187,8 +186,8 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private async createAudioDeviceSetting(): Promise<void> {
 		const setting = new Setting(this.containerEl)
-			.setName("Audio input device")
-			.setDesc("Select the microphone or audio input device to use for recording");
+			.setName("Microphone")
+			.setDesc("Select the audio input device to use for recording");
 
 		// Request permission first to get device labels (some browsers hide labels until permission is granted)
 		try {
@@ -247,9 +246,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createSaveAudioFileToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Save recording")
+			.setName("Save audio file")
 			.setDesc(
-				"Turn on to save the audio file after sending it to the Whisper API"
+				"Save the audio recording to the vault"
 			)
 			.addToggle((toggle) =>
 				toggle
@@ -257,7 +256,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.saveAudioFile = value;
 						if (!value) {
-							this.plugin.settings.saveAudioFilePath = "";
+							this.plugin.settings.audioSavePath = "";
 						}
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
@@ -269,16 +268,16 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createSaveAudioFilePathSetting(): void {
 		this.saveAudioFileInput = new Setting(this.containerEl)
-			.setName("Recordings folder")
+			.setName("Audio save path")
 			.setDesc(
-				"Specify the path in the vault where to save the audio files"
+				"Folder in the vault where audio files are saved"
 			)
 			.addText((text) =>
 				text
 					.setPlaceholder("Example: folder/audio")
-					.setValue(this.plugin.settings.saveAudioFilePath)
+					.setValue(this.plugin.settings.audioSavePath)
 					.onChange(async (value) => {
-						this.plugin.settings.saveAudioFilePath = value;
+						this.plugin.settings.audioSavePath = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
@@ -340,18 +339,18 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createNewFileToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Save transcription")
+			.setName("Create note file")
 			.setDesc(
-				"Turn on to create a new file for each recording, or leave off to add transcriptions at your cursor"
+				"Create a new note file for each transcription"
 			)
 			.addToggle((toggle) => {
 				toggle
-					.setValue(this.plugin.settings.createNewFileAfterRecording)
+					.setValue(this.plugin.settings.createNoteFile)
 					.onChange(async (value) => {
-						this.plugin.settings.createNewFileAfterRecording =
+						this.plugin.settings.createNoteFile =
 							value;
 						if (!value) {
-							this.plugin.settings.createNewFileAfterRecordingPath =
+							this.plugin.settings.noteSavePath =
 								"";
 						}
 						await this.settingsManager.saveSettings(
@@ -364,17 +363,17 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createNewFilePathSetting(): void {
 		this.createNewFileInput = new Setting(this.containerEl)
-			.setName("Transcriptions folder")
+			.setName("Note save path")
 			.setDesc(
-				"Specify the path in the vault where to save the transcription files"
+				"Folder in the vault where note files are saved"
 			)
 			.addText((text) => {
 				text.setPlaceholder("Example: folder/note")
 					.setValue(
-						this.plugin.settings.createNewFileAfterRecordingPath
+						this.plugin.settings.noteSavePath
 					)
 					.onChange(async (value) => {
-						this.plugin.settings.createNewFileAfterRecordingPath =
+						this.plugin.settings.noteSavePath =
 							value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
@@ -422,35 +421,17 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			});
 	}
 
-	private createPasteAtCursorSetting(): void {
-		new Setting(this.containerEl)
-			.setName("Paste at cursor")
-			.setDesc(
-				"Insert transcription at cursor position in the active note"
-			)
-			.addToggle((toggle) => {
-				toggle
-					.setValue(this.plugin.settings.pasteAtCursor)
-					.onChange(async (value) => {
-						this.plugin.settings.pasteAtCursor = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
-					});
-			});
-	}
-
 	private createSendCursorContextSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Send cursor context")
+			.setName("Cursor context")
 			.setDesc(
-				"Send text around the cursor as context to Whisper for better transcription accuracy"
+				"Send text around the cursor to Whisper for better transcription accuracy"
 			)
 			.addToggle((toggle) => {
 				toggle
-					.setValue(this.plugin.settings.sendCursorContext)
+					.setValue(this.plugin.settings.cursorContext)
 					.onChange(async (value) => {
-						this.plugin.settings.sendCursorContext = value;
+						this.plugin.settings.cursorContext = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
@@ -460,15 +441,15 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createIgnoreUploadFilenameSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Ignore upload filename")
+			.setName("Use timestamp filename")
 			.setDesc(
-				"Use a timestamp-based filename instead of the original file name when uploading"
+				"Replace the original filename with a timestamp when uploading audio files"
 			)
 			.addToggle((toggle) => {
 				toggle
-					.setValue(this.plugin.settings.ignoreUploadFilename)
+					.setValue(this.plugin.settings.useTimestampFilename)
 					.onChange(async (value) => {
-						this.plugin.settings.ignoreUploadFilename = value;
+						this.plugin.settings.useTimestampFilename = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
@@ -478,15 +459,15 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createPostProcessingToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Use post-processing")
+			.setName("Post-processing")
 			.setDesc(
-				"Post-process transcriptions with an LLM to fix grammar, remove filler words, and improve readability"
+				"Clean up transcriptions with an LLM — fix grammar, remove filler words, improve readability"
 			)
 			.addToggle((toggle) => {
 				toggle
-					.setValue(this.plugin.settings.postProcessingEnabled)
+					.setValue(this.plugin.settings.postProcessing)
 					.onChange(async (value) => {
-						this.plugin.settings.postProcessingEnabled = value;
+						this.plugin.settings.postProcessing = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
@@ -524,7 +505,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					);
 				});
 			})
-			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+			.setDisabled(!this.plugin.settings.postProcessing);
 	}
 
 	private createPostProcessingPromptSetting(): void {
@@ -545,14 +526,14 @@ export class WhisperSettingsTab extends PluginSettingTab {
 				text.inputEl.rows = 4;
 				text.inputEl.cols = 50;
 			})
-			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+			.setDisabled(!this.plugin.settings.postProcessing);
 	}
 
 	private createAutoGenerateTitleSetting(): void {
 		this.autoGenerateTitleInput = new Setting(this.containerEl)
-			.setName("Auto-generate title")
+			.setName("Generate title")
 			.setDesc(
-				"Use the LLM to generate a descriptive filename for transcription notes"
+				"Use the LLM to generate a descriptive filename for notes"
 			)
 			.addToggle((toggle) => {
 				toggle
@@ -565,7 +546,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 						this.titleGenerationPromptInput.setDisabled(!value);
 					});
 			})
-			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+			.setDisabled(!this.plugin.settings.postProcessing);
 	}
 
 	private createTitleGenerationPromptSetting(): void {
@@ -585,16 +566,16 @@ export class WhisperSettingsTab extends PluginSettingTab {
 				text.inputEl.cols = 50;
 			})
 			.setDisabled(
-				!this.plugin.settings.postProcessingEnabled ||
+				!this.plugin.settings.postProcessing ||
 					!this.plugin.settings.autoGenerateTitle
 			);
 	}
 
 	private createKeepOriginalTranscriptionSetting(): void {
 		this.keepOriginalInput = new Setting(this.containerEl)
-			.setName("Keep original transcription")
+			.setName("Keep original")
 			.setDesc(
-				"Append the raw Whisper transcription below the post-processed text"
+				"Append the raw Whisper transcription below the polished text"
 			)
 			.addToggle((toggle) => {
 				toggle
@@ -606,14 +587,14 @@ export class WhisperSettingsTab extends PluginSettingTab {
 						);
 					});
 			})
-			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+			.setDisabled(!this.plugin.settings.postProcessing);
 	}
 
 	private createDebugModeToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Debug Mode")
+			.setName("Debug mode")
 			.setDesc(
-				"Turn on to increase the plugin's verbosity for troubleshooting."
+				"Increase the plugin's verbosity for troubleshooting"
 			)
 			.addToggle((toggle) => {
 				toggle

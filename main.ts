@@ -195,7 +195,7 @@ export default class Whisper extends Plugin {
 					if (files && files.length > 0) {
 						const file = files[0];
 						let fileName = file.name;
-						if (this.settings.ignoreUploadFilename) {
+						if (this.settings.useTimestampFilename) {
 							const extension = file.name.split(".").pop();
 							fileName = `${new Date()
 								.toISOString()
@@ -242,5 +242,6 @@ export default class Whisper extends Plugin {
 				this.controls.open();
 			},
 		});
+
 	}
 }
