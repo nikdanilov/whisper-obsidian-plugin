@@ -75,4 +75,8 @@ describe("getExtensionFromMimeType", () => {
 	it("handles audio/ogg", () => {
 		expect(getExtensionFromMimeType("audio/ogg;codecs=opus")).toBe("ogg");
 	});
+
+	it("maps mpeg to mp3", () => {
+		expect(getExtensionFromMimeType("audio/mpeg")).toBe("mp3");
+	});
 });

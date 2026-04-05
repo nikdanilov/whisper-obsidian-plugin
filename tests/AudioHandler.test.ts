@@ -18,10 +18,14 @@ function buildFormData(settings: WhisperSettings, blob: Blob, fileName: string) 
 		formData.append("prompt", settings.prompt);
 	}
 
-	// #35: send temperature if non-default
+	// #35: send temperature and responseFormat if non-default
 	const temperature = (settings as any).temperature;
 	if (temperature !== undefined && temperature !== 0) {
 		formData.append("temperature", String(temperature));
+	}
+	const responseFormat = (settings as any).responseFormat;
+	if (responseFormat && responseFormat !== "json") {
+		formData.append("response_format", responseFormat);
 	}
 
 	return formData;
@@ -295,6 +299,18 @@ describe("#35 — Whisper API params in formData", () => {
 		const settings = { ...DEFAULT_SETTINGS, temperature: 0 } as any;
 		const fd = buildFormData(settings, blob, "test.webm");
 		expect(fd.get("temperature")).toBeNull();
+	});
+
+	it("sends response_format when non-default", () => {
+		const settings = { ...DEFAULT_SETTINGS, responseFormat: "srt" } as any;
+		const fd = buildFormData(settings, blob, "test.webm");
+		expect(fd.get("response_format")).toBe("srt");
+	});
+
+	it("omits response_format when json (default)", () => {
+		const settings = { ...DEFAULT_SETTINGS, responseFormat: "json" } as any;
+		const fd = buildFormData(settings, blob, "test.webm");
+		expect(fd.get("response_format")).toBeNull();
 	});
 });
 
