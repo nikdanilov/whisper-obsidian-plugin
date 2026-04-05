@@ -34,6 +34,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createNewFilePathSetting();
 		this.createPasteAtCursorSetting();
 		this.createSendCursorContextSetting();
+		this.createIgnoreUploadFilenameSetting();
 		this.createDebugModeToggleSetting();
 	}
 
@@ -365,6 +366,24 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.sendCursorContext)
 					.onChange(async (value) => {
 						this.plugin.settings.sendCursorContext = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+			});
+	}
+
+	private createIgnoreUploadFilenameSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Ignore upload filename")
+			.setDesc(
+				"Use a timestamp-based filename instead of the original file name when uploading"
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.ignoreUploadFilename)
+					.onChange(async (value) => {
+						this.plugin.settings.ignoreUploadFilename = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
