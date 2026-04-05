@@ -61,8 +61,14 @@ export class RealtimeTranscriber {
 	private sendSessionUpdate(): void {
 		if (!this.ws) return;
 
+		// Realtime API only supports gpt-4o-transcribe models
+		const REALTIME_MODELS = ["gpt-4o-transcribe", "gpt-4o-mini-transcribe"];
+		const model = REALTIME_MODELS.includes(this.config.model)
+			? this.config.model
+			: "gpt-4o-transcribe";
+
 		const transcription: Record<string, any> = {
-			model: this.config.model,
+			model,
 		};
 
 		if (this.config.language && this.config.language !== "auto") {

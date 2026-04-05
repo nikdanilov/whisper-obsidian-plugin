@@ -189,9 +189,18 @@ export default class Whisper extends Plugin {
 			id: "pause-resume-recording",
 			name: "Pause/resume recording",
 			callback: async () => {
-				if (this.recorder.getRecordingState() === "recording" ||
-					this.recorder.getRecordingState() === "paused") {
+				if (this.realtimeTranscriber) {
+					new Notice("Pause not supported in realtime mode");
+					return;
+				}
+
+				const state = this.recorder.getRecordingState();
+				if (state === "recording") {
 					await this.recorder.pauseRecording();
+					new Notice("Recording paused");
+				} else if (state === "paused") {
+					await this.recorder.pauseRecording();
+					new Notice("Recording resumed");
 				}
 			},
 		});
