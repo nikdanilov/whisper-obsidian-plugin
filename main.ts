@@ -3,12 +3,12 @@ import { Timer } from "src/Timer";
 import { Controls } from "src/Controls";
 import { AudioHandler } from "src/AudioHandler";
 import { WhisperSettingsTab } from "src/WhisperSettingsTab";
-import { SettingsManager, WhisperSettings } from "src/SettingsManager";
+import { SettingsManager, PluginSettings } from "src/SettingsManager";
 import { NativeAudioRecorder } from "src/AudioRecorder";
 import { RecordingStatus, StatusBar } from "src/StatusBar";
 import { getExtensionFromMimeType } from "src/utils";
 export default class Whisper extends Plugin {
-	settings: WhisperSettings;
+	settings: PluginSettings;
 	settingsManager: SettingsManager;
 	timer: Timer;
 	recorder: NativeAudioRecorder;
