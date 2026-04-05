@@ -33,7 +33,7 @@ export class Controls extends Modal {
 		// Add record button
 		this.startButton = new ButtonComponent(buttonGroupEl);
 		this.startButton
-			.setIcon("microphone")
+			.setIcon("circle")
 			.setButtonText(" Record")
 			.onClick(this.startRecording.bind(this))
 			.buttonEl.addClass("button-component");
@@ -61,10 +61,11 @@ export class Controls extends Modal {
 			.setButtonText(" Cancel")
 			.onClick(this.cancelRecording.bind(this))
 			.buttonEl.addClass("button-component");
+
+		this.resetGUI();
 	}
 
 	async startRecording() {
-		console.log("start");
 		this.plugin.statusBar.updateStatus(RecordingStatus.Recording);
 		await this.plugin.recorder.startRecording();
 		this.plugin.timer.start();
@@ -73,14 +74,17 @@ export class Controls extends Modal {
 	}
 
 	async pauseRecording() {
-		console.log("pausing recording...");
+		const wasPaused = this.plugin.recorder.getRecordingState() === "paused";
 		await this.plugin.recorder.pauseRecording();
 		this.plugin.timer.pause();
+		this.plugin.statusBar.updateStatus(
+			wasPaused ? RecordingStatus.Recording : RecordingStatus.Paused
+		);
+		new Notice(wasPaused ? "Recording resumed" : "Recording paused");
 		this.resetGUI();
 	}
 
 	async stopRecording() {
-		console.log("stopping recording...");
 		this.plugin.statusBar.updateStatus(RecordingStatus.Processing);
 		const blob = await this.plugin.recorder.stopRecording();
 		this.plugin.timer.reset();
@@ -98,10 +102,10 @@ export class Controls extends Modal {
 	}
 
 	async cancelRecording() {
-		console.log("cancelling recording...");
 		await this.plugin.recorder.stopRecording();
 		this.plugin.timer.reset();
 		this.plugin.statusBar.updateStatus(RecordingStatus.Idle);
+		new Notice("Recording cancelled");
 		this.resetGUI();
 		this.close();
 	}
@@ -112,16 +116,32 @@ export class Controls extends Modal {
 
 	resetGUI() {
 		const recorderState = this.plugin.recorder.getRecordingState();
+		const isIdle = recorderState === "inactive" || !recorderState;
+		const isPaused = recorderState === "paused";
 
-		this.startButton.setDisabled(
-			recorderState === "recording" || recorderState === "paused"
-		);
-		this.pauseButton.setDisabled(recorderState === "inactive");
-		this.stopButton.setDisabled(recorderState === "inactive");
-		this.cancelButton.setDisabled(recorderState === "inactive");
+		// Record: only visible when idle
+		this.startButton.buttonEl.style.display = isIdle ? "" : "none";
+		this.startButton.buttonEl.empty();
+		this.startButton.buttonEl.empty();
+		this.startButton.setIcon("circle");
+		this.startButton.buttonEl.appendText(" Record");
 
-		this.pauseButton.setButtonText(
-			recorderState === "paused" ? " Resume" : " Pause"
-		);
+		// Pause/Resume: visible when recording or paused
+		this.pauseButton.buttonEl.style.display = isIdle ? "none" : "";
+		this.pauseButton.buttonEl.empty();
+		this.pauseButton.setIcon(isPaused ? "play" : "pause");
+		this.pauseButton.buttonEl.appendText(isPaused ? " Resume" : " Pause");
+
+		// Stop: visible when recording or paused
+		this.stopButton.buttonEl.style.display = isIdle ? "none" : "";
+		this.stopButton.buttonEl.empty();
+		this.stopButton.setIcon("square");
+		this.stopButton.buttonEl.appendText(" Stop");
+
+		// Cancel: visible when recording or paused
+		this.cancelButton.buttonEl.style.display = isIdle ? "none" : "";
+		this.cancelButton.buttonEl.empty();
+		this.cancelButton.setIcon("x");
+		this.cancelButton.buttonEl.appendText(" Cancel");
 	}
 }
