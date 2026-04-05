@@ -24,6 +24,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createModelSetting();
 		this.createPromptSetting();
 		this.createLanguageSetting();
+		this.createAudioDeviceSetting();
 		this.createSaveAudioFileToggleSetting();
 		this.createSaveAudioFilePathSetting();
 		this.createNewFileToggleSetting();
@@ -130,6 +131,66 @@ export class WhisperSettingsTab extends PluginSettingTab {
 				await this.settingsManager.saveSettings(this.plugin.settings);
 			}
 		);
+	}
+
+	private async createAudioDeviceSetting(): Promise<void> {
+		const setting = new Setting(this.containerEl)
+			.setName("Audio input device")
+			.setDesc("Select the microphone or audio input device to use for recording");
+
+		// Request permission first to get device labels (some browsers hide labels until permission is granted)
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({
+				audio: true,
+			});
+			// Stop the stream immediately to release the microphone
+			stream.getTracks().forEach((track) => track.stop());
+		} catch (err) {
+			// Permission denied or error - continue anyway, devices may still be listed
+			console.log("Microphone permission not granted, device labels may be limited");
+		}
+
+		// Enumerate devices
+		let devices: MediaDeviceInfo[] = [];
+		try {
+			const allDevices = await navigator.mediaDevices.enumerateDevices();
+			devices = allDevices.filter((device) => device.kind === "audioinput");
+		} catch (err) {
+			console.error("Error enumerating audio devices:", err);
+		}
+
+		// Build dropdown options: "default" + all audio input devices
+		const options: Record<string, string> = {};
+		options["default"] = "Default";
+
+		devices.forEach((device) => {
+			const label = device.label || `Unknown device (${device.deviceId.substring(0, 8)})`;
+			options[device.deviceId] = label;
+		});
+
+		// Get current value, defaulting to "default" if not set or device not found
+		let currentValue = this.plugin.settings.audioDeviceId || "default";
+		if (currentValue !== "default" && !options[currentValue]) {
+			// Device no longer available, reset to default
+			currentValue = "default";
+			this.plugin.settings.audioDeviceId = "default";
+			await this.settingsManager.saveSettings(this.plugin.settings);
+		}
+
+		setting.addDropdown((dropdown) => {
+			Object.keys(options).forEach((deviceId) => {
+				dropdown.addOption(deviceId, options[deviceId]);
+			});
+			dropdown.setValue(currentValue);
+			dropdown.onChange(async (value) => {
+				this.plugin.settings.audioDeviceId = value;
+				await this.settingsManager.saveSettings(this.plugin.settings);
+				// Update recorder with new device ID
+				this.plugin.recorder.setDeviceId(
+					value === "default" ? null : value
+				);
+			});
+		});
 	}
 
 	private createSaveAudioFileToggleSetting(): void {

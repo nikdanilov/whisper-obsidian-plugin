@@ -22,6 +22,7 @@ export class NativeAudioRecorder implements AudioRecorder {
 	private chunks: BlobPart[] = [];
 	private recorder: MediaRecorder | null = null;
 	private mimeType: string | undefined;
+	private deviceId: string | null = null;
 
 	getRecordingState(): "inactive" | "recording" | "paused" | undefined {
 		return this.recorder?.state;
@@ -31,11 +32,19 @@ export class NativeAudioRecorder implements AudioRecorder {
 		return this.mimeType;
 	}
 
+	setDeviceId(deviceId: string | null): void {
+		this.deviceId = deviceId;
+	}
+
 	async startRecording(): Promise<void> {
 		if (!this.recorder) {
 			try {
+				const audioConstraints =
+					this.deviceId && this.deviceId !== "default"
+						? { deviceId: { exact: this.deviceId } }
+						: true;
 				const stream = await navigator.mediaDevices.getUserMedia({
-					audio: true,
+					audio: audioConstraints,
 				});
 				this.mimeType = getSupportedMimeType();
 
