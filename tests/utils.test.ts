@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getBaseFileName, getCursorContext } from "../src/utils";
+import { getBaseFileName, getCursorContext, getExtensionFromMimeType } from "../src/utils";
 
 describe("getBaseFileName", () => {
 	it("strips extension from simple filename", () => {
@@ -52,5 +52,27 @@ describe("getCursorContext", () => {
 		const editor = makeEditor("", 0);
 		const context = getCursorContext(editor, 5);
 		expect(context).toBe("");
+	});
+});
+
+describe("getExtensionFromMimeType", () => {
+	it("extracts extension from simple mime type", () => {
+		expect(getExtensionFromMimeType("audio/webm")).toBe("webm");
+	});
+
+	it("strips codecs parameter", () => {
+		expect(getExtensionFromMimeType("audio/webm;codecs=opus")).toBe("webm");
+	});
+
+	it("handles mp4 with codecs", () => {
+		expect(getExtensionFromMimeType("audio/mp4;codecs=mp4a.40.2")).toBe("mp4");
+	});
+
+	it("returns webm for undefined", () => {
+		expect(getExtensionFromMimeType(undefined)).toBe("webm");
+	});
+
+	it("handles audio/ogg", () => {
+		expect(getExtensionFromMimeType("audio/ogg;codecs=opus")).toBe("ogg");
 	});
 });
