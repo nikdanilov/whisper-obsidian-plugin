@@ -23,6 +23,8 @@ export interface WhisperSettings {
 	audioLinkStyle: "embed" | "link";
 	pasteAtCursor: boolean;
 	ignoreUploadFilename: boolean;
+	noteFilenameTemplate: string;
+	noteTemplate: string;
 }
 
 export interface PostProcessingSettings {
@@ -61,6 +63,8 @@ export const DEFAULT_WHISPER: WhisperSettings = {
 	audioLinkStyle: "embed",
 	pasteAtCursor: false,
 	ignoreUploadFilename: false,
+	noteFilenameTemplate: "{{date}} {{title}}",
+	noteTemplate: "{{audio}}\n{{transcription}}",
 };
 
 export const DEFAULT_POST_PROCESSING: PostProcessingSettings = {
