@@ -242,5 +242,6 @@ export default class Whisper extends Plugin {
 				this.controls.open();
 			},
 		});
+
 	}
 }

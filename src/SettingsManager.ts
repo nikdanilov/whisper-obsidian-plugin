@@ -21,7 +21,6 @@ export interface WhisperSettings {
 	responseFormat: string;
 	sendCursorContext: boolean;
 	audioLinkStyle: "embed" | "link";
-	pasteAtCursor: boolean;
 	ignoreUploadFilename: boolean;
 	noteFilenameTemplate: string;
 	noteTemplate: string;
@@ -51,17 +50,16 @@ export const DEFAULT_WHISPER: WhisperSettings = {
 	model: "whisper-1",
 	prompt: "",
 	language: "",
-	saveAudioFile: true,
+	saveAudioFile: false,
 	saveAudioFilePath: "",
 	debugMode: false,
-	createNewFileAfterRecording: true,
+	createNewFileAfterRecording: false,
 	createNewFileAfterRecordingPath: "",
 	audioDeviceId: "default",
 	temperature: 0,
 	responseFormat: "json",
 	sendCursorContext: false,
 	audioLinkStyle: "embed",
-	pasteAtCursor: false,
 	ignoreUploadFilename: false,
 	noteFilenameTemplate: "{{date}} {{title}}",
 	noteTemplate: "{{audio}}\n{{transcription}}",

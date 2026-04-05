@@ -180,64 +180,6 @@ describe("#65 — Silence/hallucination guard", () => {
 	});
 });
 
-// Simulates the dispatch logic in AudioHandler.sendAudioData
-function getTranscriptionActions(settings: {
-	createNewFileAfterRecording: boolean;
-	pasteAtCursor: boolean;
-}): { createsFile: boolean; pastesAtCursor: boolean } {
-	return {
-		createsFile: settings.createNewFileAfterRecording,
-		pastesAtCursor: settings.pasteAtCursor,
-	};
-}
-
-describe("#64 — Paste and save as independent toggles", () => {
-	it("only creates file when createNewFileAfterRecording is on", () => {
-		const actions = getTranscriptionActions({
-			createNewFileAfterRecording: true,
-			pasteAtCursor: false,
-		});
-		expect(actions.createsFile).toBe(true);
-		expect(actions.pastesAtCursor).toBe(false);
-	});
-
-	it("only pastes at cursor when pasteAtCursor is on", () => {
-		const actions = getTranscriptionActions({
-			createNewFileAfterRecording: false,
-			pasteAtCursor: true,
-		});
-		expect(actions.createsFile).toBe(false);
-		expect(actions.pastesAtCursor).toBe(true);
-	});
-
-	it("does both when both are on", () => {
-		const actions = getTranscriptionActions({
-			createNewFileAfterRecording: true,
-			pasteAtCursor: true,
-		});
-		expect(actions.createsFile).toBe(true);
-		expect(actions.pastesAtCursor).toBe(true);
-	});
-
-	it("does neither when both are off", () => {
-		const actions = getTranscriptionActions({
-			createNewFileAfterRecording: false,
-			pasteAtCursor: false,
-		});
-		expect(actions.createsFile).toBe(false);
-		expect(actions.pastesAtCursor).toBe(false);
-	});
-
-	it("default settings: creates file, does not paste", () => {
-		const actions = getTranscriptionActions({
-			createNewFileAfterRecording: DEFAULT_SETTINGS.createNewFileAfterRecording,
-			pasteAtCursor: (DEFAULT_SETTINGS as any).pasteAtCursor ?? false,
-		});
-		expect(actions.createsFile).toBe(true);
-		expect(actions.pastesAtCursor).toBe(false);
-	});
-});
-
 describe("#26 — Audio link style", () => {
 	it("uses embed syntax by default", () => {
 		const settings = { ...DEFAULT_SETTINGS, saveAudioFile: true };

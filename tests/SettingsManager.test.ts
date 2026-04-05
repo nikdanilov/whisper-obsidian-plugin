@@ -14,13 +14,12 @@ describe("DEFAULT_SETTINGS", () => {
 		expect(DEFAULT_SETTINGS.language).toBe("");
 	});
 
-	it("enables save audio and save transcription by default", () => {
-		expect(DEFAULT_SETTINGS.saveAudioFile).toBe(true);
-		expect(DEFAULT_SETTINGS.createNewFileAfterRecording).toBe(true);
+	it("defaults to dictation mode (no file saves)", () => {
+		expect(DEFAULT_SETTINGS.saveAudioFile).toBe(false);
+		expect(DEFAULT_SETTINGS.createNewFileAfterRecording).toBe(false);
 	});
 
 	it("disables optional features by default", () => {
-		expect(DEFAULT_SETTINGS.pasteAtCursor).toBe(false);
 		expect(DEFAULT_SETTINGS.sendCursorContext).toBe(false);
 		expect(DEFAULT_SETTINGS.ignoreUploadFilename).toBe(false);
 		expect(DEFAULT_SETTINGS.debugMode).toBe(false);
