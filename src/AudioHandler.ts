@@ -2,6 +2,7 @@ import axios from "axios";
 import Whisper from "main";
 import { Notice, MarkdownView } from "obsidian";
 import { getBaseFileName, getCursorContext } from "./utils";
+import { PostProcessor } from "./PostProcessor";
 
 export class AudioHandler {
 	private plugin: Whisper;
@@ -121,24 +122,91 @@ export class AudioHandler {
 				}
 			);
 
+			const originalText: string = response.data.text;
+			let finalText = originalText;
+
+			// Post-process with LLM if enabled
+			if (this.plugin.settings.postProcessingEnabled) {
+				const ppApiKey = this.plugin.settings.postProcessingApiKey || this.plugin.settings.apiKey;
+				if (!ppApiKey) {
+					new Notice("✘ Add a post-processing API key in settings");
+					return;
+				}
+				try {
+					if (this.plugin.settings.debugMode) {
+						new Notice("Post-processing...");
+					}
+					const processor = new PostProcessor({
+						apiKey: ppApiKey,
+						model: this.plugin.settings.postProcessingModel,
+					});
+					finalText = await processor.process(
+						originalText,
+						this.plugin.settings.postProcessingPrompt
+					);
+				} catch (err) {
+					console.error("Post-processing failed:", err);
+					new Notice("✘ Post-processing failed, using original transcription");
+					finalText = originalText;
+				}
+			}
+
+			// Auto-generate title for the note filename
+			let resolvedNoteFilePath = noteFilePath;
+			if (
+				this.plugin.settings.autoGenerateTitle &&
+				this.plugin.settings.createNewFileAfterRecording
+			) {
+				const ppApiKey = this.plugin.settings.postProcessingApiKey || this.plugin.settings.apiKey;
+				if (ppApiKey) {
+					try {
+						const processor = new PostProcessor({
+							apiKey: ppApiKey,
+							model: this.plugin.settings.postProcessingModel,
+						});
+						const title = await processor.process(
+							finalText,
+							this.plugin.settings.titleGenerationPrompt
+						);
+						const sanitizedTitle = title
+							.replace(/[/\\?%*:|"<>\n]/g, "-")
+							.trim();
+						if (sanitizedTitle) {
+							const folder = this.plugin.settings.createNewFileAfterRecordingPath;
+							resolvedNoteFilePath = `${
+								folder ? `${folder}/` : ""
+							}${sanitizedTitle}.md`;
+						}
+					} catch (err) {
+						console.error("Title generation failed:", err);
+						// Fall back to default filename
+					}
+				}
+			}
+
+			// Build note content
+			const outputText = this.plugin.settings.keepOriginalTranscription && finalText !== originalText
+				? `${finalText}\n\n---\n\n*Original transcription:*\n${originalText}`
+				: finalText;
+
 			if (this.plugin.settings.createNewFileAfterRecording) {
 				await this.ensureFolderExists(
 					this.plugin.settings.createNewFileAfterRecordingPath
 				);
-				let noteContent = response.data.text;
+				let noteContent = outputText;
 				if (this.plugin.settings.saveAudioFile) {
 					const audioRef =
 						this.plugin.settings.audioLinkStyle === "link"
 							? `[[${audioFilePath}]]`
 							: `![[${audioFilePath}]]`;
-					noteContent = `${audioRef}\n${response.data.text}`;
+					noteContent = `${audioRef}\n${outputText}`;
 				}
 				await this.plugin.app.vault.create(
-					noteFilePath,
+					resolvedNoteFilePath,
 					noteContent
 				);
 				await this.plugin.app.workspace.openLinkText(
-					noteFilePath,
+					resolvedNoteFilePath,
 					"",
 					true
 				);
@@ -151,11 +219,11 @@ export class AudioHandler {
 					)?.editor;
 				if (editor) {
 					const cursorPosition = editor.getCursor();
-					editor.replaceRange(response.data.text, cursorPosition);
+					editor.replaceRange(outputText, cursorPosition);
 
 					const newPosition = {
 						line: cursorPosition.line,
-						ch: cursorPosition.ch + response.data.text.length,
+						ch: cursorPosition.ch + outputText.length,
 					};
 					editor.setCursor(newPosition);
 				}

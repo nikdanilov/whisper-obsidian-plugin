@@ -7,6 +7,12 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private settingsManager: SettingsManager;
 	private createNewFileInput: Setting;
 	private saveAudioFileInput: Setting;
+	private postProcessingModelInput: Setting;
+	private postProcessingApiKeyInput: Setting;
+	private postProcessingPromptInput: Setting;
+	private autoGenerateTitleInput: Setting;
+	private titleGenerationPromptInput: Setting;
+	private keepOriginalInput: Setting;
 
 	constructor(app: App, plugin: Whisper) {
 		super(app, plugin);
@@ -43,6 +49,15 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createPasteAtCursorSetting();
 		this.createAudioLinkStyleSetting();
 		this.createIgnoreUploadFilenameSetting();
+
+		containerEl.createEl("h2", { text: "Post-Processing" });
+		this.createPostProcessingToggleSetting();
+		this.createPostProcessingModelSetting();
+		this.createPostProcessingApiKeySetting();
+		this.createPostProcessingPromptSetting();
+		this.createAutoGenerateTitleSetting();
+		this.createTitleGenerationPromptSetting();
+		this.createKeepOriginalTranscriptionSetting();
 
 		containerEl.createEl("h2", { text: "Advanced" });
 		this.createDebugModeToggleSetting();
@@ -395,6 +410,160 @@ export class WhisperSettingsTab extends PluginSettingTab {
 						);
 					});
 			});
+	}
+
+	private createPostProcessingToggleSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Enable post-processing")
+			.setDesc(
+				"Use an LLM to clean up transcriptions — fix grammar, remove filler words, and improve readability"
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.postProcessingEnabled)
+					.onChange(async (value) => {
+						this.plugin.settings.postProcessingEnabled = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+						this.postProcessingModelInput.setDisabled(!value);
+						this.postProcessingApiKeyInput.setDisabled(!value);
+						this.postProcessingPromptInput.setDisabled(!value);
+						this.autoGenerateTitleInput.setDisabled(!value);
+						this.titleGenerationPromptInput.setDisabled(
+							!value || !this.plugin.settings.autoGenerateTitle
+						);
+						this.keepOriginalInput.setDisabled(!value);
+					});
+			});
+	}
+
+	private createPostProcessingModelSetting(): void {
+		const models: Record<string, string> = {
+			"claude-haiku-4-5-20251001": "Claude Haiku 4.5 (fast, cheap)",
+			"claude-sonnet-4-6-20260414": "Claude Sonnet 4.6",
+			"claude-opus-4-6-20260414": "Claude Opus 4.6",
+			"gpt-4o-mini": "GPT-4o Mini",
+			"gpt-4o": "GPT-4o",
+		};
+		this.postProcessingModelInput = new Setting(this.containerEl)
+			.setName("Post-processing model")
+			.setDesc("LLM model used for post-processing and title generation")
+			.addDropdown((dropdown) => {
+				for (const [value, label] of Object.entries(models)) {
+					dropdown.addOption(value, label);
+				}
+				dropdown.setValue(this.plugin.settings.postProcessingModel);
+				dropdown.onChange(async (value) => {
+					this.plugin.settings.postProcessingModel = value;
+					await this.settingsManager.saveSettings(
+						this.plugin.settings
+					);
+				});
+			})
+			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+	}
+
+	private createPostProcessingApiKeySetting(): void {
+		this.postProcessingApiKeyInput = new Setting(this.containerEl)
+			.setName("Post-processing API key")
+			.setDesc(
+				"API key for the post-processing model. Leave empty to use the Whisper API key (OpenAI models only)."
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder("sk-... or sk-ant-...")
+					.setValue(this.plugin.settings.postProcessingApiKey)
+					.onChange(async (value) => {
+						this.plugin.settings.postProcessingApiKey = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					})
+			)
+			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+	}
+
+	private createPostProcessingPromptSetting(): void {
+		this.postProcessingPromptInput = new Setting(this.containerEl)
+			.setName("Post-processing prompt")
+			.setDesc(
+				"Instructions for the LLM on how to clean up the transcription"
+			)
+			.addTextArea((text) => {
+				text.setPlaceholder("You are a transcription editor...")
+					.setValue(this.plugin.settings.postProcessingPrompt)
+					.onChange(async (value) => {
+						this.plugin.settings.postProcessingPrompt = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+				text.inputEl.rows = 4;
+				text.inputEl.cols = 50;
+			})
+			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+	}
+
+	private createAutoGenerateTitleSetting(): void {
+		this.autoGenerateTitleInput = new Setting(this.containerEl)
+			.setName("Auto-generate title")
+			.setDesc(
+				"Use the LLM to generate a descriptive filename for transcription notes"
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.autoGenerateTitle)
+					.onChange(async (value) => {
+						this.plugin.settings.autoGenerateTitle = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+						this.titleGenerationPromptInput.setDisabled(!value);
+					});
+			})
+			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+	}
+
+	private createTitleGenerationPromptSetting(): void {
+		this.titleGenerationPromptInput = new Setting(this.containerEl)
+			.setName("Title generation prompt")
+			.setDesc("Instructions for the LLM on how to generate the title")
+			.addTextArea((text) => {
+				text.setPlaceholder("Generate a short title...")
+					.setValue(this.plugin.settings.titleGenerationPrompt)
+					.onChange(async (value) => {
+						this.plugin.settings.titleGenerationPrompt = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+				text.inputEl.rows = 2;
+				text.inputEl.cols = 50;
+			})
+			.setDisabled(
+				!this.plugin.settings.postProcessingEnabled ||
+					!this.plugin.settings.autoGenerateTitle
+			);
+	}
+
+	private createKeepOriginalTranscriptionSetting(): void {
+		this.keepOriginalInput = new Setting(this.containerEl)
+			.setName("Keep original transcription")
+			.setDesc(
+				"Append the raw Whisper transcription below the post-processed text"
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.keepOriginalTranscription)
+					.onChange(async (value) => {
+						this.plugin.settings.keepOriginalTranscription = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+			})
+			.setDisabled(!this.plugin.settings.postProcessingEnabled);
 	}
 
 	private createDebugModeToggleSetting(): void {

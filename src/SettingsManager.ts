@@ -18,6 +18,13 @@ export interface WhisperSettings {
 	audioLinkStyle: "embed" | "link";
 	pasteAtCursor: boolean;
 	ignoreUploadFilename: boolean;
+	postProcessingEnabled: boolean;
+	postProcessingModel: string;
+	postProcessingApiKey: string;
+	postProcessingPrompt: string;
+	autoGenerateTitle: boolean;
+	titleGenerationPrompt: string;
+	keepOriginalTranscription: boolean;
 }
 
 export const DEFAULT_SETTINGS: WhisperSettings = {
@@ -38,6 +45,15 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	audioLinkStyle: "embed",
 	pasteAtCursor: false,
 	ignoreUploadFilename: false,
+	postProcessingEnabled: false,
+	postProcessingModel: "claude-haiku-4-5-20251001",
+	postProcessingApiKey: "",
+	postProcessingPrompt:
+		"You are a transcription editor. Clean up the following transcription: fix grammar, remove filler words and repetitions, and improve readability. Preserve the original meaning and language. Return only the polished text, nothing else.",
+	autoGenerateTitle: false,
+	titleGenerationPrompt:
+		"Generate a short title (1-5 words) for the following text. Return only the title, nothing else.",
+	keepOriginalTranscription: false,
 };
 
 export class SettingsManager {
