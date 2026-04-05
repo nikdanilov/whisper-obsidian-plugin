@@ -27,19 +27,19 @@ export interface TemplateVariables {
 	datetime: string;
 	title: string;
 	transcription: string;
-	audio: string;
+	audioFile: string;
 }
 
 export function buildTemplateVariables(
 	transcription: string,
 	title: string,
-	audioRef: string
+	audioFilePath: string
 ): TemplateVariables {
 	const now = new Date();
 	const date = now.toISOString().split("T")[0];
 	const time = now.toTimeString().split(" ")[0].replace(/:/g, "-");
 	const datetime = `${date} ${now.toTimeString().split(" ")[0]}`;
-	return { date, time, datetime, title, transcription, audio: audioRef };
+	return { date, time, datetime, title, transcription, audioFile: audioFilePath };
 }
 
 export function resolveTemplate(
@@ -52,7 +52,7 @@ export function resolveTemplate(
 		.replace(/\{\{datetime\}\}/g, vars.datetime)
 		.replace(/\{\{title\}\}/g, vars.title)
 		.replace(/\{\{transcription\}\}/g, vars.transcription)
-		.replace(/\{\{audio\}\}/g, vars.audio);
+		.replace(/\{\{audioFile\}\}/g, vars.audioFile);
 }
 
 export function getBaseFileName(filePath: string) {
