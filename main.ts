@@ -141,5 +141,27 @@ export default class Whisper extends Plugin {
 				fileInput.click();
 			},
 		});
+
+		this.addCommand({
+			id: "pause-resume-recording",
+			name: "Pause/resume recording",
+			callback: async () => {
+				if (this.recorder.getRecordingState() === "recording" ||
+					this.recorder.getRecordingState() === "paused") {
+					await this.recorder.pauseRecording();
+				}
+			},
+		});
+
+		this.addCommand({
+			id: "open-recording-controls",
+			name: "Open recording controls",
+			callback: () => {
+				if (!this.controls) {
+					this.controls = new Controls(this);
+				}
+				this.controls.open();
+			},
+		});
 	}
 }
