@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { getBaseFileName, getCursorContext, getExtensionFromMimeType } from "../src/utils";
+import {
+	getBaseFileName,
+	getCursorContext,
+	getExtensionFromMimeType,
+	resolveTemplate,
+	buildTemplateVariables,
+} from "../src/utils";
 
 describe("getBaseFileName", () => {
 	it("strips extension from simple filename", () => {
@@ -78,5 +84,64 @@ describe("getExtensionFromMimeType", () => {
 
 	it("maps mpeg to mp3", () => {
 		expect(getExtensionFromMimeType("audio/mpeg")).toBe("mp3");
+	});
+});
+
+describe("resolveTemplate", () => {
+	const vars = {
+		date: "2026-04-05",
+		time: "14-30-00",
+		datetime: "2026-04-05 14:30:00",
+		title: "Meeting Notes",
+		transcription: "Hello world",
+		audio: "![[recordings/rec.webm]]",
+	};
+
+	it("replaces all placeholders", () => {
+		const result = resolveTemplate(
+			"{{audio}}\n# {{title}}\n{{transcription}}",
+			vars
+		);
+		expect(result).toBe(
+			"![[recordings/rec.webm]]\n# Meeting Notes\nHello world"
+		);
+	});
+
+	it("replaces date/time placeholders in filename", () => {
+		const result = resolveTemplate("{{date}} {{title}}", vars);
+		expect(result).toBe("2026-04-05 Meeting Notes");
+	});
+
+	it("handles multiple occurrences of same variable", () => {
+		const result = resolveTemplate("{{date}} - {{date}}", vars);
+		expect(result).toBe("2026-04-05 - 2026-04-05");
+	});
+
+	it("leaves unknown placeholders unchanged", () => {
+		const result = resolveTemplate("{{unknown}} {{date}}", vars);
+		expect(result).toBe("{{unknown}} 2026-04-05");
+	});
+
+	it("handles template with no placeholders", () => {
+		const result = resolveTemplate("plain text", vars);
+		expect(result).toBe("plain text");
+	});
+
+	it("handles empty audio ref gracefully", () => {
+		const noAudioVars = { ...vars, audio: "" };
+		const result = resolveTemplate("{{audio}}\n{{transcription}}", noAudioVars);
+		expect(result).toBe("\nHello world");
+	});
+});
+
+describe("buildTemplateVariables", () => {
+	it("produces variables with correct types", () => {
+		const vars = buildTemplateVariables("text", "title", "![[audio.webm]]");
+		expect(vars.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+		expect(vars.time).toMatch(/^\d{2}-\d{2}-\d{2}$/);
+		expect(vars.datetime).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
+		expect(vars.title).toBe("title");
+		expect(vars.transcription).toBe("text");
+		expect(vars.audio).toBe("![[audio.webm]]");
 	});
 });

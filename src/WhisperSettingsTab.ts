@@ -45,6 +45,8 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createSaveAudioFilePathSetting();
 		this.createNewFileToggleSetting();
 		this.createNewFilePathSetting();
+		this.createNoteFilenameTemplateSetting();
+		this.createNoteTemplateSetting();
 		this.createPasteAtCursorSetting();
 		this.createAudioLinkStyleSetting();
 		this.createIgnoreUploadFilenameSetting();
@@ -378,6 +380,45 @@ export class WhisperSettingsTab extends PluginSettingTab {
 							this.plugin.settings
 						);
 					});
+			});
+	}
+
+	private createNoteFilenameTemplateSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Note filename template")
+			.setDesc(
+				"Template for note filenames. Variables: {{date}}, {{time}}, {{datetime}}, {{title}}"
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder("{{date}} {{title}}")
+					.setValue(this.plugin.settings.noteFilenameTemplate)
+					.onChange(async (value) => {
+						this.plugin.settings.noteFilenameTemplate = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					})
+			);
+	}
+
+	private createNoteTemplateSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Note template")
+			.setDesc(
+				"Template for note content. Variables: {{transcription}}, {{audio}}, {{date}}, {{time}}, {{datetime}}, {{title}}"
+			)
+			.addTextArea((text) => {
+				text.setPlaceholder("{{audio}}\n{{transcription}}")
+					.setValue(this.plugin.settings.noteTemplate)
+					.onChange(async (value) => {
+						this.plugin.settings.noteTemplate = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+				text.inputEl.rows = 4;
+				text.inputEl.cols = 50;
 			});
 	}
 
