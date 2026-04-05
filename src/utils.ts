@@ -21,6 +21,40 @@ export function getExtensionFromMimeType(mimeType: string | undefined): string {
 	return extensionMap[subtype] || subtype;
 }
 
+export interface TemplateVariables {
+	date: string;
+	time: string;
+	datetime: string;
+	title: string;
+	transcription: string;
+	audio: string;
+}
+
+export function buildTemplateVariables(
+	transcription: string,
+	title: string,
+	audioRef: string
+): TemplateVariables {
+	const now = new Date();
+	const date = now.toISOString().split("T")[0];
+	const time = now.toTimeString().split(" ")[0].replace(/:/g, "-");
+	const datetime = `${date} ${now.toTimeString().split(" ")[0]}`;
+	return { date, time, datetime, title, transcription, audio: audioRef };
+}
+
+export function resolveTemplate(
+	template: string,
+	vars: TemplateVariables
+): string {
+	return template
+		.replace(/\{\{date\}\}/g, vars.date)
+		.replace(/\{\{time\}\}/g, vars.time)
+		.replace(/\{\{datetime\}\}/g, vars.datetime)
+		.replace(/\{\{title\}\}/g, vars.title)
+		.replace(/\{\{transcription\}\}/g, vars.transcription)
+		.replace(/\{\{audio\}\}/g, vars.audio);
+}
+
 export function getBaseFileName(filePath: string) {
 	// Extract the file name including extension
 	const fileName = filePath.substring(filePath.lastIndexOf("/") + 1);

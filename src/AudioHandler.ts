@@ -1,7 +1,12 @@
 import axios from "axios";
 import Whisper from "main";
 import { Notice, MarkdownView } from "obsidian";
-import { getBaseFileName, getCursorContext } from "./utils";
+import {
+	getBaseFileName,
+	getCursorContext,
+	buildTemplateVariables,
+	resolveTemplate,
+} from "./utils";
 import { PostProcessor } from "./PostProcessor";
 
 export class AudioHandler {
@@ -160,7 +165,7 @@ export class AudioHandler {
 			}
 
 			// Auto-generate title for the note filename
-			let resolvedNoteFilePath = noteFilePath;
+			let generatedTitle = baseFileName;
 			if (
 				this.plugin.settings.autoGenerateTitle &&
 				this.plugin.settings.createNewFileAfterRecording
@@ -180,19 +185,15 @@ export class AudioHandler {
 							.replace(/[/\\?%*:|"<>\n]/g, "-")
 							.trim();
 						if (sanitizedTitle) {
-							const folder = this.plugin.settings.createNewFileAfterRecordingPath;
-							resolvedNoteFilePath = `${
-								folder ? `${folder}/` : ""
-							}${sanitizedTitle}.md`;
+							generatedTitle = sanitizedTitle;
 						}
 					} catch (err) {
 						console.error("Title generation failed:", err);
-						// Fall back to default filename
 					}
 				}
 			}
 
-			// Build note content
+			// Build note content with templates
 			const outputText = this.plugin.settings.keepOriginalTranscription && finalText !== originalText
 				? `${finalText}\n\n---\n\n*Original transcription:*\n${originalText}`
 				: finalText;
@@ -201,14 +202,36 @@ export class AudioHandler {
 				await this.ensureFolderExists(
 					this.plugin.settings.createNewFileAfterRecordingPath
 				);
-				let noteContent = outputText;
-				if (this.plugin.settings.saveAudioFile) {
-					const audioRef =
-						this.plugin.settings.audioLinkStyle === "link"
-							? `[[${audioFilePath}]]`
-							: `![[${audioFilePath}]]`;
-					noteContent = `${audioRef}\n${outputText}`;
-				}
+
+				const audioRef = this.plugin.settings.saveAudioFile
+					? (this.plugin.settings.audioLinkStyle === "link"
+						? `[[${audioFilePath}]]`
+						: `![[${audioFilePath}]]`)
+					: "";
+
+				const vars = buildTemplateVariables(
+					outputText,
+					generatedTitle,
+					audioRef
+				);
+
+				// Resolve filename template
+				const resolvedFilename = resolveTemplate(
+					this.plugin.settings.noteFilenameTemplate,
+					vars
+				).replace(/[/\\?%*:|"<>\n]/g, "-").trim() || baseFileName;
+
+				const folder = this.plugin.settings.createNewFileAfterRecordingPath;
+				const resolvedNoteFilePath = `${
+					folder ? `${folder}/` : ""
+				}${resolvedFilename}.md`;
+
+				// Resolve note content template
+				const noteContent = resolveTemplate(
+					this.plugin.settings.noteTemplate,
+					vars
+				).trim();
+
 				await this.plugin.app.vault.create(
 					resolvedNoteFilePath,
 					noteContent
