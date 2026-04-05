@@ -14,6 +14,7 @@ export interface WhisperSettings {
 	audioDeviceId: string;
 	temperature: number;
 	responseFormat: string;
+	sendCursorContext: boolean;
 }
 
 export const DEFAULT_SETTINGS: WhisperSettings = {
@@ -30,6 +31,7 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	audioDeviceId: "default",
 	temperature: 0,
 	responseFormat: "json",
+	sendCursorContext: false,
 };
 
 export class SettingsManager {

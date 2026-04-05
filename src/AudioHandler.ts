@@ -1,7 +1,7 @@
 import axios from "axios";
 import Whisper from "main";
 import { Notice, MarkdownView } from "obsidian";
-import { getBaseFileName } from "./utils";
+import { getBaseFileName, getCursorContext } from "./utils";
 
 export class AudioHandler {
 	private plugin: Whisper;
@@ -65,8 +65,20 @@ export class AudioHandler {
 		) {
 			formData.append("language", this.plugin.settings.language);
 		}
-		if (this.plugin.settings.prompt)
-			formData.append("prompt", this.plugin.settings.prompt);
+
+		let prompt = this.plugin.settings.prompt || "";
+		if (this.plugin.settings.sendCursorContext) {
+			const editor =
+				this.plugin.app.workspace.getActiveViewOfType(
+					MarkdownView
+				)?.editor;
+			if (editor) {
+				const context = getCursorContext(editor);
+				prompt = prompt ? `${prompt}\n${context}` : context;
+			}
+		}
+		if (prompt) formData.append("prompt", prompt);
+
 		if (this.plugin.settings.temperature !== 0)
 			formData.append(
 				"temperature",
