@@ -84,7 +84,8 @@ export default class Whisper extends Plugin {
 			id: "start-stop-recording",
 			name: "Start/stop recording",
 			callback: async () => {
-				if (this.statusBar.status !== RecordingStatus.Recording) {
+				if (this.statusBar.status !== RecordingStatus.Recording &&
+					this.statusBar.status !== RecordingStatus.Paused) {
 					this.statusBar.updateStatus(RecordingStatus.Recording);
 					new Notice("Recording...");
 
@@ -197,9 +198,11 @@ export default class Whisper extends Plugin {
 				const state = this.recorder.getRecordingState();
 				if (state === "recording") {
 					await this.recorder.pauseRecording();
+					this.statusBar.updateStatus(RecordingStatus.Paused);
 					new Notice("Recording paused");
 				} else if (state === "paused") {
 					await this.recorder.pauseRecording();
+					this.statusBar.updateStatus(RecordingStatus.Recording);
 					new Notice("Recording resumed");
 				}
 			},
