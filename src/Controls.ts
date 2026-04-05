@@ -1,6 +1,7 @@
 import Whisper from "main";
 import { ButtonComponent, Modal, Notice } from "obsidian";
 import { RecordingStatus } from "./StatusBar";
+import { getExtensionFromMimeType } from "./utils";
 
 export class Controls extends Modal {
 	private plugin: Whisper;
@@ -85,7 +86,9 @@ export class Controls extends Modal {
 		this.plugin.timer.reset();
 		this.resetGUI();
 
-		const extension = this.plugin.recorder.getMimeType()?.split("/")[1];
+		const extension = getExtensionFromMimeType(
+			this.plugin.recorder.getMimeType()
+		);
 		const fileName = `${new Date()
 			.toISOString()
 			.replace(/[:.]/g, "-")}.${extension}`;

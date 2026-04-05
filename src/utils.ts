@@ -9,6 +9,18 @@ export function getCursorContext(
 	return lines.slice(start, end).join("\n").trim();
 }
 
+export function getExtensionFromMimeType(mimeType: string | undefined): string {
+	if (!mimeType) return "webm";
+	const base = mimeType.split(";")[0];
+	const subtype = base.split("/")[1];
+	const extensionMap: Record<string, string> = {
+		"mp4a.40.2": "m4a",
+		"mpeg": "mp3",
+		"x-m4a": "m4a",
+	};
+	return extensionMap[subtype] || subtype;
+}
+
 export function getBaseFileName(filePath: string) {
 	// Extract the file name including extension
 	const fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
