@@ -36,23 +36,19 @@ export class AudioHandler {
 		}${baseFileName}.md`;
 
 		if (this.plugin.settings.debugMode) {
-			new Notice(`Sending audio data size: ${blob.size / 1000} KB`);
+			new Notice(`Sending ${Math.round(blob.size / 1000)} KB...`);
 		}
 
 		const isDefaultApi = this.plugin.settings.apiUrl ===
 			"https://api.openai.com/v1/audio/transcriptions";
 		if (isDefaultApi && !this.plugin.settings.apiKey) {
-			new Notice(
-				"API key is missing. Please add your API key in the settings."
-			);
+			new Notice("Add your API key in Whisper settings");
 			return;
 		}
 
 		const MIN_AUDIO_SIZE_BYTES = 1000;
 		if (blob.size < MIN_AUDIO_SIZE_BYTES) {
-			new Notice(
-				"Recording too short or silent — skipping transcription."
-			);
+			new Notice("Recording too short");
 			return;
 		}
 
@@ -101,16 +97,16 @@ export class AudioHandler {
 					audioFilePath,
 					new Uint8Array(arrayBuffer)
 				);
-				new Notice("Audio saved successfully.");
+				// No notice for intermediate save — final "Transcription complete" covers it
 			}
 		} catch (err) {
 			console.error("Error saving audio file:", err);
-			new Notice("Error saving audio file: " + (err instanceof Error ? err.message : String(err)));
+			new Notice("Couldn't save audio: " + (err instanceof Error ? err.message : String(err)));
 		}
 
 		try {
 			if (this.plugin.settings.debugMode) {
-				new Notice("Parsing audio data:" + fileName);
+				new Notice("Transcribing...");
 			}
 			const response = await axios.post(
 				this.plugin.settings.apiUrl,
@@ -165,10 +161,10 @@ export class AudioHandler {
 				}
 			}
 
-			new Notice("Audio parsed successfully.");
+			new Notice("Transcription complete");
 		} catch (err) {
 			console.error("Error parsing audio:", err);
-			new Notice("Error parsing audio: " + (err instanceof Error ? err.message : String(err)));
+			new Notice("Transcription failed: " + (err instanceof Error ? err.message : String(err)));
 		}
 	}
 }

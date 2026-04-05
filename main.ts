@@ -83,7 +83,7 @@ export default class Whisper extends Plugin {
 				if (this.statusBar.status !== RecordingStatus.Recording) {
 					this.statusBar.updateStatus(RecordingStatus.Recording);
 					await this.recorder.startRecording();
-					new Notice("Recording started");
+					new Notice("Recording...");
 				} else {
 					this.statusBar.updateStatus(RecordingStatus.Processing);
 					const audioBlob = await this.recorder.stopRecording();
