@@ -125,13 +125,7 @@ export class AudioHandler {
 				}
 			);
 
-			// Determine if a new file should be created
-			const activeView =
-				this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
-			const shouldCreateNewFile =
-				this.plugin.settings.createNewFileAfterRecording || !activeView;
-
-			if (shouldCreateNewFile) {
+			if (this.plugin.settings.createNewFileAfterRecording) {
 				await this.ensureFolderExists(
 					this.plugin.settings.createNewFileAfterRecordingPath
 				);
@@ -152,8 +146,9 @@ export class AudioHandler {
 					"",
 					true
 				);
-			} else {
-				// Insert the transcription at the cursor position
+			}
+
+			if (this.plugin.settings.pasteAtCursor) {
 				const editor =
 					this.plugin.app.workspace.getActiveViewOfType(
 						MarkdownView
@@ -162,7 +157,6 @@ export class AudioHandler {
 					const cursorPosition = editor.getCursor();
 					editor.replaceRange(response.data.text, cursorPosition);
 
-					// Move the cursor to the end of the inserted text
 					const newPosition = {
 						line: cursorPosition.line,
 						ch: cursorPosition.ch + response.data.text.length,

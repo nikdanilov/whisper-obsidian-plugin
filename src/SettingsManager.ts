@@ -16,6 +16,7 @@ export interface WhisperSettings {
 	responseFormat: string;
 	sendCursorContext: boolean;
 	audioLinkStyle: "embed" | "link";
+	pasteAtCursor: boolean;
 }
 
 export const DEFAULT_SETTINGS: WhisperSettings = {
@@ -34,6 +35,7 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	responseFormat: "json",
 	sendCursorContext: false,
 	audioLinkStyle: "embed",
+	pasteAtCursor: false,
 };
 
 export class SettingsManager {
