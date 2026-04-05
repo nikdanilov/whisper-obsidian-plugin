@@ -7,7 +7,7 @@ describe("DEFAULT_SETTINGS", () => {
 			"https://api.openai.com/v1/audio/transcriptions"
 		);
 		expect(DEFAULT_SETTINGS.model).toBe("whisper-1");
-		expect(DEFAULT_SETTINGS.language).toBe("en");
+		expect(DEFAULT_SETTINGS.language).toBe("");
 		expect(DEFAULT_SETTINGS.saveAudioFile).toBe(true);
 		expect(DEFAULT_SETTINGS.createNewFileAfterRecording).toBe(true);
 	});

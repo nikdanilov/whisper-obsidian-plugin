@@ -123,8 +123,8 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private createLanguageSetting(): void {
 		this.createTextSetting(
 			"Language",
-			"Specify the language of the message being whispered",
-			"en",
+			"Specify the language, or leave empty for auto-detection",
+			"en (leave empty for auto-detect)",
 			this.plugin.settings.language,
 			async (value) => {
 				this.plugin.settings.language = value;
