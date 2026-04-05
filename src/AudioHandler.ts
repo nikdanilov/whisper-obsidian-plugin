@@ -39,7 +39,9 @@ export class AudioHandler {
 			new Notice(`Sending audio data size: ${blob.size / 1000} KB`);
 		}
 
-		if (!this.plugin.settings.apiKey) {
+		const isDefaultApi = this.plugin.settings.apiUrl ===
+			"https://api.openai.com/v1/audio/transcriptions";
+		if (isDefaultApi && !this.plugin.settings.apiKey) {
 			new Notice(
 				"API key is missing. Please add your API key in the settings."
 			);
@@ -89,7 +91,9 @@ export class AudioHandler {
 				{
 					headers: {
 						"Content-Type": "multipart/form-data",
-						Authorization: `Bearer ${this.plugin.settings.apiKey}`,
+						...(this.plugin.settings.apiKey
+							? { Authorization: `Bearer ${this.plugin.settings.apiKey}` }
+							: {}),
 					},
 				}
 			);
