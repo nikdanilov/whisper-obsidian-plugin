@@ -105,7 +105,7 @@ export class AudioHandler {
 			}
 		} catch (err) {
 			console.error("Error saving audio file:", err);
-			new Notice("Error saving audio file: " + err.message);
+			new Notice("Error saving audio file: " + (err instanceof Error ? err.message : String(err)));
 		}
 
 		try {
@@ -168,7 +168,7 @@ export class AudioHandler {
 			new Notice("Audio parsed successfully.");
 		} catch (err) {
 			console.error("Error parsing audio:", err);
-			new Notice("Error parsing audio: " + err.message);
+			new Notice("Error parsing audio: " + (err instanceof Error ? err.message : String(err)));
 		}
 	}
 }
