@@ -74,13 +74,7 @@ export class AudioHandler {
 				}
 			);
 
-			// Determine if a new file should be created
-			const activeView =
-				this.plugin.app.workspace.getActiveViewOfType(MarkdownView);
-			const shouldCreateNewFile =
-				this.plugin.settings.createNewFileAfterRecording || !activeView;
-
-			if (shouldCreateNewFile) {
+			if (this.plugin.settings.createNewFileAfterRecording) {
 				await this.plugin.app.vault.create(
 					noteFilePath,
 					`![[${audioFilePath}]]\n${response.data.text}`
@@ -90,8 +84,7 @@ export class AudioHandler {
 					"",
 					true
 				);
-			} else {
-				// Insert the transcription at the cursor position
+			if (!this.plugin.settings.createNewFileAfterRecording) {
 				const editor =
 					this.plugin.app.workspace.getActiveViewOfType(
 						MarkdownView
