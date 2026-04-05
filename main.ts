@@ -77,10 +77,10 @@ export default class Whisper extends Plugin {
 	}
 
 	registerUriHandler() {
-		// URI format: obsidian://whisper?action=start|stop|pause|cancel
-		// Default (no action): opens recording controls modal
+		// URI format: obsidian://whisper?command=start|stop|pause|cancel
+		// Default (no command): opens recording controls modal
 		this.registerObsidianProtocolHandler("whisper", async (params) => {
-			const action = params.action;
+			const action = params.command;
 
 			if (!action) {
 				// Default: open recording controls
