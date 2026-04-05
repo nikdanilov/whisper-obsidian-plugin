@@ -131,8 +131,12 @@ export class Controls extends Modal {
 	}
 
 	async pauseRecording() {
+		const wasPaused = this.plugin.recorder.getRecordingState() === "paused";
 		await this.plugin.recorder.pauseRecording();
 		this.plugin.timer.pause();
+		this.plugin.statusBar.updateStatus(
+			wasPaused ? RecordingStatus.Recording : RecordingStatus.Paused
+		);
 		this.resetGUI();
 	}
 
