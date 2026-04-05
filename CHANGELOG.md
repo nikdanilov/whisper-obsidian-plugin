@@ -1,5 +1,12 @@
 
 
+## [1.6.1](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.6.0...1.6.1) (2026-04-05)
+
+
+### Bug Fixes
+
+* recording controls UX — show/hide buttons, paused state ([0fbd64c](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/0fbd64c368a3cd13e7319179aee108ffc1589963))
+
 ## [1.6.0](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.5.5...1.6.0) (2026-04-05)
 
 
