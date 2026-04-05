@@ -37,6 +37,14 @@ export class AudioHandler {
 			return;
 		}
 
+		const MIN_AUDIO_SIZE_BYTES = 1000;
+		if (blob.size < MIN_AUDIO_SIZE_BYTES) {
+			new Notice(
+				"Recording too short or silent — skipping transcription."
+			);
+			return;
+		}
+
 		const formData = new FormData();
 		formData.append("file", blob, fileName);
 		formData.append("model", this.plugin.settings.model);
