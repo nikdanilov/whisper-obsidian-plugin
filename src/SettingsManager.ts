@@ -1,7 +1,12 @@
 import { Plugin } from "obsidian";
 
-export interface WhisperSettings {
+export interface ApiKeysSettings {
 	apiKey: string;
+	openAiApiKey: string;
+	anthropicApiKey: string;
+}
+
+export interface WhisperSettings {
 	apiUrl: string;
 	model: string;
 	prompt: string;
@@ -20,8 +25,26 @@ export interface WhisperSettings {
 	ignoreUploadFilename: boolean;
 }
 
-export const DEFAULT_SETTINGS: WhisperSettings = {
+export interface PostProcessingSettings {
+	postProcessingEnabled: boolean;
+	postProcessingModel: string;
+	postProcessingPrompt: string;
+	autoGenerateTitle: boolean;
+	titleGenerationPrompt: string;
+	keepOriginalTranscription: boolean;
+}
+
+export type PluginSettings = ApiKeysSettings &
+	WhisperSettings &
+	PostProcessingSettings;
+
+export const DEFAULT_API_KEYS: ApiKeysSettings = {
 	apiKey: "",
+	openAiApiKey: "",
+	anthropicApiKey: "",
+};
+
+export const DEFAULT_WHISPER: WhisperSettings = {
 	apiUrl: "https://api.openai.com/v1/audio/transcriptions",
 	model: "whisper-1",
 	prompt: "",
@@ -40,6 +63,23 @@ export const DEFAULT_SETTINGS: WhisperSettings = {
 	ignoreUploadFilename: false,
 };
 
+export const DEFAULT_POST_PROCESSING: PostProcessingSettings = {
+	postProcessingEnabled: false,
+	postProcessingModel: "claude-haiku-4-5-20251001",
+	postProcessingPrompt:
+		"You are a transcription editor. Clean up the following transcription: fix grammar, remove filler words and repetitions, and improve readability. Preserve the original meaning and language. Return only the polished text, nothing else.",
+	autoGenerateTitle: false,
+	titleGenerationPrompt:
+		"Generate a short title (1-5 words) for the following text. Return only the title, nothing else.",
+	keepOriginalTranscription: false,
+};
+
+export const DEFAULT_SETTINGS: PluginSettings = {
+	...DEFAULT_API_KEYS,
+	...DEFAULT_WHISPER,
+	...DEFAULT_POST_PROCESSING,
+};
+
 export class SettingsManager {
 	private plugin: Plugin;
 
@@ -47,7 +87,7 @@ export class SettingsManager {
 		this.plugin = plugin;
 	}
 
-	async loadSettings(): Promise<WhisperSettings> {
+	async loadSettings(): Promise<PluginSettings> {
 		return Object.assign(
 			{},
 			DEFAULT_SETTINGS,
@@ -55,7 +95,7 @@ export class SettingsManager {
 		);
 	}
 
-	async saveSettings(settings: WhisperSettings): Promise<void> {
+	async saveSettings(settings: PluginSettings): Promise<void> {
 		await this.plugin.saveData(settings);
 	}
 }
