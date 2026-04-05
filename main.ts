@@ -120,7 +120,7 @@ export default class Whisper extends Plugin {
 				// Create an input element for file selection
 				const fileInput = document.createElement("input");
 				fileInput.type = "file";
-				fileInput.accept = "audio/*"; // Accept only audio files
+				fileInput.accept = "audio/*,video/*,.mp4,.m4a,.wav,.webm,.ogg,.mp3";
 
 				// Handle file selection
 				fileInput.onchange = async (event) => {
