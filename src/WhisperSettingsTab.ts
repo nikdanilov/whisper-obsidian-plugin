@@ -31,6 +31,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createResponseFormatSetting();
 		this.createNewFileToggleSetting();
 		this.createNewFilePathSetting();
+		this.createSendCursorContextSetting();
 		this.createDebugModeToggleSetting();
 	}
 
@@ -304,6 +305,24 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.createNewFileAfterRecordingPath =
 							value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+			});
+	}
+
+	private createSendCursorContextSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Send cursor context")
+			.setDesc(
+				"Send text around the cursor as context to Whisper for better transcription accuracy"
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.sendCursorContext)
+					.onChange(async (value) => {
+						this.plugin.settings.sendCursorContext = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
