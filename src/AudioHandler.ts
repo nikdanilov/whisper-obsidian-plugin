@@ -42,13 +42,13 @@ export class AudioHandler {
 		const isDefaultApi = this.plugin.settings.apiUrl ===
 			"https://api.openai.com/v1/audio/transcriptions";
 		if (isDefaultApi && !this.plugin.settings.apiKey) {
-			new Notice("Add your API key in Whisper settings");
+			new Notice("✘ Add your API key in Whisper settings");
 			return;
 		}
 
 		const MIN_AUDIO_SIZE_BYTES = 1000;
 		if (blob.size < MIN_AUDIO_SIZE_BYTES) {
-			new Notice("Recording too short");
+			new Notice("✘ Recording too short");
 			return;
 		}
 
@@ -101,7 +101,7 @@ export class AudioHandler {
 			}
 		} catch (err) {
 			console.error("Error saving audio file:", err);
-			new Notice("Couldn't save audio: " + (err instanceof Error ? err.message : String(err)));
+			new Notice("✘ Couldn't save audio: " + (err instanceof Error ? err.message : String(err)));
 		}
 
 		try {
@@ -164,7 +164,7 @@ export class AudioHandler {
 			new Notice("Transcription complete");
 		} catch (err) {
 			console.error("Error parsing audio:", err);
-			new Notice("Transcription failed: " + (err instanceof Error ? err.message : String(err)));
+			new Notice("✘ Transcription failed: " + (err instanceof Error ? err.message : String(err)));
 		}
 	}
 }

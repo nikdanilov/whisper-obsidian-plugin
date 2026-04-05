@@ -72,7 +72,7 @@ export class NativeAudioRecorder implements AudioRecorder {
 
 				this.recorder = recorder;
 			} catch (err) {
-				new Notice("Couldn't access microphone");
+				new Notice("✘ Couldn't access microphone");
 				console.error("Error initializing recorder:", err);
 				return;
 			}
