@@ -10,6 +10,15 @@ export class AudioHandler {
 		this.plugin = plugin;
 	}
 
+	private async ensureFolderExists(folderPath: string): Promise<void> {
+		if (
+			folderPath &&
+			!(await this.plugin.app.vault.adapter.exists(folderPath))
+		) {
+			await this.plugin.app.vault.createFolder(folderPath);
+		}
+	}
+
 	async sendAudioData(blob: Blob, fileName: string): Promise<void> {
 		// Get the base file name without extension
 		const baseFileName = getBaseFileName(fileName);
@@ -47,6 +56,9 @@ export class AudioHandler {
 		try {
 			// If the saveAudioFile setting is true, save the audio file
 			if (this.plugin.settings.saveAudioFile) {
+				await this.ensureFolderExists(
+					this.plugin.settings.saveAudioFilePath
+				);
 				const arrayBuffer = await blob.arrayBuffer();
 				await this.plugin.app.vault.adapter.writeBinary(
 					audioFilePath,
@@ -81,6 +93,9 @@ export class AudioHandler {
 				this.plugin.settings.createNewFileAfterRecording || !activeView;
 
 			if (shouldCreateNewFile) {
+				await this.ensureFolderExists(
+					this.plugin.settings.createNewFileAfterRecordingPath
+				);
 				await this.plugin.app.vault.create(
 					noteFilePath,
 					`![[${audioFilePath}]]\n${response.data.text}`
