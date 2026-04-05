@@ -67,6 +67,16 @@ export class AudioHandler {
 		}
 		if (this.plugin.settings.prompt)
 			formData.append("prompt", this.plugin.settings.prompt);
+		if (this.plugin.settings.temperature !== 0)
+			formData.append(
+				"temperature",
+				String(this.plugin.settings.temperature)
+			);
+		if (this.plugin.settings.responseFormat !== "json")
+			formData.append(
+				"response_format",
+				this.plugin.settings.responseFormat
+			);
 
 		try {
 			// If the saveAudioFile setting is true, save the audio file
