@@ -63,7 +63,7 @@ export const DEFAULT_WHISPER: WhisperSettings = {
 	audioSavePath: "",
 	createNoteFile: false,
 	noteSavePath: "",
-	noteFilenameTemplate: "{{date}} {{title}}",
+	noteFilenameTemplate: "{{datetime}}",
 	noteTemplate: "{{audio}}\n{{transcription}}",
 	audioLinkStyle: "embed",
 	useTimestampFilename: false,

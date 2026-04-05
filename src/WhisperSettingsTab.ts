@@ -392,7 +392,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			)
 			.addText((text) =>
 				text
-					.setPlaceholder("{{date}} {{title}}")
+					.setPlaceholder("{{datetime}}")
 					.setValue(this.plugin.settings.noteFilenameTemplate)
 					.onChange(async (value) => {
 						this.plugin.settings.noteFilenameTemplate = value;
