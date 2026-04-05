@@ -8,6 +8,7 @@ export class Timer {
 	}
 
 	start(): void {
+		if (this.intervalId !== null) return;
 		this.intervalId = window.setInterval(() => {
 			this.elapsedTime += 1000;
 			if (this.onUpdate) {

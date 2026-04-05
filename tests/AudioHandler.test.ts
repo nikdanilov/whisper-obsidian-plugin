@@ -325,3 +325,47 @@ describe("buildAudioFilePath", () => {
 		expect(buildAudioFilePath(settings, "rec.webm")).toBe("rec.webm");
 	});
 });
+
+describe("isDefaultApi — API key requirement", () => {
+	const DEFAULT_URL = "https://api.openai.com/v1/audio/transcriptions";
+
+	function isApiKeyRequired(apiUrl: string, apiKey: string): boolean {
+		const isDefaultApi = apiUrl === DEFAULT_URL;
+		return isDefaultApi && !apiKey;
+	}
+
+	it("requires API key for default OpenAI URL", () => {
+		expect(isApiKeyRequired(DEFAULT_URL, "")).toBe(true);
+	});
+
+	it("does not require API key for custom URL", () => {
+		expect(isApiKeyRequired("http://localhost:9000/asr", "")).toBe(false);
+	});
+
+	it("passes when API key is provided for default URL", () => {
+		expect(isApiKeyRequired(DEFAULT_URL, "sk-abc")).toBe(false);
+	});
+});
+
+describe("file-menu audio extension matching", () => {
+	const audioExtensions = ['.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm', '.ogg'];
+	const isAudioFile = (path: string) => audioExtensions.some(ext => path.endsWith(ext));
+
+	it("matches common audio files", () => {
+		expect(isAudioFile("recording.mp3")).toBe(true);
+		expect(isAudioFile("folder/audio.webm")).toBe(true);
+		expect(isAudioFile("voice.ogg")).toBe(true);
+		expect(isAudioFile("meeting.m4a")).toBe(true);
+	});
+
+	it("rejects non-audio files", () => {
+		expect(isAudioFile("document.pdf")).toBe(false);
+		expect(isAudioFile("image.png")).toBe(false);
+		expect(isAudioFile("note.md")).toBe(false);
+	});
+
+	it("does not false-positive on partial extension matches", () => {
+		expect(isAudioFile("stamp3")).toBe(false);
+		expect(isAudioFile("camp3")).toBe(false);
+	});
+});
