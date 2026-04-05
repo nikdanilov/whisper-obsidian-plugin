@@ -46,6 +46,7 @@ export class Setting {
 	setDesc(_d: string) { return this; }
 	addText(_cb: any) { return this; }
 	addToggle(_cb: any) { return this; }
+	addDropdown(_cb: any) { return this; }
 	setDisabled(_d: boolean) { return this; }
 }
 
