@@ -3,6 +3,7 @@ import axios from "axios";
 export interface PostProcessorConfig {
 	apiKey: string;
 	model: string;
+	url: string;
 }
 
 export class PostProcessor {
@@ -25,7 +26,7 @@ export class PostProcessor {
 
 	private async callOpenAI(text: string, prompt: string): Promise<string> {
 		const response = await axios.post(
-			"https://api.openai.com/v1/chat/completions",
+			this.config.url,
 			{
 				model: this.config.model,
 				messages: [
@@ -45,7 +46,7 @@ export class PostProcessor {
 
 	private async callAnthropic(text: string, prompt: string): Promise<string> {
 		const response = await axios.post(
-			"https://api.anthropic.com/v1/messages",
+			this.config.url,
 			{
 				model: this.config.model,
 				max_tokens: 8192,

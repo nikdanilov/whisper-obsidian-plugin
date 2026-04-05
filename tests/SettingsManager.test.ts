@@ -21,17 +21,12 @@ describe("DEFAULT_SETTINGS", () => {
 
 	it("disables optional features by default", () => {
 		expect(DEFAULT_SETTINGS.cursorContext).toBe(false);
-		expect(DEFAULT_SETTINGS.useTimestampFilename).toBe(false);
 		expect(DEFAULT_SETTINGS.debugMode).toBe(false);
 	});
 
 	it("has safe Whisper API param defaults", () => {
 		expect(DEFAULT_SETTINGS.temperature).toBe(0);
 		expect(DEFAULT_SETTINGS.responseFormat).toBe("json");
-	});
-
-	it("defaults to embed audio link style", () => {
-		expect(DEFAULT_SETTINGS.audioLinkStyle).toBe("embed");
 	});
 
 	it("defaults to system audio device", () => {

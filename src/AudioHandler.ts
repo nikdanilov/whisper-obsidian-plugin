@@ -152,6 +152,7 @@ export class AudioHandler {
 					const processor = new PostProcessor({
 						apiKey: ppApiKey,
 						model: this.plugin.settings.postProcessingModel,
+						url: this.plugin.settings.postProcessingUrl,
 					});
 					finalText = await processor.process(
 						originalText,
@@ -176,6 +177,7 @@ export class AudioHandler {
 						const processor = new PostProcessor({
 							apiKey: ppApiKey,
 							model: this.plugin.settings.postProcessingModel,
+							url: this.plugin.settings.postProcessingUrl,
 						});
 						const title = await processor.process(
 							finalText,
@@ -203,16 +205,10 @@ export class AudioHandler {
 					this.plugin.settings.noteSavePath
 				);
 
-				const audioRef = this.plugin.settings.saveAudioFile
-					? (this.plugin.settings.audioLinkStyle === "link"
-						? `[[${audioFilePath}]]`
-						: `![[${audioFilePath}]]`)
-					: "";
-
 				const vars = buildTemplateVariables(
 					outputText,
 					generatedTitle,
-					audioRef
+					audioFilePath
 				);
 
 				// Resolve filename template

@@ -48,21 +48,11 @@ function buildAudioFilePath(settings: PluginSettings, fileName: string) {
 		: fileName;
 }
 
-function buildNoteContent(
-	settings: PluginSettings,
-	audioFilePath: string,
-	transcription: string
-) {
-	// #52: don't include audio link if save is disabled
-	if (!settings.saveAudioFile) {
-		return transcription;
-	}
-	// #26: embed vs link style
-	const linkStyle = (settings as any).audioLinkStyle;
-	if (linkStyle === "link") {
-		return `[[${audioFilePath}]]\n${transcription}`;
-	}
-	return `![[${audioFilePath}]]\n${transcription}`;
+function getAudioFilePath(settings: PluginSettings, fileName: string): string {
+	if (!settings.saveAudioFile) return "";
+	return settings.audioSavePath
+		? `${settings.audioSavePath}/${fileName}`
+		: fileName;
 }
 
 // #40: auto-create folders
@@ -113,16 +103,14 @@ describe("#40 — Auto-create folders", () => {
 });
 
 describe("#52 — Phantom audio link fix", () => {
-	it("includes audio embed when saveAudioFile is true", () => {
+	it("returns audio path when saveAudioFile is true", () => {
 		const settings = { ...DEFAULT_SETTINGS, saveAudioFile: true };
-		const content = buildNoteContent(settings, "audio/rec.webm", "Hello world");
-		expect(content).toBe("![[audio/rec.webm]]\nHello world");
+		expect(getAudioFilePath(settings, "rec.webm")).toBe("rec.webm");
 	});
 
-	it("excludes audio link when saveAudioFile is false", () => {
+	it("returns empty string when saveAudioFile is false", () => {
 		const settings = { ...DEFAULT_SETTINGS, saveAudioFile: false };
-		const content = buildNoteContent(settings, "audio/rec.webm", "Hello world");
-		expect(content).toBe("Hello world");
+		expect(getAudioFilePath(settings, "rec.webm")).toBe("");
 	});
 });
 
@@ -177,54 +165,6 @@ describe("#65 — Silence/hallucination guard", () => {
 		const blob = new Blob([new ArrayBuffer(500)], { type: "audio/webm" });
 		expect(isSilentRecording(blob, 200)).toBe(false);
 		expect(isSilentRecording(blob, 1000)).toBe(true);
-	});
-});
-
-describe("#26 — Audio link style", () => {
-	it("uses embed syntax by default", () => {
-		const settings = { ...DEFAULT_SETTINGS, saveAudioFile: true };
-		const content = buildNoteContent(settings, "rec.webm", "text");
-		expect(content).toContain("![[rec.webm]]");
-	});
-
-	it("uses link syntax when configured", () => {
-		const settings = { ...DEFAULT_SETTINGS, saveAudioFile: true, audioLinkStyle: "link" } as any;
-		const content = buildNoteContent(settings, "rec.webm", "text");
-		expect(content).toBe("[[rec.webm]]\ntext");
-		expect(content).not.toContain("![[");
-	});
-});
-
-describe("#68 — Ignore upload filename", () => {
-	it("generates timestamp filename when useTimestampFilename is true", () => {
-		const originalName = "my-important-meeting.mp3";
-		const useTimestampFilename = true;
-
-		let fileName: string;
-		if (useTimestampFilename) {
-			const extension = originalName.split(".").pop();
-			fileName = `${new Date().toISOString().replace(/[:.]/g, "-")}.${extension}`;
-		} else {
-			fileName = originalName;
-		}
-
-		expect(fileName).not.toBe(originalName);
-		expect(fileName).toMatch(/\.mp3$/);
-	});
-
-	it("keeps original filename when useTimestampFilename is false", () => {
-		const originalName = "my-important-meeting.mp3";
-		const useTimestampFilename = false;
-
-		let fileName: string;
-		if (useTimestampFilename) {
-			const extension = originalName.split(".").pop();
-			fileName = `${new Date().toISOString().replace(/[:.]/g, "-")}.${extension}`;
-		} else {
-			fileName = originalName;
-		}
-
-		expect(fileName).toBe(originalName);
 	});
 });
 

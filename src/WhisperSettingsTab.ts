@@ -7,6 +7,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private settingsManager: SettingsManager;
 	private createNewFileInput: Setting;
 	private saveAudioFileInput: Setting;
+	private postProcessingUrlInput: Setting;
 	private postProcessingModelInput: Setting;
 	private postProcessingPromptInput: Setting;
 	private autoGenerateTitleInput: Setting;
@@ -47,13 +48,12 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createNewFilePathSetting();
 		this.createNoteFilenameTemplateSetting();
 		this.createNoteTemplateSetting();
-		this.createAudioLinkStyleSetting();
-		this.createIgnoreUploadFilenameSetting();
 		this.createDebugModeToggleSetting();
 
 		// --- Post-Processing Settings ---
 		containerEl.createEl("h2", { text: "Post-Processing Settings" });
 		this.createPostProcessingToggleSetting();
+		this.createPostProcessingUrlSetting();
 		this.createPostProcessingModelSetting();
 		this.createPostProcessingPromptSetting();
 		this.createAutoGenerateTitleSetting();
@@ -286,28 +286,6 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			.setDisabled(!this.plugin.settings.saveAudioFile);
 	}
 
-	private createAudioLinkStyleSetting(): void {
-		new Setting(this.containerEl)
-			.setName("Audio link style")
-			.setDesc(
-				"Choose how the audio file is referenced in notes: embed (playable) or link"
-			)
-			.addDropdown((dropdown) => {
-				dropdown
-					.addOption("embed", "Embed (![[file]])")
-					.addOption("link", "Link ([[file]])")
-					.setValue(this.plugin.settings.audioLinkStyle)
-					.onChange(async (value) => {
-						this.plugin.settings.audioLinkStyle = value as
-							| "embed"
-							| "link";
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
-					});
-			});
-	}
-
 	private createTemperatureSetting(): void {
 		this.createTextSetting(
 			"Temperature",
@@ -390,7 +368,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			)
 			.addText((text) =>
 				text
-					.setPlaceholder("{{date}} {{title}}")
+					.setPlaceholder("{{datetime}}")
 					.setValue(this.plugin.settings.noteFilenameTemplate)
 					.onChange(async (value) => {
 						this.plugin.settings.noteFilenameTemplate = value;
@@ -405,10 +383,10 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		new Setting(this.containerEl)
 			.setName("Note template")
 			.setDesc(
-				"Template for note content. Variables: {{transcription}}, {{audio}}, {{date}}, {{time}}, {{datetime}}, {{title}}"
+				"Template for note content. Variables: {{transcription}}, {{audioFile}}, {{date}}, {{time}}, {{datetime}}, {{title}}. Use ![[{{audioFile}}]] to embed or [[{{audioFile}}]] to link."
 			)
 			.addTextArea((text) => {
-				text.setPlaceholder("{{audio}}\n{{transcription}}")
+				text.setPlaceholder("![[{{audioFile}}]]\n{{transcription}}")
 					.setValue(this.plugin.settings.noteTemplate)
 					.onChange(async (value) => {
 						this.plugin.settings.noteTemplate = value;
@@ -439,24 +417,6 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			});
 	}
 
-	private createIgnoreUploadFilenameSetting(): void {
-		new Setting(this.containerEl)
-			.setName("Use timestamp filename")
-			.setDesc(
-				"Replace the original filename with a timestamp when uploading audio files"
-			)
-			.addToggle((toggle) => {
-				toggle
-					.setValue(this.plugin.settings.useTimestampFilename)
-					.onChange(async (value) => {
-						this.plugin.settings.useTimestampFilename = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
-					});
-			});
-	}
-
 	private createPostProcessingToggleSetting(): void {
 		new Setting(this.containerEl)
 			.setName("Post-processing")
@@ -471,6 +431,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
+						this.postProcessingUrlInput.setDisabled(!value);
 						this.postProcessingModelInput.setDisabled(!value);
 						this.postProcessingPromptInput.setDisabled(!value);
 						this.autoGenerateTitleInput.setDisabled(!value);
@@ -482,29 +443,43 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			});
 	}
 
+	private createPostProcessingUrlSetting(): void {
+		this.postProcessingUrlInput = new Setting(this.containerEl)
+			.setName("Post-processing API URL")
+			.setDesc(
+				"Endpoint for post-processing requests. Change for Anthropic, Ollama, or other providers."
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder("https://api.anthropic.com/v1/messages")
+					.setValue(this.plugin.settings.postProcessingUrl)
+					.onChange(async (value) => {
+						this.plugin.settings.postProcessingUrl = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					})
+			)
+			.setDisabled(!this.plugin.settings.postProcessing);
+	}
+
 	private createPostProcessingModelSetting(): void {
-		const models: Record<string, string> = {
-			"claude-haiku-4-5-20251001": "Claude Haiku 4.5 (fast, cheap)",
-			"claude-sonnet-4-6-20260414": "Claude Sonnet 4.6",
-			"claude-opus-4-6-20260414": "Claude Opus 4.6",
-			"gpt-4o-mini": "GPT-4o Mini",
-			"gpt-4o": "GPT-4o",
-		};
 		this.postProcessingModelInput = new Setting(this.containerEl)
 			.setName("Post-processing model")
-			.setDesc("LLM model used for post-processing and title generation")
-			.addDropdown((dropdown) => {
-				for (const [value, label] of Object.entries(models)) {
-					dropdown.addOption(value, label);
-				}
-				dropdown.setValue(this.plugin.settings.postProcessingModel);
-				dropdown.onChange(async (value) => {
-					this.plugin.settings.postProcessingModel = value;
-					await this.settingsManager.saveSettings(
-						this.plugin.settings
-					);
-				});
-			})
+			.setDesc(
+				"Model ID for post-processing and title generation (e.g. claude-haiku-4-5-20251001, gpt-4.1-nano)"
+			)
+			.addText((text) =>
+				text
+					.setPlaceholder("claude-haiku-4-5-20251001")
+					.setValue(this.plugin.settings.postProcessingModel)
+					.onChange(async (value) => {
+						this.plugin.settings.postProcessingModel = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					})
+			)
 			.setDisabled(!this.plugin.settings.postProcessing);
 	}
 
@@ -531,7 +506,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createAutoGenerateTitleSetting(): void {
 		this.autoGenerateTitleInput = new Setting(this.containerEl)
-			.setName("Generate title")
+			.setName("Auto-generate title")
 			.setDesc(
 				"Use the LLM to generate a descriptive filename for notes"
 			)
@@ -573,10 +548,10 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	private createKeepOriginalTranscriptionSetting(): void {
 		this.keepOriginalInput = new Setting(this.containerEl)
-			.setName("Keep original")
+			.setName("Keep original transcription")
 			.setDesc(
-				"Append the raw Whisper transcription below the polished text"
-			)
+				"Append the raw Whisper transcription below the post-processed text"
+			)	
 			.addToggle((toggle) => {
 				toggle
 					.setValue(this.plugin.settings.keepOriginalTranscription)

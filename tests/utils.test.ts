@@ -94,12 +94,12 @@ describe("resolveTemplate", () => {
 		datetime: "2026-04-05 14:30:00",
 		title: "Meeting Notes",
 		transcription: "Hello world",
-		audio: "![[recordings/rec.webm]]",
+		audioFile: "recordings/rec.webm",
 	};
 
 	it("replaces all placeholders", () => {
 		const result = resolveTemplate(
-			"{{audio}}\n# {{title}}\n{{transcription}}",
+			"![[{{audioFile}}]]\n# {{title}}\n{{transcription}}",
 			vars
 		);
 		expect(result).toBe(
@@ -127,21 +127,26 @@ describe("resolveTemplate", () => {
 		expect(result).toBe("plain text");
 	});
 
-	it("handles empty audio ref gracefully", () => {
-		const noAudioVars = { ...vars, audio: "" };
-		const result = resolveTemplate("{{audio}}\n{{transcription}}", noAudioVars);
-		expect(result).toBe("\nHello world");
+	it("handles empty audioFile gracefully", () => {
+		const noAudioVars = { ...vars, audioFile: "" };
+		const result = resolveTemplate("![[{{audioFile}}]]\n{{transcription}}", noAudioVars);
+		expect(result).toBe("![[]]\nHello world");
+	});
+
+	it("supports link syntax for audio", () => {
+		const result = resolveTemplate("[[{{audioFile}}]]", vars);
+		expect(result).toBe("[[recordings/rec.webm]]");
 	});
 });
 
 describe("buildTemplateVariables", () => {
 	it("produces variables with correct types", () => {
-		const vars = buildTemplateVariables("text", "title", "![[audio.webm]]");
+		const vars = buildTemplateVariables("text", "title", "audio.webm");
 		expect(vars.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
 		expect(vars.time).toMatch(/^\d{2}-\d{2}-\d{2}$/);
 		expect(vars.datetime).toMatch(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
 		expect(vars.title).toBe("title");
 		expect(vars.transcription).toBe("text");
-		expect(vars.audio).toBe("![[audio.webm]]");
+		expect(vars.audioFile).toBe("audio.webm");
 	});
 });
