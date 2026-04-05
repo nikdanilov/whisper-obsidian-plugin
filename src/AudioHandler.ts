@@ -135,9 +135,12 @@ export class AudioHandler {
 				await this.ensureFolderExists(
 					this.plugin.settings.createNewFileAfterRecordingPath
 				);
+				const noteContent = this.plugin.settings.saveAudioFile
+					? `![[${audioFilePath}]]\n${response.data.text}`
+					: response.data.text;
 				await this.plugin.app.vault.create(
 					noteFilePath,
-					`![[${audioFilePath}]]\n${response.data.text}`
+					noteContent
 				);
 				await this.plugin.app.workspace.openLinkText(
 					noteFilePath,
