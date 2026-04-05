@@ -8,25 +8,31 @@
 .recording-controls .button-group {
 	display: flex;
 	justify-content: center;
-	gap: 10px;
+	gap: 8px;
 }
 .recording-controls .button-component {
-	padding: 5px 10px;
-}
-
-.recording-controls .button-component {
-	background-color: var(--text-accent);
-	color: var(--text-light);
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 12px;
+	border-radius: 6px;
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
 	cursor: pointer;
+	font-size: var(--font-ui-small);
 }
 
 .recording-controls .button-component:hover {
-	background-color: var(--text-accent-hover);
+	background-color: var(--interactive-accent-hover);
 }
 
 .recording-controls .button-component:disabled {
 	pointer-events: none;
-	background-color: var(--text-accent-muted);
-	color: var(--text-muted);
+	opacity: 0.4;
 	cursor: not-allowed;
+}
+
+.recording-controls .button-component svg {
+	width: 14px;
+	height: 14px;
 }
