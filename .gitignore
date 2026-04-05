@@ -5,8 +5,10 @@
 *.iml
 .idea
 
-# npm
+# dependencies
 node_modules
+package-lock.json
+yarn.lock
 
 # Don't include the compiled main.js file in the repo.
 # They should be uploaded to GitHub releases instead.
