@@ -43,8 +43,8 @@ function buildHeaders(settings: PluginSettings) {
 }
 
 function buildAudioFilePath(settings: PluginSettings, fileName: string) {
-	return settings.saveAudioFilePath
-		? `${settings.saveAudioFilePath}/${fileName}`
+	return settings.audioSavePath
+		? `${settings.audioSavePath}/${fileName}`
 		: fileName;
 }
 
@@ -196,12 +196,12 @@ describe("#26 — Audio link style", () => {
 });
 
 describe("#68 — Ignore upload filename", () => {
-	it("generates timestamp filename when ignoreUploadFilename is true", () => {
+	it("generates timestamp filename when useTimestampFilename is true", () => {
 		const originalName = "my-important-meeting.mp3";
-		const ignoreUploadFilename = true;
+		const useTimestampFilename = true;
 
 		let fileName: string;
-		if (ignoreUploadFilename) {
+		if (useTimestampFilename) {
 			const extension = originalName.split(".").pop();
 			fileName = `${new Date().toISOString().replace(/[:.]/g, "-")}.${extension}`;
 		} else {
@@ -212,12 +212,12 @@ describe("#68 — Ignore upload filename", () => {
 		expect(fileName).toMatch(/\.mp3$/);
 	});
 
-	it("keeps original filename when ignoreUploadFilename is false", () => {
+	it("keeps original filename when useTimestampFilename is false", () => {
 		const originalName = "my-important-meeting.mp3";
-		const ignoreUploadFilename = false;
+		const useTimestampFilename = false;
 
 		let fileName: string;
-		if (ignoreUploadFilename) {
+		if (useTimestampFilename) {
 			const extension = originalName.split(".").pop();
 			fileName = `${new Date().toISOString().replace(/[:.]/g, "-")}.${extension}`;
 		} else {
@@ -258,12 +258,12 @@ describe("#35 — Whisper API params in formData", () => {
 
 describe("buildAudioFilePath", () => {
 	it("prepends folder path when set", () => {
-		const settings = { ...DEFAULT_SETTINGS, saveAudioFilePath: "recordings" };
+		const settings = { ...DEFAULT_SETTINGS, audioSavePath: "recordings" };
 		expect(buildAudioFilePath(settings, "rec.webm")).toBe("recordings/rec.webm");
 	});
 
 	it("uses just filename when path is empty", () => {
-		const settings = { ...DEFAULT_SETTINGS, saveAudioFilePath: "" };
+		const settings = { ...DEFAULT_SETTINGS, audioSavePath: "" };
 		expect(buildAudioFilePath(settings, "rec.webm")).toBe("rec.webm");
 	});
 });

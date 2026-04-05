@@ -7,27 +7,31 @@ export interface ApiKeysSettings {
 }
 
 export interface WhisperSettings {
+	// API
 	apiUrl: string;
 	model: string;
-	prompt: string;
 	language: string;
-	saveAudioFile: boolean;
-	saveAudioFilePath: string;
-	debugMode: boolean;
-	createNewFileAfterRecording: boolean;
-	createNewFileAfterRecordingPath: string;
-	audioDeviceId: string;
+	prompt: string;
 	temperature: number;
 	responseFormat: string;
-	sendCursorContext: boolean;
-	audioLinkStyle: "embed" | "link";
-	ignoreUploadFilename: boolean;
+	cursorContext: boolean;
+	// Recording
+	audioDeviceId: string;
+	saveAudioFile: boolean;
+	audioSavePath: string;
+	// Output
+	createNoteFile: boolean;
+	noteSavePath: string;
 	noteFilenameTemplate: string;
 	noteTemplate: string;
+	audioLinkStyle: "embed" | "link";
+	useTimestampFilename: boolean;
+	// Advanced
+	debugMode: boolean;
 }
 
 export interface PostProcessingSettings {
-	postProcessingEnabled: boolean;
+	postProcessing: boolean;
 	postProcessingModel: string;
 	postProcessingPrompt: string;
 	autoGenerateTitle: boolean;
@@ -48,25 +52,25 @@ export const DEFAULT_API_KEYS: ApiKeysSettings = {
 export const DEFAULT_WHISPER: WhisperSettings = {
 	apiUrl: "https://api.openai.com/v1/audio/transcriptions",
 	model: "whisper-1",
-	prompt: "",
 	language: "",
-	saveAudioFile: false,
-	saveAudioFilePath: "",
-	debugMode: false,
-	createNewFileAfterRecording: false,
-	createNewFileAfterRecordingPath: "",
-	audioDeviceId: "default",
+	prompt: "",
 	temperature: 0,
 	responseFormat: "json",
-	sendCursorContext: false,
-	audioLinkStyle: "embed",
-	ignoreUploadFilename: false,
+	cursorContext: false,
+	audioDeviceId: "default",
+	saveAudioFile: false,
+	audioSavePath: "",
+	createNoteFile: false,
+	noteSavePath: "",
 	noteFilenameTemplate: "{{date}} {{title}}",
 	noteTemplate: "{{audio}}\n{{transcription}}",
+	audioLinkStyle: "embed",
+	useTimestampFilename: false,
+	debugMode: false,
 };
 
 export const DEFAULT_POST_PROCESSING: PostProcessingSettings = {
-	postProcessingEnabled: false,
+	postProcessing: false,
 	postProcessingModel: "claude-haiku-4-5-20251001",
 	postProcessingPrompt:
 		"You are a transcription editor. Clean up the following transcription: fix grammar, remove filler words and repetitions, and improve readability. Preserve the original meaning and language. Return only the polished text, nothing else.",

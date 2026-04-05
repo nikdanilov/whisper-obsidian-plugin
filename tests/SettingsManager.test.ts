@@ -16,12 +16,12 @@ describe("DEFAULT_SETTINGS", () => {
 
 	it("defaults to dictation mode (no file saves)", () => {
 		expect(DEFAULT_SETTINGS.saveAudioFile).toBe(false);
-		expect(DEFAULT_SETTINGS.createNewFileAfterRecording).toBe(false);
+		expect(DEFAULT_SETTINGS.createNoteFile).toBe(false);
 	});
 
 	it("disables optional features by default", () => {
-		expect(DEFAULT_SETTINGS.sendCursorContext).toBe(false);
-		expect(DEFAULT_SETTINGS.ignoreUploadFilename).toBe(false);
+		expect(DEFAULT_SETTINGS.cursorContext).toBe(false);
+		expect(DEFAULT_SETTINGS.useTimestampFilename).toBe(false);
 		expect(DEFAULT_SETTINGS.debugMode).toBe(false);
 	});
 

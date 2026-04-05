@@ -256,7 +256,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.saveAudioFile = value;
 						if (!value) {
-							this.plugin.settings.saveAudioFilePath = "";
+							this.plugin.settings.audioSavePath = "";
 						}
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
@@ -275,9 +275,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			.addText((text) =>
 				text
 					.setPlaceholder("Example: folder/audio")
-					.setValue(this.plugin.settings.saveAudioFilePath)
+					.setValue(this.plugin.settings.audioSavePath)
 					.onChange(async (value) => {
-						this.plugin.settings.saveAudioFilePath = value;
+						this.plugin.settings.audioSavePath = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
@@ -345,12 +345,12 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			)
 			.addToggle((toggle) => {
 				toggle
-					.setValue(this.plugin.settings.createNewFileAfterRecording)
+					.setValue(this.plugin.settings.createNoteFile)
 					.onChange(async (value) => {
-						this.plugin.settings.createNewFileAfterRecording =
+						this.plugin.settings.createNoteFile =
 							value;
 						if (!value) {
-							this.plugin.settings.createNewFileAfterRecordingPath =
+							this.plugin.settings.noteSavePath =
 								"";
 						}
 						await this.settingsManager.saveSettings(
@@ -370,10 +370,10 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			.addText((text) => {
 				text.setPlaceholder("Example: folder/note")
 					.setValue(
-						this.plugin.settings.createNewFileAfterRecordingPath
+						this.plugin.settings.noteSavePath
 					)
 					.onChange(async (value) => {
-						this.plugin.settings.createNewFileAfterRecordingPath =
+						this.plugin.settings.noteSavePath =
 							value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
@@ -429,9 +429,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			)
 			.addToggle((toggle) => {
 				toggle
-					.setValue(this.plugin.settings.sendCursorContext)
+					.setValue(this.plugin.settings.cursorContext)
 					.onChange(async (value) => {
-						this.plugin.settings.sendCursorContext = value;
+						this.plugin.settings.cursorContext = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
@@ -447,9 +447,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			)
 			.addToggle((toggle) => {
 				toggle
-					.setValue(this.plugin.settings.ignoreUploadFilename)
+					.setValue(this.plugin.settings.useTimestampFilename)
 					.onChange(async (value) => {
-						this.plugin.settings.ignoreUploadFilename = value;
+						this.plugin.settings.useTimestampFilename = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
@@ -465,9 +465,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			)
 			.addToggle((toggle) => {
 				toggle
-					.setValue(this.plugin.settings.postProcessingEnabled)
+					.setValue(this.plugin.settings.postProcessing)
 					.onChange(async (value) => {
-						this.plugin.settings.postProcessingEnabled = value;
+						this.plugin.settings.postProcessing = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
@@ -505,7 +505,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					);
 				});
 			})
-			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+			.setDisabled(!this.plugin.settings.postProcessing);
 	}
 
 	private createPostProcessingPromptSetting(): void {
@@ -526,7 +526,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 				text.inputEl.rows = 4;
 				text.inputEl.cols = 50;
 			})
-			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+			.setDisabled(!this.plugin.settings.postProcessing);
 	}
 
 	private createAutoGenerateTitleSetting(): void {
@@ -546,7 +546,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 						this.titleGenerationPromptInput.setDisabled(!value);
 					});
 			})
-			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+			.setDisabled(!this.plugin.settings.postProcessing);
 	}
 
 	private createTitleGenerationPromptSetting(): void {
@@ -566,7 +566,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 				text.inputEl.cols = 50;
 			})
 			.setDisabled(
-				!this.plugin.settings.postProcessingEnabled ||
+				!this.plugin.settings.postProcessing ||
 					!this.plugin.settings.autoGenerateTitle
 			);
 	}
@@ -587,7 +587,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 						);
 					});
 			})
-			.setDisabled(!this.plugin.settings.postProcessingEnabled);
+			.setDisabled(!this.plugin.settings.postProcessing);
 	}
 
 	private createDebugModeToggleSetting(): void {
