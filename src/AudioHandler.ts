@@ -152,6 +152,7 @@ export class AudioHandler {
 					const processor = new PostProcessor({
 						apiKey: ppApiKey,
 						model: this.plugin.settings.postProcessingModel,
+						url: this.plugin.settings.postProcessingUrl,
 					});
 					finalText = await processor.process(
 						originalText,
@@ -176,6 +177,7 @@ export class AudioHandler {
 						const processor = new PostProcessor({
 							apiKey: ppApiKey,
 							model: this.plugin.settings.postProcessingModel,
+							url: this.plugin.settings.postProcessingUrl,
 						});
 						const title = await processor.process(
 							finalText,
