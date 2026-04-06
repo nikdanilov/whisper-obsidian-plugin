@@ -1,12 +1,5 @@
 
 
-## [1.9.0](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.2...1.9.0) (2026-04-06)
-
-
-### Features
-
-* store API keys in Obsidian SecretStorage instead of data.json ([#83](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/83)) ([f7c7e18](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/f7c7e1894a46a4a73b3701d90573c091353a4e74))
-
 ## [1.6.1](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.6.0...1.6.1) (2026-04-05)
 
 
