@@ -1,5 +1,6 @@
 import Whisper from "main";
 import { ButtonComponent, Modal } from "obsidian";
+import { RecordingStatus } from "./StatusBar";
 
 export class Controls extends Modal {
 	private plugin: Whisper;
@@ -78,9 +79,9 @@ export class Controls extends Modal {
 	}
 
 	resetGUI() {
-		const recorderState = this.plugin.recorder.getRecordingState();
-		const isIdle = recorderState === "inactive" || !recorderState;
-		const isPaused = recorderState === "paused";
+		const status = this.plugin.statusBar.status;
+		const isIdle = status === RecordingStatus.Idle;
+		const isPaused = status === RecordingStatus.Paused;
 
 		this.startButton.buttonEl.style.display = isIdle ? "" : "none";
 		this.startButton.buttonEl.empty();
