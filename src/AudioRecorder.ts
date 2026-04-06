@@ -66,7 +66,6 @@ export class NativeAudioRecorder implements AudioRecorder {
 				const recorder = new MediaRecorder(stream, options);
 
 				recorder.addEventListener("dataavailable", (e: BlobEvent) => {
-					console.log("dataavailable", e.data.size);
 					this.chunks.push(e.data);
 				});
 
@@ -98,9 +97,6 @@ export class NativeAudioRecorder implements AudioRecorder {
 			if (!this.recorder || this.recorder.state === "inactive") {
 				const blob = new Blob(this.chunks, { type: this.mimeType });
 				this.chunks.length = 0;
-
-				console.log("Stop recording (no active recorder):", blob);
-
 				resolve(blob);
 			} else {
 				this.recorder.addEventListener(
@@ -110,8 +106,6 @@ export class NativeAudioRecorder implements AudioRecorder {
 							type: this.mimeType,
 						});
 						this.chunks.length = 0;
-
-						console.log("Stop recording (active recorder):", blob);
 
 						// will stop all the tracks associated with the stream, effectively releasing any resources (like the mic) used by them
 						if (this.recorder) {
