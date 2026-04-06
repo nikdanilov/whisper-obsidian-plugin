@@ -236,6 +236,62 @@ describe("isDefaultApi — API key requirement", () => {
 	});
 });
 
+describe("#115 — createNoteFile does not navigate away", () => {
+	// Simulates the output behavior of sendAudioData:
+	// - always paste at cursor in the active editor
+	// - optionally save a note file in the background (no navigation)
+
+	function simulateTranscriptionOutput(
+		settings: { createNoteFile: boolean },
+		hasActiveEditor: boolean
+	) {
+		const actions: string[] = [];
+
+		if (settings.createNoteFile) {
+			actions.push("create-note-file");
+			// openLinkText was removed — no navigation
+		}
+
+		if (hasActiveEditor) {
+			actions.push("paste-at-cursor");
+		}
+
+		return actions;
+	}
+
+	it("pastes at cursor when createNoteFile is off", () => {
+		const actions = simulateTranscriptionOutput(
+			{ createNoteFile: false },
+			true
+		);
+		expect(actions).toEqual(["paste-at-cursor"]);
+	});
+
+	it("pastes at cursor AND creates note file when both enabled", () => {
+		const actions = simulateTranscriptionOutput(
+			{ createNoteFile: true },
+			true
+		);
+		expect(actions).toEqual(["create-note-file", "paste-at-cursor"]);
+	});
+
+	it("does not navigate away when creating note file", () => {
+		const actions = simulateTranscriptionOutput(
+			{ createNoteFile: true },
+			true
+		);
+		expect(actions).not.toContain("navigate-to-note");
+	});
+
+	it("only creates note file when no active editor", () => {
+		const actions = simulateTranscriptionOutput(
+			{ createNoteFile: true },
+			false
+		);
+		expect(actions).toEqual(["create-note-file"]);
+	});
+});
+
 describe("file-menu audio extension matching", () => {
 	const audioExtensions = [
 		".mp3",

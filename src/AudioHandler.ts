@@ -253,14 +253,9 @@ export class AudioHandler {
 					resolvedNoteFilePath,
 					noteContent
 				);
-				await this.plugin.app.workspace.openLinkText(
-					resolvedNoteFilePath,
-					"",
-					true
-				);
 			}
 
-			// Always paste at cursor if there's an active editor
+			// Paste at cursor if there's an active editor
 			const editor =
 				this.plugin.app.workspace.getActiveViewOfType(
 					MarkdownView
