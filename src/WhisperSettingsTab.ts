@@ -198,14 +198,18 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			stream.getTracks().forEach((track) => track.stop());
 		} catch (err) {
 			// Permission denied or error - continue anyway, devices may still be listed
-			console.log("Microphone permission not granted, device labels may be limited");
+			console.log(
+				"Microphone permission not granted, device labels may be limited"
+			);
 		}
 
 		// Enumerate devices
 		let devices: MediaDeviceInfo[] = [];
 		try {
 			const allDevices = await navigator.mediaDevices.enumerateDevices();
-			devices = allDevices.filter((device) => device.kind === "audioinput");
+			devices = allDevices.filter(
+				(device) => device.kind === "audioinput"
+			);
 		} catch (err) {
 			console.error("Error enumerating audio devices:", err);
 		}
@@ -215,7 +219,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		options["default"] = "Default";
 
 		devices.forEach((device) => {
-			const label = device.label || `Unknown device (${device.deviceId.substring(0, 8)})`;
+			const label =
+				device.label ||
+				`Unknown device (${device.deviceId.substring(0, 8)})`;
 			options[device.deviceId] = label;
 		});
 
@@ -247,9 +253,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private createSaveAudioFileToggleSetting(): void {
 		new Setting(this.containerEl)
 			.setName("Save audio file")
-			.setDesc(
-				"Save the audio recording to the vault"
-			)
+			.setDesc("Save the audio recording to the vault")
 			.addToggle((toggle) =>
 				toggle
 					.setValue(this.plugin.settings.saveAudioFile)
@@ -269,9 +273,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private createSaveAudioFilePathSetting(): void {
 		this.saveAudioFileInput = new Setting(this.containerEl)
 			.setName("Audio save path")
-			.setDesc(
-				"Folder in the vault where audio files are saved"
-			)
+			.setDesc("Folder in the vault where audio files are saved")
 			.addText((text) =>
 				text
 					.setPlaceholder("Example: folder/audio")
@@ -318,18 +320,14 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private createNewFileToggleSetting(): void {
 		new Setting(this.containerEl)
 			.setName("Create note file")
-			.setDesc(
-				"Create a new note file for each transcription"
-			)
+			.setDesc("Create a new note file for each transcription")
 			.addToggle((toggle) => {
 				toggle
 					.setValue(this.plugin.settings.createNoteFile)
 					.onChange(async (value) => {
-						this.plugin.settings.createNoteFile =
-							value;
+						this.plugin.settings.createNoteFile = value;
 						if (!value) {
-							this.plugin.settings.noteSavePath =
-								"";
+							this.plugin.settings.noteSavePath = "";
 						}
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
@@ -342,17 +340,12 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private createNewFilePathSetting(): void {
 		this.createNewFileInput = new Setting(this.containerEl)
 			.setName("Note save path")
-			.setDesc(
-				"Folder in the vault where note files are saved"
-			)
+			.setDesc("Folder in the vault where note files are saved")
 			.addText((text) => {
 				text.setPlaceholder("Example: folder/note")
-					.setValue(
-						this.plugin.settings.noteSavePath
-					)
+					.setValue(this.plugin.settings.noteSavePath)
 					.onChange(async (value) => {
-						this.plugin.settings.noteSavePath =
-							value;
+						this.plugin.settings.noteSavePath = value;
 						await this.settingsManager.saveSettings(
 							this.plugin.settings
 						);
@@ -507,9 +500,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private createAutoGenerateTitleSetting(): void {
 		this.autoGenerateTitleInput = new Setting(this.containerEl)
 			.setName("Auto-generate title")
-			.setDesc(
-				"Use the LLM to generate a descriptive filename for notes"
-			)
+			.setDesc("Use the LLM to generate a descriptive filename for notes")
 			.addToggle((toggle) => {
 				toggle
 					.setValue(this.plugin.settings.autoGenerateTitle)
@@ -551,7 +542,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			.setName("Keep original transcription")
 			.setDesc(
 				"Append the raw Whisper transcription below the post-processed text"
-			)	
+			)
 			.addToggle((toggle) => {
 				toggle
 					.setValue(this.plugin.settings.keepOriginalTranscription)
@@ -568,9 +559,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	private createDebugModeToggleSetting(): void {
 		new Setting(this.containerEl)
 			.setName("Debug mode")
-			.setDesc(
-				"Increase the plugin's verbosity for troubleshooting"
-			)
+			.setDesc("Increase the plugin's verbosity for troubleshooting")
 			.addToggle((toggle) => {
 				toggle
 					.setValue(this.plugin.settings.debugMode)

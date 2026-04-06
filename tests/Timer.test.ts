@@ -2,11 +2,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Timer } from "../src/Timer";
 
 // Timer uses window.setInterval — proxy to globalThis so fake timers work
-vi.stubGlobal("window", new Proxy(globalThis, {
-	get(target, prop) {
-		return (target as any)[prop];
-	},
-}));
+vi.stubGlobal(
+	"window",
+	new Proxy(globalThis, {
+		get(target, prop) {
+			return (target as any)[prop];
+		},
+	})
+);
 
 describe("Timer", () => {
 	let timer: Timer;

@@ -17,7 +17,8 @@ export class AudioHandler {
 	}
 
 	private getPostProcessingApiKey(): string {
-		const isAnthropic = this.plugin.settings.postProcessingModel.startsWith("claude");
+		const isAnthropic =
+			this.plugin.settings.postProcessingModel.startsWith("claude");
 		return isAnthropic
 			? this.plugin.settings.anthropicApiKey
 			: this.plugin.settings.openAiApiKey || this.plugin.settings.apiKey;
@@ -52,7 +53,8 @@ export class AudioHandler {
 			new Notice(`Sending ${Math.round(blob.size / 1000)} KB...`);
 		}
 
-		const isDefaultApi = this.plugin.settings.apiUrl ===
+		const isDefaultApi =
+			this.plugin.settings.apiUrl ===
 			"https://api.openai.com/v1/audio/transcriptions";
 		if (isDefaultApi && !this.plugin.settings.apiKey) {
 			new Notice("✘ Add your API key in Whisper settings");
@@ -114,7 +116,10 @@ export class AudioHandler {
 			}
 		} catch (err) {
 			console.error("Error saving audio file:", err);
-			new Notice("✘ Couldn't save audio: " + (err instanceof Error ? err.message : String(err)));
+			new Notice(
+				"✘ Couldn't save audio: " +
+					(err instanceof Error ? err.message : String(err))
+			);
 		}
 
 		try {
@@ -128,7 +133,9 @@ export class AudioHandler {
 					headers: {
 						"Content-Type": "multipart/form-data",
 						...(this.plugin.settings.apiKey
-							? { Authorization: `Bearer ${this.plugin.settings.apiKey}` }
+							? {
+									Authorization: `Bearer ${this.plugin.settings.apiKey}`,
+							  }
 							: {}),
 					},
 				}
@@ -141,8 +148,15 @@ export class AudioHandler {
 			if (this.plugin.settings.postProcessing) {
 				const ppApiKey = this.getPostProcessingApiKey();
 				if (!ppApiKey) {
-					const isAnthropic = this.plugin.settings.postProcessingModel.startsWith("claude");
-					new Notice(`✘ Add your ${isAnthropic ? "Anthropic" : "OpenAI"} API key in settings`);
+					const isAnthropic =
+						this.plugin.settings.postProcessingModel.startsWith(
+							"claude"
+						);
+					new Notice(
+						`✘ Add your ${
+							isAnthropic ? "Anthropic" : "OpenAI"
+						} API key in settings`
+					);
 					return;
 				}
 				try {
@@ -160,7 +174,9 @@ export class AudioHandler {
 					);
 				} catch (err) {
 					console.error("Post-processing failed:", err);
-					new Notice("✘ Post-processing failed, using original transcription");
+					new Notice(
+						"✘ Post-processing failed, using original transcription"
+					);
 					finalText = originalText;
 				}
 			}
@@ -196,9 +212,11 @@ export class AudioHandler {
 			}
 
 			// Build note content with templates
-			const outputText = this.plugin.settings.keepOriginalTranscription && finalText !== originalText
-				? `${finalText}\n\n---\n\n*Original transcription:*\n${originalText}`
-				: finalText;
+			const outputText =
+				this.plugin.settings.keepOriginalTranscription &&
+				finalText !== originalText
+					? `${finalText}\n\n---\n\n*Original transcription:*\n${originalText}`
+					: finalText;
 
 			if (this.plugin.settings.createNoteFile) {
 				await this.ensureFolderExists(
@@ -212,10 +230,13 @@ export class AudioHandler {
 				);
 
 				// Resolve filename template
-				const resolvedFilename = resolveTemplate(
-					this.plugin.settings.noteFilenameTemplate,
-					vars
-				).replace(/[/\\?%*:|"<>\n]/g, "-").trim() || baseFileName;
+				const resolvedFilename =
+					resolveTemplate(
+						this.plugin.settings.noteFilenameTemplate,
+						vars
+					)
+						.replace(/[/\\?%*:|"<>\n]/g, "-")
+						.trim() || baseFileName;
 
 				const folder = this.plugin.settings.noteSavePath;
 				const resolvedNoteFilePath = `${
@@ -258,7 +279,10 @@ export class AudioHandler {
 			new Notice("Transcription complete");
 		} catch (err) {
 			console.error("Error parsing audio:", err);
-			new Notice("✘ Transcription failed: " + (err instanceof Error ? err.message : String(err)));
+			new Notice(
+				"✘ Transcription failed: " +
+					(err instanceof Error ? err.message : String(err))
+			);
 		}
 	}
 }

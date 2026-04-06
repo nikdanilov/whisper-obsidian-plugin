@@ -71,7 +71,9 @@ describe("getExtensionFromMimeType", () => {
 	});
 
 	it("handles mp4 with codecs", () => {
-		expect(getExtensionFromMimeType("audio/mp4;codecs=mp4a.40.2")).toBe("mp4");
+		expect(getExtensionFromMimeType("audio/mp4;codecs=mp4a.40.2")).toBe(
+			"mp4"
+		);
 	});
 
 	it("returns webm for undefined", () => {
@@ -129,7 +131,10 @@ describe("resolveTemplate", () => {
 
 	it("handles empty audioFile gracefully", () => {
 		const noAudioVars = { ...vars, audioFile: "" };
-		const result = resolveTemplate("![[{{audioFile}}]]\n{{transcription}}", noAudioVars);
+		const result = resolveTemplate(
+			"![[{{audioFile}}]]\n{{transcription}}",
+			noAudioVars
+		);
 		expect(result).toBe("![[]]\nHello world");
 	});
 

@@ -57,7 +57,10 @@ function getAudioFilePath(settings: PluginSettings, fileName: string): string {
 
 // #40: auto-create folders
 async function ensureFolderExists(
-	vault: { adapter: { exists: (p: string) => Promise<boolean> }; createFolder: (p: string) => Promise<void> },
+	vault: {
+		adapter: { exists: (p: string) => Promise<boolean> };
+		createFolder: (p: string) => Promise<void>;
+	},
 	folderPath: string
 ) {
 	if (folderPath && !(await vault.adapter.exists(folderPath))) {
@@ -157,7 +160,9 @@ describe("#65 — Silence/hallucination guard", () => {
 	});
 
 	it("passes normal recording", () => {
-		const normalBlob = new Blob([new ArrayBuffer(5000)], { type: "audio/webm" });
+		const normalBlob = new Blob([new ArrayBuffer(5000)], {
+			type: "audio/webm",
+		});
 		expect(isSilentRecording(normalBlob)).toBe(false);
 	});
 
@@ -199,7 +204,9 @@ describe("#35 — Whisper API params in formData", () => {
 describe("buildAudioFilePath", () => {
 	it("prepends folder path when set", () => {
 		const settings = { ...DEFAULT_SETTINGS, audioSavePath: "recordings" };
-		expect(buildAudioFilePath(settings, "rec.webm")).toBe("recordings/rec.webm");
+		expect(buildAudioFilePath(settings, "rec.webm")).toBe(
+			"recordings/rec.webm"
+		);
 	});
 
 	it("uses just filename when path is empty", () => {
@@ -230,8 +237,18 @@ describe("isDefaultApi — API key requirement", () => {
 });
 
 describe("file-menu audio extension matching", () => {
-	const audioExtensions = ['.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm', '.ogg'];
-	const isAudioFile = (path: string) => audioExtensions.some(ext => path.endsWith(ext));
+	const audioExtensions = [
+		".mp3",
+		".mp4",
+		".mpeg",
+		".mpga",
+		".m4a",
+		".wav",
+		".webm",
+		".ogg",
+	];
+	const isAudioFile = (path: string) =>
+		audioExtensions.some((ext) => path.endsWith(ext));
 
 	it("matches common audio files", () => {
 		expect(isAudioFile("recording.mp3")).toBe(true);
