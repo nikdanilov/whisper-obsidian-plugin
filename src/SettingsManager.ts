@@ -1,5 +1,11 @@
 import { Plugin } from "obsidian";
 
+const SECRET_IDS: Record<keyof ApiKeysSettings, string> = {
+	apiKey: "api-key",
+	openAiApiKey: "openai-api-key",
+	anthropicApiKey: "anthropic-api-key",
+};
+
 export interface ApiKeysSettings {
 	apiKey: string;
 	openAiApiKey: string;
@@ -91,15 +97,52 @@ export class SettingsManager {
 		this.plugin = plugin;
 	}
 
+	private get secrets() {
+		return this.plugin.app.secretStorage;
+	}
+
+	private migrateKeysToSecretStorage(settings: PluginSettings): boolean {
+		let migrated = false;
+		for (const [field, secretId] of Object.entries(SECRET_IDS)) {
+			const key = field as keyof ApiKeysSettings;
+			if (settings[key]) {
+				this.secrets.setSecret(secretId, settings[key]);
+				settings[key] = "";
+				migrated = true;
+			}
+		}
+		return migrated;
+	}
+
+	private loadKeysFromSecretStorage(settings: PluginSettings): void {
+		for (const [field, secretId] of Object.entries(SECRET_IDS)) {
+			const key = field as keyof ApiKeysSettings;
+			settings[key] = this.secrets.getSecret(secretId) ?? "";
+		}
+	}
+
 	async loadSettings(): Promise<PluginSettings> {
-		return Object.assign(
+		const settings = Object.assign(
 			{},
 			DEFAULT_SETTINGS,
 			await this.plugin.loadData()
 		);
+
+		// Migrate any plain-text keys left in data.json
+		if (this.migrateKeysToSecretStorage(settings)) {
+			await this.plugin.saveData(settings);
+		}
+
+		// Populate in-memory settings from SecretStorage
+		this.loadKeysFromSecretStorage(settings);
+		return settings;
 	}
 
 	async saveSettings(settings: PluginSettings): Promise<void> {
+		// Move any new keys to SecretStorage before persisting
+		this.migrateKeysToSecretStorage(settings);
 		await this.plugin.saveData(settings);
+		// Restore keys in memory so the rest of the plugin can use them
+		this.loadKeysFromSecretStorage(settings);
 	}
 }
