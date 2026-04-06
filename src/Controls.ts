@@ -61,12 +61,15 @@ export class Controls extends Modal {
 			})
 			.buttonEl.addClass("button-component");
 
-		this.resetGUI();
-
 		this.statusListener = () => {
 			this.resetGUI();
 			this.updateTimerDisplay();
 		};
+	}
+
+	onOpen() {
+		this.resetGUI();
+		this.updateTimerDisplay();
 		this.plugin.statusBar.onChange(this.statusListener);
 	}
 
