@@ -63,11 +63,7 @@ export function resolveTemplate(
 }
 
 export function getBaseFileName(filePath: string) {
-	// Extract the file name including extension
 	const fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
-
-	// Remove the extension from the file name
-	const baseFileName = fileName.substring(0, fileName.lastIndexOf("."));
-
-	return baseFileName;
+	const dotIndex = fileName.lastIndexOf(".");
+	return dotIndex > 0 ? fileName.substring(0, dotIndex) : fileName;
 }

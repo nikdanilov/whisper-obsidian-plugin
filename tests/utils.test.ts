@@ -22,8 +22,12 @@ describe("getBaseFileName", () => {
 		);
 	});
 
-	it("returns empty string for file with no base name", () => {
-		expect(getBaseFileName(".hidden")).toBe("");
+	it("returns full name for file with no extension", () => {
+		expect(getBaseFileName("recording")).toBe("recording");
+	});
+
+	it("returns full name for dotfile", () => {
+		expect(getBaseFileName(".hidden")).toBe(".hidden");
 	});
 });
 
