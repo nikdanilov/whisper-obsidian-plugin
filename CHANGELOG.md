@@ -1,5 +1,7 @@
 
 
+## [1.8.4](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.3...1.8.4) (2026-04-06)
+
 ## [1.8.3](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.2...1.8.3) (2026-04-06)
 
 
