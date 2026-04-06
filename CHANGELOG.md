@@ -1,5 +1,12 @@
 
 
+## [1.8.6](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.5...1.8.6) (2026-04-06)
+
+
+### Bug Fixes
+
+* paste transcription at cursor when saving note file ([#115](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/115)) ([a518202](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/a518202c65b66aee1d9b34f166f7c01442b08f04))
+
 ## [1.8.5](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.4...1.8.5) (2026-04-06)
 
 
