@@ -107,9 +107,14 @@ export default class Whisper extends Plugin {
 			new Notice("Already recording");
 			return;
 		}
-		this.statusBar.updateStatus(RecordingStatus.Recording);
-		await this.recorder.startRecording();
-		new Notice("Recording...");
+		try {
+			await this.recorder.startRecording();
+			this.statusBar.updateStatus(RecordingStatus.Recording);
+			new Notice("Recording...");
+		} catch (err) {
+			this.statusBar.updateStatus(RecordingStatus.Idle);
+			new Notice("✘ Could not start recording");
+		}
 	}
 
 	async stopRecording() {
