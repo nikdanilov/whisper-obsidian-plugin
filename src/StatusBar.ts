@@ -11,6 +11,7 @@ export class StatusBar {
 	plugin: Plugin;
 	statusBarItem: HTMLElement | null = null;
 	status: RecordingStatus = RecordingStatus.Idle;
+	private listeners: Array<(status: RecordingStatus) => void> = [];
 
 	constructor(plugin: Plugin) {
 		this.plugin = plugin;
@@ -18,9 +19,18 @@ export class StatusBar {
 		this.updateStatusBarItem();
 	}
 
+	onChange(listener: (status: RecordingStatus) => void): void {
+		this.listeners.push(listener);
+	}
+
+	offChange(listener: (status: RecordingStatus) => void): void {
+		this.listeners = this.listeners.filter((fn) => fn !== listener);
+	}
+
 	updateStatus(status: RecordingStatus) {
 		this.status = status;
 		this.updateStatusBarItem();
+		this.listeners.forEach((fn) => fn(status));
 	}
 
 	updateStatusBarItem() {

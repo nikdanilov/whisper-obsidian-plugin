@@ -20,11 +20,8 @@ export default class Whisper extends Plugin {
 		this.settingsManager = new SettingsManager(this);
 		this.settings = await this.settingsManager.loadSettings();
 
-		this.addRibbonIcon("mic", "Open recording controls", (evt) => {
-			if (!this.controls) {
-				this.controls = new Controls(this);
-			}
-			this.controls.open();
+		this.addRibbonIcon("mic", "Open recording controls", () => {
+			this.openControls();
 		});
 
 		this.addSettingTab(new WhisperSettingsTab(this.app, this));
@@ -32,7 +29,6 @@ export default class Whisper extends Plugin {
 		this.timer = new Timer();
 		this.audioHandler = new AudioHandler(this);
 		this.recorder = new NativeAudioRecorder();
-		// Set initial device ID from settings
 		const deviceId =
 			this.settings.audioDeviceId === "default"
 				? null
@@ -46,7 +42,6 @@ export default class Whisper extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on('file-menu', (menu, file) => {
-
 				if (!(file instanceof TFile)) return;
 
 				const audioExtensions = ['.mp3', '.mp4', '.mpeg', '.mpga', '.m4a', '.wav', '.webm', '.ogg'];
@@ -58,10 +53,7 @@ export default class Whisper extends Plugin {
 						.setIcon('document')
 						.onClick(async () => {
 							const audioBlob = new Blob([await file.vault.readBinary(file)]);
-							await this.audioHandler.sendAudioData(
-								audioBlob,
-								file.name
-							);
+							await this.audioHandler.sendAudioData(audioBlob, file.name);
 						});
 				});
 			})
@@ -72,81 +64,72 @@ export default class Whisper extends Plugin {
 		if (this.controls) {
 			this.controls.close();
 		}
-
 		this.statusBar.remove();
 	}
 
-	registerUriHandler() {
-		// URI format: obsidian://whisper?command=start|stop|pause|cancel
-		// Default (no command): opens recording controls modal
-		this.registerObsidianProtocolHandler("whisper", async (params) => {
-			const action = params.command;
+	// --- Recording state transitions (single source of truth) ---
 
-			if (!action) {
-				// Default: open recording controls
-				if (!this.controls) {
-					this.controls = new Controls(this);
-				}
-				this.controls.open();
-				return;
-			}
-
-			switch (action) {
-				case "start":
-					if (this.statusBar.status === RecordingStatus.Recording ||
-						this.statusBar.status === RecordingStatus.Paused) {
-						new Notice("Already recording");
-						return;
-					}
-					this.statusBar.updateStatus(RecordingStatus.Recording);
-					await this.recorder.startRecording();
-					new Notice("Recording...");
-					break;
-
-				case "stop":
-					if (this.statusBar.status !== RecordingStatus.Recording &&
-						this.statusBar.status !== RecordingStatus.Paused) {
-						return;
-					}
-					this.statusBar.updateStatus(RecordingStatus.Processing);
-					const audioBlob = await this.recorder.stopRecording();
-					const extension = getExtensionFromMimeType(
-						this.recorder.getMimeType()
-					);
-					const fileName = `${new Date()
-						.toISOString()
-						.replace(/[:.]/g, "-")}.${extension}`;
-					await this.audioHandler.sendAudioData(audioBlob, fileName);
-					this.statusBar.updateStatus(RecordingStatus.Idle);
-					break;
-
-				case "pause":
-					if (this.statusBar.status === RecordingStatus.Recording) {
-						await this.recorder.pauseRecording();
-						this.statusBar.updateStatus(RecordingStatus.Paused);
-						new Notice("Recording paused");
-					} else if (this.statusBar.status === RecordingStatus.Paused) {
-						await this.recorder.pauseRecording();
-						this.statusBar.updateStatus(RecordingStatus.Recording);
-						new Notice("Recording resumed");
-					}
-					break;
-
-				case "cancel":
-					if (this.statusBar.status !== RecordingStatus.Recording &&
-						this.statusBar.status !== RecordingStatus.Paused) {
-						return;
-					}
-					await this.recorder.stopRecording();
-					this.statusBar.updateStatus(RecordingStatus.Idle);
-					new Notice("Recording cancelled");
-					break;
-
-				default:
-					new Notice(`✘ Unknown whisper action: ${action}`);
-			}
-		});
+	async startRecording() {
+		if (this.statusBar.status === RecordingStatus.Recording ||
+			this.statusBar.status === RecordingStatus.Paused) {
+			new Notice("Already recording");
+			return;
+		}
+		this.statusBar.updateStatus(RecordingStatus.Recording);
+		await this.recorder.startRecording();
+		this.timer.start();
+		new Notice("Recording...");
 	}
+
+	async stopRecording() {
+		if (this.statusBar.status !== RecordingStatus.Recording &&
+			this.statusBar.status !== RecordingStatus.Paused) {
+			return;
+		}
+		this.statusBar.updateStatus(RecordingStatus.Processing);
+		const audioBlob = await this.recorder.stopRecording();
+		this.timer.reset();
+		const extension = getExtensionFromMimeType(this.recorder.getMimeType());
+		const fileName = `${new Date()
+			.toISOString()
+			.replace(/[:.]/g, "-")}.${extension}`;
+		await this.audioHandler.sendAudioData(audioBlob, fileName);
+		this.statusBar.updateStatus(RecordingStatus.Idle);
+	}
+
+	async pauseRecording() {
+		if (this.statusBar.status === RecordingStatus.Recording) {
+			await this.recorder.pauseRecording();
+			this.timer.pause();
+			this.statusBar.updateStatus(RecordingStatus.Paused);
+			new Notice("Recording paused");
+		} else if (this.statusBar.status === RecordingStatus.Paused) {
+			await this.recorder.pauseRecording();
+			this.timer.resume();
+			this.statusBar.updateStatus(RecordingStatus.Recording);
+			new Notice("Recording resumed");
+		}
+	}
+
+	async cancelRecording() {
+		if (this.statusBar.status !== RecordingStatus.Recording &&
+			this.statusBar.status !== RecordingStatus.Paused) {
+			return;
+		}
+		await this.recorder.stopRecording();
+		this.timer.reset();
+		this.statusBar.updateStatus(RecordingStatus.Idle);
+		new Notice("Recording cancelled");
+	}
+
+	openControls() {
+		if (!this.controls) {
+			this.controls = new Controls(this);
+		}
+		this.controls.open();
+	}
+
+	// --- Commands ---
 
 	addCommands() {
 		this.addCommand({
@@ -155,55 +138,29 @@ export default class Whisper extends Plugin {
 			callback: async () => {
 				if (this.statusBar.status !== RecordingStatus.Recording &&
 					this.statusBar.status !== RecordingStatus.Paused) {
-					this.statusBar.updateStatus(RecordingStatus.Recording);
-					await this.recorder.startRecording();
-					new Notice("Recording...");
+					await this.startRecording();
 				} else {
-					this.statusBar.updateStatus(RecordingStatus.Processing);
-					const audioBlob = await this.recorder.stopRecording();
-					const extension = getExtensionFromMimeType(
-						this.recorder.getMimeType()
-					);
-					const fileName = `${new Date()
-						.toISOString()
-						.replace(/[:.]/g, "-")}.${extension}`;
-					// Use audioBlob to send or save the recorded audio as needed
-					await this.audioHandler.sendAudioData(audioBlob, fileName);
-					this.statusBar.updateStatus(RecordingStatus.Idle);
+					await this.stopRecording();
 				}
 			},
-			hotkeys: [
-				{
-					modifiers: ["Alt"],
-					key: "Q",
-				},
-			],
+			hotkeys: [{ modifiers: ["Alt"], key: "Q" }],
 		});
 
 		this.addCommand({
 			id: "upload-audio-file",
 			name: "Upload audio file",
 			callback: () => {
-				// Create an input element for file selection
 				const fileInput = document.createElement("input");
 				fileInput.type = "file";
 				fileInput.accept = "audio/*,video/*,.mp4,.m4a,.wav,.webm,.ogg,.mp3";
-
-				// Handle file selection
 				fileInput.onchange = async (event) => {
 					const files = (event.target as HTMLInputElement).files;
 					if (files && files.length > 0) {
 						const file = files[0];
 						const audioBlob = file.slice(0, file.size, file.type);
-						// Use audioBlob to send or save the uploaded audio as needed
-						await this.audioHandler.sendAudioData(
-							audioBlob,
-							file.name
-						);
+						await this.audioHandler.sendAudioData(audioBlob, file.name);
 					}
 				};
-
-				// Programmatically open the file dialog
 				fileInput.click();
 			},
 		});
@@ -211,30 +168,30 @@ export default class Whisper extends Plugin {
 		this.addCommand({
 			id: "pause-resume-recording",
 			name: "Pause/resume recording",
-			callback: async () => {
-				const state = this.recorder.getRecordingState();
-				if (state === "recording") {
-					await this.recorder.pauseRecording();
-					this.statusBar.updateStatus(RecordingStatus.Paused);
-					new Notice("Recording paused");
-				} else if (state === "paused") {
-					await this.recorder.pauseRecording();
-					this.statusBar.updateStatus(RecordingStatus.Recording);
-					new Notice("Recording resumed");
-				}
-			},
+			callback: () => this.pauseRecording(),
 		});
 
 		this.addCommand({
 			id: "open-recording-controls",
 			name: "Open recording controls",
-			callback: () => {
-				if (!this.controls) {
-					this.controls = new Controls(this);
-				}
-				this.controls.open();
-			},
+			callback: () => this.openControls(),
 		});
+	}
 
+	// --- URI Handler ---
+
+	registerUriHandler() {
+		this.registerObsidianProtocolHandler("whisper", async (params) => {
+			const command = params.command;
+			if (!command) { this.openControls(); return; }
+
+			switch (command) {
+				case "start": await this.startRecording(); break;
+				case "stop": await this.stopRecording(); break;
+				case "pause": await this.pauseRecording(); break;
+				case "cancel": await this.cancelRecording(); break;
+				default: new Notice(`✘ Unknown whisper command: ${command}`);
+			}
+		});
 	}
 }

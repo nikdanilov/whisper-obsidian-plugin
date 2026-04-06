@@ -43,9 +43,22 @@ describe("Timer", () => {
 		vi.advanceTimersByTime(2000);
 		timer.pause();
 		vi.advanceTimersByTime(5000);
-		timer.pause(); // resume
+		timer.resume();
 		vi.advanceTimersByTime(3000);
 		expect(timer.getFormattedTime()).toBe("00:00:05");
+	});
+
+	it("resume is a no-op when already running", () => {
+		timer.start();
+		vi.advanceTimersByTime(2000);
+		timer.resume(); // should be no-op
+		vi.advanceTimersByTime(1000);
+		expect(timer.getFormattedTime()).toBe("00:00:03");
+	});
+
+	it("pause is a no-op when not running", () => {
+		timer.pause(); // should be no-op
+		expect(timer.getFormattedTime()).toBe("00:00:00");
 	});
 
 	it("resets the timer", () => {
