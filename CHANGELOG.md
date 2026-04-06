@@ -1,5 +1,12 @@
 
 
+## [1.8.7](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.6...1.8.7) (2026-04-06)
+
+
+### Bug Fixes
+
+* reset status on recording failure, handle extensionless filenames ([c1a2412](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/c1a24129ecd0b4752f5332fffece4b1b13469b7b))
+
 ## [1.8.6](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.5...1.8.6) (2026-04-06)
 
 
