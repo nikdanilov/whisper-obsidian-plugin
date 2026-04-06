@@ -93,8 +93,26 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			);
 	}
 
+	private createApiKeySetting(
+		name: string,
+		desc: string,
+		placeholder: string,
+		value: string,
+		onChange: (value: string) => Promise<void>
+	): void {
+		new Setting(this.containerEl)
+			.setName(name)
+			.setDesc(desc)
+			.addText((text) => {
+				text.setPlaceholder(placeholder)
+					.setValue(value)
+					.onChange(async (value) => await onChange(value));
+				text.inputEl.type = "password";
+			});
+	}
+
 	private createWhisperApiKeySetting(): void {
-		this.createTextSetting(
+		this.createApiKeySetting(
 			"Whisper API Key",
 			"API key for Whisper transcription (OpenAI, Groq, or Azure)",
 			"sk-...xxxx",
@@ -107,7 +125,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	}
 
 	private createOpenAiApiKeySetting(): void {
-		this.createTextSetting(
+		this.createApiKeySetting(
 			"OpenAI API Key",
 			"API key for GPT post-processing models",
 			"sk-...xxxx",
@@ -120,7 +138,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 	}
 
 	private createAnthropicApiKeySetting(): void {
-		this.createTextSetting(
+		this.createApiKeySetting(
 			"Anthropic API Key",
 			"API key for Claude post-processing models",
 			"sk-ant-...xxxx",
