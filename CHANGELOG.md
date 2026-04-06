@@ -1,5 +1,12 @@
 
 
+## [1.8.5](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.4...1.8.5) (2026-04-06)
+
+
+### Bug Fixes
+
+* mask API key fields in settings as password inputs ([0c49667](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/0c496674045cbae37c125c475e59453220c52d85))
+
 ## [1.8.4](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.3...1.8.4) (2026-04-06)
 
 ## [1.8.3](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.2...1.8.3) (2026-04-06)
