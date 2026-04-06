@@ -37,6 +37,22 @@ export default class Whisper extends Plugin {
 
 		this.statusBar = new StatusBar(this);
 
+		// Timer reacts to recording state changes
+		this.statusBar.onChange((status) => {
+			switch (status) {
+				case RecordingStatus.Recording:
+					this.timer.start();
+					break;
+				case RecordingStatus.Paused:
+					this.timer.pause();
+					break;
+				case RecordingStatus.Processing:
+				case RecordingStatus.Idle:
+					this.timer.reset();
+					break;
+			}
+		});
+
 		this.addCommands();
 		this.registerUriHandler();
 
@@ -77,7 +93,6 @@ export default class Whisper extends Plugin {
 		}
 		this.statusBar.updateStatus(RecordingStatus.Recording);
 		await this.recorder.startRecording();
-		this.timer.start();
 		new Notice("Recording...");
 	}
 
@@ -88,7 +103,6 @@ export default class Whisper extends Plugin {
 		}
 		this.statusBar.updateStatus(RecordingStatus.Processing);
 		const audioBlob = await this.recorder.stopRecording();
-		this.timer.reset();
 		const extension = getExtensionFromMimeType(this.recorder.getMimeType());
 		const fileName = `${new Date()
 			.toISOString()
@@ -100,12 +114,10 @@ export default class Whisper extends Plugin {
 	async pauseRecording() {
 		if (this.statusBar.status === RecordingStatus.Recording) {
 			await this.recorder.pauseRecording();
-			this.timer.pause();
 			this.statusBar.updateStatus(RecordingStatus.Paused);
 			new Notice("Recording paused");
 		} else if (this.statusBar.status === RecordingStatus.Paused) {
 			await this.recorder.pauseRecording();
-			this.timer.resume();
 			this.statusBar.updateStatus(RecordingStatus.Recording);
 			new Notice("Recording resumed");
 		}
@@ -117,7 +129,6 @@ export default class Whisper extends Plugin {
 			return;
 		}
 		await this.recorder.stopRecording();
-		this.timer.reset();
 		this.statusBar.updateStatus(RecordingStatus.Idle);
 		new Notice("Recording cancelled");
 	}
