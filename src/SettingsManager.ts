@@ -77,7 +77,7 @@ export const DEFAULT_POST_PROCESSING: PostProcessingSettings = {
 	postProcessingUrl: "https://api.anthropic.com/v1/messages",
 	postProcessingModel: "claude-haiku-4-5-20251001",
 	postProcessingPrompt:
-		"You are a transcription editor. Clean up the following voice transcription: fix grammar, remove filler words (um, uh, like) and repetitions, and improve readability. Format the text in markdown. If there are action items or to-dos, format them as task lists with \"[ ]\". Preserve the original meaning and language. Return only the polished text, nothing else.",
+		'You are a transcription editor. Clean up the following voice transcription: fix grammar, remove filler words (um, uh, like) and repetitions, and improve readability. Format the text in markdown. If there are action items or to-dos, format them as task lists with "[ ]". Preserve the original meaning and language. Return only the polished text, nothing else.',
 	autoGenerateTitle: false,
 	titleGenerationPrompt:
 		"Generate a short title (1-5 words) for the following text. Return only the title, nothing else.",

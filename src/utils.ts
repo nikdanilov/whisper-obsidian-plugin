@@ -15,7 +15,7 @@ export function getExtensionFromMimeType(mimeType: string | undefined): string {
 	const subtype = base.split("/")[1];
 	const extensionMap: Record<string, string> = {
 		"mp4a.40.2": "m4a",
-		"mpeg": "mp3",
+		mpeg: "mp3",
 		"x-m4a": "m4a",
 	};
 	return extensionMap[subtype] || subtype;
@@ -39,7 +39,14 @@ export function buildTemplateVariables(
 	const date = now.toISOString().split("T")[0];
 	const time = now.toTimeString().split(" ")[0].replace(/:/g, "-");
 	const datetime = `${date} ${now.toTimeString().split(" ")[0]}`;
-	return { date, time, datetime, title, transcription, audioFile: audioFilePath };
+	return {
+		date,
+		time,
+		datetime,
+		title,
+		transcription,
+		audioFile: audioFilePath,
+	};
 }
 
 export function resolveTemplate(

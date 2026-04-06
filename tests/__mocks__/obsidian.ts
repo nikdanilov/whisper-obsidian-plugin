@@ -42,12 +42,24 @@ export class MarkdownView {
 
 export class Setting {
 	constructor(_el: HTMLElement) {}
-	setName(_n: string) { return this; }
-	setDesc(_d: string) { return this; }
-	addText(_cb: any) { return this; }
-	addToggle(_cb: any) { return this; }
-	addDropdown(_cb: any) { return this; }
-	setDisabled(_d: boolean) { return this; }
+	setName(_n: string) {
+		return this;
+	}
+	setDesc(_d: string) {
+		return this;
+	}
+	addText(_cb: any) {
+		return this;
+	}
+	addToggle(_cb: any) {
+		return this;
+	}
+	addDropdown(_cb: any) {
+		return this;
+	}
+	setDisabled(_d: boolean) {
+		return this;
+	}
 }
 
 export class PluginSettingTab {
@@ -63,10 +75,18 @@ export class PluginSettingTab {
 export class ButtonComponent {
 	buttonEl = document.createElement("button");
 	constructor(_el: HTMLElement) {}
-	setIcon(_i: string) { return this; }
-	setButtonText(_t: string) { return this; }
-	onClick(_cb: any) { return this; }
-	setDisabled(_d: boolean) { return this; }
+	setIcon(_i: string) {
+		return this;
+	}
+	setButtonText(_t: string) {
+		return this;
+	}
+	onClick(_cb: any) {
+		return this;
+	}
+	setDisabled(_d: boolean) {
+		return this;
+	}
 }
 
 export class TFolder {
