@@ -105,7 +105,7 @@ export default class Whisper extends Plugin {
 			new Notice("Recording paused");
 		} else if (this.statusBar.status === RecordingStatus.Paused) {
 			await this.recorder.pauseRecording();
-			this.timer.pause();
+			this.timer.resume();
 			this.statusBar.updateStatus(RecordingStatus.Recording);
 			new Notice("Recording resumed");
 		}

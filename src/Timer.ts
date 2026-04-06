@@ -18,20 +18,17 @@ export class Timer {
 	}
 
 	pause(): void {
-		if (this.intervalId !== null) {
-			clearInterval(this.intervalId);
-			this.intervalId = null;
-			if (this.onUpdate) {
-				this.onUpdate();
-			}
-		} else {
-			this.intervalId = window.setInterval(() => {
-				this.elapsedTime += 1000;
-				if (this.onUpdate) {
-					this.onUpdate();
-				}
-			}, 1000);
+		if (this.intervalId === null) return;
+		clearInterval(this.intervalId);
+		this.intervalId = null;
+		if (this.onUpdate) {
+			this.onUpdate();
 		}
+	}
+
+	resume(): void {
+		if (this.intervalId !== null) return;
+		this.start();
 	}
 
 	reset(): void {
