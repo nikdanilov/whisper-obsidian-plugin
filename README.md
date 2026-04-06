@@ -1,8 +1,8 @@
 # Whisper — Speech-to-text for Obsidian
 
-Record or upload audio, transcribe with [Whisper](https://openai.com/research/whisper), and optionally polish the result with an LLM. Works on desktop and mobile.
+Record or upload audio, transcribe with [Whisper](https://openai.com/research/whisper), and optionally post-process the result with an LLM. Works on desktop and mobile.
 
-Supports OpenAI, [Groq](https://groq.com), Azure, or any Whisper-compatible API.
+Works with OpenAI, Groq, Azure, or any other Whisper-compatible API.
 
 ## Quick Start
 
