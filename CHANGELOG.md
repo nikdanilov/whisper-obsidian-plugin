@@ -1,5 +1,12 @@
 
 
+## [1.9.0](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.7...1.9.0) (2026-04-07)
+
+
+### Features
+
+* post-processing provider dropdown with custom endpoint support ([#116](https://github.com/nikdanilov/whisper-obsidian-plugin/issues/116)) ([43f05f9](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/43f05f93add65c38952ddef3515f49de4f5277bc))
+
 ## [1.8.7](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.6...1.8.7) (2026-04-06)
 
 
