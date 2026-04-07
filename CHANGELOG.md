@@ -1,5 +1,12 @@
 
 
+## [1.9.1](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.9.0...1.9.1) (2026-04-07)
+
+
+### Bug Fixes
+
+* settings UX cleanup and better defaults ([a2ab889](https://github.com/nikdanilov/whisper-obsidian-plugin/commit/a2ab889419275c33490ee447c5da54c3af0893a5))
+
 ## [1.9.0](https://github.com/nikdanilov/whisper-obsidian-plugin/compare/1.8.7...1.9.0) (2026-04-07)
 
 
