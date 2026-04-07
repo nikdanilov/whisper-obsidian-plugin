@@ -14,9 +14,9 @@ describe("DEFAULT_SETTINGS", () => {
 		expect(DEFAULT_SETTINGS.language).toBe("");
 	});
 
-	it("defaults to dictation mode (no file saves)", () => {
-		expect(DEFAULT_SETTINGS.saveAudioFile).toBe(false);
-		expect(DEFAULT_SETTINGS.createNoteFile).toBe(false);
+	it("saves audio and creates note file by default", () => {
+		expect(DEFAULT_SETTINGS.saveAudioFile).toBe(true);
+		expect(DEFAULT_SETTINGS.createNoteFile).toBe(true);
 	});
 
 	it("disables optional features by default", () => {
