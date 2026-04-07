@@ -1,5 +1,5 @@
 import Whisper from "main";
-import { App, PluginSettingTab, Setting, TFolder } from "obsidian";
+import { App, PluginSettingTab, Setting } from "obsidian";
 import {
 	SettingsManager,
 	PostProcessingProvider,
@@ -10,8 +10,6 @@ import {
 export class WhisperSettingsTab extends PluginSettingTab {
 	private plugin: Whisper;
 	private settingsManager: SettingsManager;
-	private createNewFileInput: Setting;
-	private saveAudioFileInput: Setting;
 
 	constructor(app: App, plugin: Whisper) {
 		super(app, plugin);
@@ -21,59 +19,68 @@ export class WhisperSettingsTab extends PluginSettingTab {
 
 	display(): void {
 		const { containerEl } = this;
+		const scrollTop = containerEl.scrollTop;
 
 		containerEl.empty();
 
 		// --- API Keys ---
-		containerEl.createEl("h2", { text: "API Keys" });
+		new Setting(containerEl).setName("API Keys").setHeading();
 		this.createWhisperApiKeySetting();
 		this.createOpenAiApiKeySetting();
 		this.createAnthropicApiKeySetting();
 
-		// --- Whisper Settings ---
-		containerEl.createEl("h2", { text: "Whisper Settings" });
+		// --- Transcription ---
+		new Setting(containerEl).setName("Transcription").setHeading();
 		this.createApiUrlSetting();
 		this.createModelSetting();
 		this.createLanguageSetting();
 		this.createPromptSetting();
+		this.createSendCursorContextSetting();
 		this.createTemperatureSetting();
 		this.createResponseFormatSetting();
-		this.createSendCursorContextSetting();
+
+		// --- Recording ---
+		new Setting(containerEl).setName("Recording").setHeading();
 		// async — populates device dropdown after enumeration completes
 		void this.createAudioDeviceSetting();
 		this.createSaveAudioFileToggleSetting();
-		this.createSaveAudioFilePathSetting();
-		this.createNewFileToggleSetting();
-		this.createNewFilePathSetting();
-		this.createNoteFilenameTemplateSetting();
-		this.createNoteTemplateSetting();
-		this.createDebugModeToggleSetting();
-
-		// --- Post-Processing Settings ---
-		containerEl.createEl("h2", { text: "Post-Processing Settings" });
-		this.createPostProcessingToggleSetting();
-		this.createPostProcessingProviderSetting();
-		this.createPostProcessingUrlSetting();
-		this.createPostProcessingApiKeySetting();
-		this.createPostProcessingModelSetting();
-		this.createPostProcessingPromptSetting();
-		this.createAutoGenerateTitleSetting();
-		this.createTitleGenerationPromptSetting();
-		this.createKeepOriginalTranscriptionSetting();
-	}
-
-	private getUniqueFolders(): TFolder[] {
-		const files = this.app.vault.getMarkdownFiles();
-		const folderSet = new Set<TFolder>();
-
-		for (const file of files) {
-			const parentFolder = file.parent;
-			if (parentFolder && parentFolder instanceof TFolder) {
-				folderSet.add(parentFolder);
-			}
+		if (this.plugin.settings.saveAudioFile) {
+			this.createSaveAudioFilePathSetting();
 		}
 
-		return Array.from(folderSet);
+		// --- Output ---
+		new Setting(containerEl).setName("Output").setHeading();
+		this.createNewFileToggleSetting();
+		if (this.plugin.settings.createNoteFile) {
+			this.createNewFilePathSetting();
+			this.createNoteFilenameTemplateSetting();
+			this.createNoteTemplateSetting();
+		}
+
+		// --- Post-Processing ---
+		new Setting(containerEl).setName("Post-processing").setHeading();
+		this.createPostProcessingToggleSetting();
+		if (this.plugin.settings.postProcessing) {
+			this.createPostProcessingProviderSetting();
+			this.createPostProcessingUrlSetting();
+			this.createPostProcessingApiKeySetting();
+			this.createPostProcessingModelSetting();
+			this.createPostProcessingPromptSetting();
+			this.createAutoGenerateTitleSetting();
+			this.createTitleGenerationPromptSetting();
+			this.createKeepOriginalTranscriptionSetting();
+		}
+
+		// --- Advanced ---
+		new Setting(containerEl).setName("Advanced").setHeading();
+		this.createDebugModeToggleSetting();
+
+		// Restore scroll position after re-render to prevent jumping
+		containerEl.scrollTop = scrollTop;
+	}
+
+	private async save(): Promise<void> {
+		await this.settingsManager.saveSettings(this.plugin.settings);
 	}
 
 	private createTextSetting(
@@ -281,16 +288,14 @@ export class WhisperSettingsTab extends PluginSettingTab {
 						if (!value) {
 							this.plugin.settings.audioSavePath = "";
 						}
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
-						this.saveAudioFileInput.setDisabled(!value);
+						await this.save();
+						this.display();
 					})
 			);
 	}
 
 	private createSaveAudioFilePathSetting(): void {
-		this.saveAudioFileInput = new Setting(this.containerEl)
+		new Setting(this.containerEl)
 			.setName("Audio save path")
 			.setDesc("Folder in the vault where audio files are saved")
 			.addText((text) =>
@@ -299,12 +304,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.audioSavePath)
 					.onChange(async (value) => {
 						this.plugin.settings.audioSavePath = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
+						await this.save();
 					})
-			)
-			.setDisabled(!this.plugin.settings.saveAudioFile);
+			);
 	}
 
 	private createTemperatureSetting(): void {
@@ -348,16 +350,14 @@ export class WhisperSettingsTab extends PluginSettingTab {
 						if (!value) {
 							this.plugin.settings.noteSavePath = "";
 						}
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
-						this.createNewFileInput.setDisabled(!value);
+						await this.save();
+						this.display();
 					});
 			});
 	}
 
 	private createNewFilePathSetting(): void {
-		this.createNewFileInput = new Setting(this.containerEl)
+		new Setting(this.containerEl)
 			.setName("Note save path")
 			.setDesc("Folder in the vault where note files are saved")
 			.addText((text) => {
@@ -365,9 +365,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.noteSavePath)
 					.onChange(async (value) => {
 						this.plugin.settings.noteSavePath = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
+						await this.save();
 					});
 			});
 	}
@@ -429,17 +427,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			});
 	}
 
-	private get postProcessingEnabled(): boolean {
-		return this.plugin.settings.postProcessing;
-	}
-
-	private async savePostProcessingChange(): Promise<void> {
-		await this.settingsManager.saveSettings(this.plugin.settings);
-	}
-
 	private createPostProcessingToggleSetting(): void {
 		new Setting(this.containerEl)
-			.setName("Post-processing")
+			.setName("Enable post-processing")
 			.setDesc(
 				"Clean up transcriptions with an LLM — fix grammar, remove filler words, improve readability"
 			)
@@ -448,7 +438,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.postProcessing)
 					.onChange(async (value) => {
 						this.plugin.settings.postProcessing = value;
-						await this.savePostProcessingChange();
+						await this.save();
 						this.display();
 					});
 			});
@@ -464,7 +454,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		new Setting(this.containerEl)
 			.setName("Provider")
 			.setDesc(
-				"LLM provider for post-processing. Anthropic and OpenAI use API keys from the API Keys section above."
+				"Anthropic and OpenAI use the API keys from the API Keys section above"
 			)
 			.addDropdown((dropdown) => {
 				for (const [value, label] of Object.entries(providers)) {
@@ -481,29 +471,10 @@ export class WhisperSettingsTab extends PluginSettingTab {
 							this.plugin.settings.postProcessingModel =
 								PROVIDER_DEFAULT_MODELS[provider];
 						}
-						await this.savePostProcessingChange();
+						await this.save();
 						this.display();
 					});
-			})
-			.setDisabled(!this.postProcessingEnabled);
-	}
-
-	private createPostProcessingApiKeySetting(): void {
-		if (this.plugin.settings.postProcessingProvider !== "custom") return;
-
-		new Setting(this.containerEl)
-			.setName("Post-processing API Key")
-			.setDesc("API key for the custom endpoint")
-			.addText((text) => {
-				text.setPlaceholder("sk-...xxxx")
-					.setValue(this.plugin.settings.postProcessingApiKey)
-					.onChange(async (value) => {
-						this.plugin.settings.postProcessingApiKey = value;
-						await this.savePostProcessingChange();
-					});
-				text.inputEl.type = "password";
-			})
-			.setDisabled(!this.postProcessingEnabled);
+			});
 	}
 
 	private createPostProcessingUrlSetting(): void {
@@ -518,10 +489,26 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.postProcessingUrl)
 					.onChange(async (value) => {
 						this.plugin.settings.postProcessingUrl = value;
-						await this.savePostProcessingChange();
+						await this.save();
 					})
-			)
-			.setDisabled(!this.postProcessingEnabled);
+			);
+	}
+
+	private createPostProcessingApiKeySetting(): void {
+		if (this.plugin.settings.postProcessingProvider !== "custom") return;
+
+		new Setting(this.containerEl)
+			.setName("Post-processing API Key")
+			.setDesc("API key for the custom endpoint")
+			.addText((text) => {
+				text.setPlaceholder("sk-...xxxx")
+					.setValue(this.plugin.settings.postProcessingApiKey)
+					.onChange(async (value) => {
+						this.plugin.settings.postProcessingApiKey = value;
+						await this.save();
+					});
+				text.inputEl.type = "password";
+			});
 	}
 
 	private createPostProcessingModelSetting(): void {
@@ -534,10 +521,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.postProcessingModel)
 					.onChange(async (value) => {
 						this.plugin.settings.postProcessingModel = value;
-						await this.savePostProcessingChange();
+						await this.save();
 					})
-			)
-			.setDisabled(!this.postProcessingEnabled);
+			);
 	}
 
 	private createPostProcessingPromptSetting(): void {
@@ -551,12 +537,11 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.postProcessingPrompt)
 					.onChange(async (value) => {
 						this.plugin.settings.postProcessingPrompt = value;
-						await this.savePostProcessingChange();
+						await this.save();
 					});
 				text.inputEl.rows = 4;
 				text.inputEl.cols = 50;
-			})
-			.setDisabled(!this.postProcessingEnabled);
+			});
 	}
 
 	private createAutoGenerateTitleSetting(): void {
@@ -568,11 +553,10 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.autoGenerateTitle)
 					.onChange(async (value) => {
 						this.plugin.settings.autoGenerateTitle = value;
-						await this.savePostProcessingChange();
+						await this.save();
 						this.display();
 					});
-			})
-			.setDisabled(!this.postProcessingEnabled);
+			});
 	}
 
 	private createTitleGenerationPromptSetting(): void {
@@ -586,12 +570,11 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.titleGenerationPrompt)
 					.onChange(async (value) => {
 						this.plugin.settings.titleGenerationPrompt = value;
-						await this.savePostProcessingChange();
+						await this.save();
 					});
 				text.inputEl.rows = 2;
 				text.inputEl.cols = 50;
-			})
-			.setDisabled(!this.postProcessingEnabled);
+			});
 	}
 
 	private createKeepOriginalTranscriptionSetting(): void {
@@ -605,10 +588,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.keepOriginalTranscription)
 					.onChange(async (value) => {
 						this.plugin.settings.keepOriginalTranscription = value;
-						await this.savePostProcessingChange();
+						await this.save();
 					});
-			})
-			.setDisabled(!this.postProcessingEnabled);
+			});
 	}
 
 	private createDebugModeToggleSetting(): void {
