@@ -17,11 +17,14 @@ export class AudioHandler {
 	}
 
 	private getPostProcessingApiKey(): string {
-		const isAnthropic =
-			this.plugin.settings.postProcessingModel.startsWith("claude");
-		return isAnthropic
-			? this.plugin.settings.anthropicApiKey
-			: this.plugin.settings.openAiApiKey || this.plugin.settings.apiKey;
+		switch (this.plugin.settings.postProcessingProvider) {
+			case "anthropic":
+				return this.plugin.settings.anthropicApiKey;
+			case "openai":
+				return this.plugin.settings.openAiApiKey;
+			case "custom":
+				return this.plugin.settings.postProcessingApiKey;
+		}
 	}
 
 	private async ensureFolderExists(folderPath: string): Promise<void> {
@@ -148,14 +151,8 @@ export class AudioHandler {
 			if (this.plugin.settings.postProcessing) {
 				const ppApiKey = this.getPostProcessingApiKey();
 				if (!ppApiKey) {
-					const isAnthropic =
-						this.plugin.settings.postProcessingModel.startsWith(
-							"claude"
-						);
 					new Notice(
-						`✘ Add your ${
-							isAnthropic ? "Anthropic" : "OpenAI"
-						} API key in settings`
+						"✘ Add your post-processing API key in settings"
 					);
 					return;
 				}
@@ -167,6 +164,7 @@ export class AudioHandler {
 						apiKey: ppApiKey,
 						model: this.plugin.settings.postProcessingModel,
 						url: this.plugin.settings.postProcessingUrl,
+						provider: this.plugin.settings.postProcessingProvider,
 					});
 					finalText = await processor.process(
 						originalText,
@@ -194,6 +192,7 @@ export class AudioHandler {
 							apiKey: ppApiKey,
 							model: this.plugin.settings.postProcessingModel,
 							url: this.plugin.settings.postProcessingUrl,
+							provider: this.plugin.settings.postProcessingProvider,
 						});
 						const title = await processor.process(
 							finalText,

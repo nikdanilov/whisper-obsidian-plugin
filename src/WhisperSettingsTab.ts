@@ -1,18 +1,17 @@
 import Whisper from "main";
 import { App, PluginSettingTab, Setting, TFolder } from "obsidian";
-import { SettingsManager } from "./SettingsManager";
+import {
+	SettingsManager,
+	PostProcessingProvider,
+	PROVIDER_URLS,
+	PROVIDER_DEFAULT_MODELS,
+} from "./SettingsManager";
 
 export class WhisperSettingsTab extends PluginSettingTab {
 	private plugin: Whisper;
 	private settingsManager: SettingsManager;
 	private createNewFileInput: Setting;
 	private saveAudioFileInput: Setting;
-	private postProcessingUrlInput: Setting;
-	private postProcessingModelInput: Setting;
-	private postProcessingPromptInput: Setting;
-	private autoGenerateTitleInput: Setting;
-	private titleGenerationPromptInput: Setting;
-	private keepOriginalInput: Setting;
 
 	constructor(app: App, plugin: Whisper) {
 		super(app, plugin);
@@ -53,7 +52,9 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		// --- Post-Processing Settings ---
 		containerEl.createEl("h2", { text: "Post-Processing Settings" });
 		this.createPostProcessingToggleSetting();
+		this.createPostProcessingProviderSetting();
 		this.createPostProcessingUrlSetting();
+		this.createPostProcessingApiKeySetting();
 		this.createPostProcessingModelSetting();
 		this.createPostProcessingPromptSetting();
 		this.createAutoGenerateTitleSetting();
@@ -428,6 +429,14 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			});
 	}
 
+	private get postProcessingEnabled(): boolean {
+		return this.plugin.settings.postProcessing;
+	}
+
+	private async savePostProcessingChange(): Promise<void> {
+		await this.settingsManager.saveSettings(this.plugin.settings);
+	}
+
 	private createPostProcessingToggleSetting(): void {
 		new Setting(this.containerEl)
 			.setName("Post-processing")
@@ -439,63 +448,100 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.postProcessing)
 					.onChange(async (value) => {
 						this.plugin.settings.postProcessing = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
-						this.postProcessingUrlInput.setDisabled(!value);
-						this.postProcessingModelInput.setDisabled(!value);
-						this.postProcessingPromptInput.setDisabled(!value);
-						this.autoGenerateTitleInput.setDisabled(!value);
-						this.titleGenerationPromptInput.setDisabled(
-							!value || !this.plugin.settings.autoGenerateTitle
-						);
-						this.keepOriginalInput.setDisabled(!value);
+						await this.savePostProcessingChange();
+						this.display();
 					});
 			});
 	}
 
-	private createPostProcessingUrlSetting(): void {
-		this.postProcessingUrlInput = new Setting(this.containerEl)
-			.setName("Post-processing API URL")
+	private createPostProcessingProviderSetting(): void {
+		const providers: Record<PostProcessingProvider, string> = {
+			anthropic: "Anthropic",
+			openai: "OpenAI",
+			custom: "Custom",
+		};
+
+		new Setting(this.containerEl)
+			.setName("Provider")
 			.setDesc(
-				"Endpoint for post-processing requests. Change for Anthropic, Ollama, or other providers."
+				"LLM provider for post-processing. Anthropic and OpenAI use API keys from the API Keys section above."
 			)
+			.addDropdown((dropdown) => {
+				for (const [value, label] of Object.entries(providers)) {
+					dropdown.addOption(value, label);
+				}
+				dropdown
+					.setValue(this.plugin.settings.postProcessingProvider)
+					.onChange(async (value) => {
+						const provider = value as PostProcessingProvider;
+						this.plugin.settings.postProcessingProvider = provider;
+						if (provider !== "custom") {
+							this.plugin.settings.postProcessingUrl =
+								PROVIDER_URLS[provider];
+							this.plugin.settings.postProcessingModel =
+								PROVIDER_DEFAULT_MODELS[provider];
+						}
+						await this.savePostProcessingChange();
+						this.display();
+					});
+			})
+			.setDisabled(!this.postProcessingEnabled);
+	}
+
+	private createPostProcessingApiKeySetting(): void {
+		if (this.plugin.settings.postProcessingProvider !== "custom") return;
+
+		new Setting(this.containerEl)
+			.setName("Post-processing API Key")
+			.setDesc("API key for the custom endpoint")
+			.addText((text) => {
+				text.setPlaceholder("sk-...xxxx")
+					.setValue(this.plugin.settings.postProcessingApiKey)
+					.onChange(async (value) => {
+						this.plugin.settings.postProcessingApiKey = value;
+						await this.savePostProcessingChange();
+					});
+				text.inputEl.type = "password";
+			})
+			.setDisabled(!this.postProcessingEnabled);
+	}
+
+	private createPostProcessingUrlSetting(): void {
+		if (this.plugin.settings.postProcessingProvider !== "custom") return;
+
+		new Setting(this.containerEl)
+			.setName("Post-processing API URL")
+			.setDesc("Endpoint for post-processing requests")
 			.addText((text) =>
 				text
-					.setPlaceholder("https://api.anthropic.com/v1/messages")
+					.setPlaceholder("https://api.example.com/v1/chat/completions")
 					.setValue(this.plugin.settings.postProcessingUrl)
 					.onChange(async (value) => {
 						this.plugin.settings.postProcessingUrl = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
+						await this.savePostProcessingChange();
 					})
 			)
-			.setDisabled(!this.plugin.settings.postProcessing);
+			.setDisabled(!this.postProcessingEnabled);
 	}
 
 	private createPostProcessingModelSetting(): void {
-		this.postProcessingModelInput = new Setting(this.containerEl)
+		new Setting(this.containerEl)
 			.setName("Post-processing model")
-			.setDesc(
-				"Model ID for post-processing and title generation (e.g. claude-haiku-4-5-20251001, gpt-4.1-nano)"
-			)
+			.setDesc("Model ID for the selected provider")
 			.addText((text) =>
 				text
 					.setPlaceholder("claude-haiku-4-5-20251001")
 					.setValue(this.plugin.settings.postProcessingModel)
 					.onChange(async (value) => {
 						this.plugin.settings.postProcessingModel = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
+						await this.savePostProcessingChange();
 					})
 			)
-			.setDisabled(!this.plugin.settings.postProcessing);
+			.setDisabled(!this.postProcessingEnabled);
 	}
 
 	private createPostProcessingPromptSetting(): void {
-		this.postProcessingPromptInput = new Setting(this.containerEl)
+		new Setting(this.containerEl)
 			.setName("Post-processing prompt")
 			.setDesc(
 				"Instructions for the LLM on how to clean up the transcription"
@@ -505,18 +551,16 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.postProcessingPrompt)
 					.onChange(async (value) => {
 						this.plugin.settings.postProcessingPrompt = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
+						await this.savePostProcessingChange();
 					});
 				text.inputEl.rows = 4;
 				text.inputEl.cols = 50;
 			})
-			.setDisabled(!this.plugin.settings.postProcessing);
+			.setDisabled(!this.postProcessingEnabled);
 	}
 
 	private createAutoGenerateTitleSetting(): void {
-		this.autoGenerateTitleInput = new Setting(this.containerEl)
+		new Setting(this.containerEl)
 			.setName("Auto-generate title")
 			.setDesc("Use the LLM to generate a descriptive filename for notes")
 			.addToggle((toggle) => {
@@ -524,17 +568,17 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.autoGenerateTitle)
 					.onChange(async (value) => {
 						this.plugin.settings.autoGenerateTitle = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
-						this.titleGenerationPromptInput.setDisabled(!value);
+						await this.savePostProcessingChange();
+						this.display();
 					});
 			})
-			.setDisabled(!this.plugin.settings.postProcessing);
+			.setDisabled(!this.postProcessingEnabled);
 	}
 
 	private createTitleGenerationPromptSetting(): void {
-		this.titleGenerationPromptInput = new Setting(this.containerEl)
+		if (!this.plugin.settings.autoGenerateTitle) return;
+
+		new Setting(this.containerEl)
 			.setName("Title generation prompt")
 			.setDesc("Instructions for the LLM on how to generate the title")
 			.addTextArea((text) => {
@@ -542,21 +586,16 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.titleGenerationPrompt)
 					.onChange(async (value) => {
 						this.plugin.settings.titleGenerationPrompt = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
+						await this.savePostProcessingChange();
 					});
 				text.inputEl.rows = 2;
 				text.inputEl.cols = 50;
 			})
-			.setDisabled(
-				!this.plugin.settings.postProcessing ||
-					!this.plugin.settings.autoGenerateTitle
-			);
+			.setDisabled(!this.postProcessingEnabled);
 	}
 
 	private createKeepOriginalTranscriptionSetting(): void {
-		this.keepOriginalInput = new Setting(this.containerEl)
+		new Setting(this.containerEl)
 			.setName("Keep original transcription")
 			.setDesc(
 				"Append the raw Whisper transcription below the post-processed text"
@@ -566,12 +605,10 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.keepOriginalTranscription)
 					.onChange(async (value) => {
 						this.plugin.settings.keepOriginalTranscription = value;
-						await this.settingsManager.saveSettings(
-							this.plugin.settings
-						);
+						await this.savePostProcessingChange();
 					});
 			})
-			.setDisabled(!this.plugin.settings.postProcessing);
+			.setDisabled(!this.postProcessingEnabled);
 	}
 
 	private createDebugModeToggleSetting(): void {

@@ -1,9 +1,11 @@
 import axios from "axios";
+import { PostProcessingProvider } from "./SettingsManager";
 
 export interface PostProcessorConfig {
 	apiKey: string;
 	model: string;
 	url: string;
+	provider: PostProcessingProvider;
 }
 
 export class PostProcessor {
@@ -13,12 +15,8 @@ export class PostProcessor {
 		this.config = config;
 	}
 
-	private isAnthropicModel(): boolean {
-		return this.config.model.startsWith("claude");
-	}
-
 	async process(text: string, prompt: string): Promise<string> {
-		if (this.isAnthropicModel()) {
+		if (this.config.provider === "anthropic") {
 			return this.callAnthropic(text, prompt);
 		}
 		return this.callOpenAI(text, prompt);
