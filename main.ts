@@ -1,4 +1,4 @@
-import { Notice, Plugin, TFile } from "obsidian";
+import { MarkdownView, Notice, Plugin, TFile } from "obsidian";
 import { Timer } from "src/Timer";
 import { Controls } from "src/Controls";
 import { AudioHandler } from "src/AudioHandler";
@@ -217,6 +217,35 @@ export default class Whisper extends Plugin {
 			id: "open-recording-controls",
 			name: "Open recording controls",
 			callback: () => this.openControls(),
+		});
+
+		this.addCommand({
+			id: "insert-timestamp",
+			name: "Insert recording timestamp",
+			callback: () => {
+				if (
+					this.statusBar.status !== RecordingStatus.Recording &&
+					this.statusBar.status !== RecordingStatus.Paused
+				) {
+					new Notice("No recording in progress");
+					return;
+				}
+				const editor =
+					this.app.workspace.getActiveViewOfType(
+						MarkdownView
+					)?.editor;
+				if (!editor) {
+					new Notice("No active note");
+					return;
+				}
+				const timestamp = this.timer.getTimestamp();
+				const cursor = editor.getCursor();
+				editor.replaceRange(timestamp, cursor);
+				editor.setCursor({
+					line: cursor.line,
+					ch: cursor.ch + timestamp.length,
+				});
+			},
 		});
 	}
 

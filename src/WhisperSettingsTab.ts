@@ -38,6 +38,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createSendCursorContextSetting();
 		this.createTemperatureSetting();
 		this.createResponseFormatSetting();
+		this.createIncludeTimestampsSetting();
 
 		// --- Recording ---
 		new Setting(containerEl).setName("Recording").setHeading();
@@ -336,6 +337,24 @@ export class WhisperSettingsTab extends PluginSettingTab {
 				await this.settingsManager.saveSettings(this.plugin.settings);
 			}
 		);
+	}
+
+	private createIncludeTimestampsSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Include timestamps")
+			.setDesc(
+				"Prefix each segment of the transcription with its timestamp. Uses verbose_json response format."
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.includeTimestamps)
+					.onChange(async (value) => {
+						this.plugin.settings.includeTimestamps = value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
+			});
 	}
 
 	private createNewFileToggleSetting(): void {
