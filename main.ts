@@ -36,6 +36,11 @@ export default class Whisper extends Plugin {
 		this.recorder.setDeviceId(deviceId);
 
 		this.statusBar = new StatusBar(this);
+		this.statusBar.timer = this.timer;
+
+		this.timer.setOnUpdate(() => {
+			this.statusBar.updateStatusBarItem();
+		});
 
 		// Timer reacts to recording state changes
 		this.statusBar.onChange((status) => {
@@ -99,7 +104,7 @@ export default class Whisper extends Plugin {
 
 	// --- Recording state transitions (single source of truth) ---
 
-	async startRecording() {
+	async startRecording(limitMs?: number) {
 		if (
 			this.statusBar.status === RecordingStatus.Recording ||
 			this.statusBar.status === RecordingStatus.Paused
@@ -109,8 +114,22 @@ export default class Whisper extends Plugin {
 		}
 		try {
 			await this.recorder.startRecording();
+			this.timer.setLimit(limitMs ?? null);
+			this.timer.setOnLimitReached(
+				limitMs
+					? async () => {
+							await this.pauseRecording();
+							this.openControls();
+							new Notice("Time limit reached — recording paused");
+					  }
+					: null
+			);
 			this.statusBar.updateStatus(RecordingStatus.Recording);
-			new Notice("Recording...");
+			new Notice(
+				limitMs
+					? `Recording... (pauses in ${Math.round(limitMs / 60_000)} min)`
+					: "Recording..."
+			);
 		} catch (err) {
 			this.statusBar.updateStatus(RecordingStatus.Idle);
 			new Notice("✘ Could not start recording");
@@ -141,6 +160,8 @@ export default class Whisper extends Plugin {
 			new Notice("Recording paused");
 		} else if (this.statusBar.status === RecordingStatus.Paused) {
 			await this.recorder.pauseRecording();
+			this.timer.setLimit(null);
+			this.timer.setOnLimitReached(null);
 			this.statusBar.updateStatus(RecordingStatus.Recording);
 			new Notice("Recording resumed");
 		}
