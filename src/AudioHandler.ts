@@ -270,6 +270,17 @@ export class AudioHandler {
 				editor.setCursor(newPosition);
 			}
 
+			if (
+				this.plugin.settings.saveAudioFile &&
+				this.plugin.settings.deleteAudioAfterTranscription
+			) {
+				try {
+					await this.plugin.app.vault.adapter.remove(audioFilePath);
+				} catch (err) {
+					console.error("Error deleting audio file:", err);
+				}
+			}
+
 			new Notice("Transcription complete");
 		} catch (err) {
 			console.error("Error parsing audio:", err);

@@ -46,6 +46,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		this.createSaveAudioFileToggleSetting();
 		if (this.plugin.settings.saveAudioFile) {
 			this.createSaveAudioFilePathSetting();
+			this.createDeleteAudioAfterTranscriptionSetting();
 		}
 
 		// --- Output ---
@@ -304,6 +305,20 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.audioSavePath)
 					.onChange(async (value) => {
 						this.plugin.settings.audioSavePath = value;
+						await this.save();
+					})
+			);
+	}
+
+	private createDeleteAudioAfterTranscriptionSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Delete after transcription")
+			.setDesc("Delete the audio file from the vault after a successful transcription")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.deleteAudioAfterTranscription)
+					.onChange(async (value) => {
+						this.plugin.settings.deleteAudioAfterTranscription = value;
 						await this.save();
 					})
 			);
