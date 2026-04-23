@@ -41,6 +41,7 @@ export interface WhisperSettings {
 	audioDeviceId: string;
 	saveAudioFile: boolean;
 	audioSavePath: string;
+	deleteAudioAfterTranscription: boolean;
 	// Output
 	createNoteFile: boolean;
 	noteSavePath: string;
@@ -83,6 +84,7 @@ export const DEFAULT_WHISPER: WhisperSettings = {
 	audioDeviceId: "default",
 	saveAudioFile: true,
 	audioSavePath: "",
+	deleteAudioAfterTranscription: false,
 	createNoteFile: true,
 	noteSavePath: "",
 	noteFilenameTemplate: "{{datetime}}",
