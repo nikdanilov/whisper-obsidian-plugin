@@ -48,6 +48,7 @@ export interface WhisperSettings {
 	noteTemplate: string;
 	// Advanced
 	debugMode: boolean;
+	includeTimestamps: boolean;
 }
 
 export interface PostProcessingSettings {
@@ -88,6 +89,7 @@ export const DEFAULT_WHISPER: WhisperSettings = {
 	noteFilenameTemplate: "{{datetime}}",
 	noteTemplate: "![[{{audioFile}}]]\n{{transcription}}",
 	debugMode: false,
+	includeTimestamps: false,
 };
 
 export const DEFAULT_POST_PROCESSING: PostProcessingSettings = {

@@ -16,6 +16,25 @@ export class AudioHandler {
 		this.plugin = plugin;
 	}
 
+	private formatSegments(
+		segments: Array<{ start: number; text: string }>
+	): string {
+		return segments
+			.map((seg) => {
+				const totalSeconds = Math.floor(seg.start);
+				const hours = Math.floor(totalSeconds / 3600);
+				const minutes = Math.floor((totalSeconds % 3600) / 60);
+				const seconds = totalSeconds % 60;
+				const pad = (n: number) => String(n).padStart(2, "0");
+				const timestamp =
+					hours > 0
+						? `[${pad(hours)}:${pad(minutes)}:${pad(seconds)}]`
+						: `[${pad(minutes)}:${pad(seconds)}]`;
+				return `${timestamp} ${seg.text.trim()}`;
+			})
+			.join("\n");
+	}
+
 	private getPostProcessingApiKey(): string {
 		switch (this.plugin.settings.postProcessingProvider) {
 			case "anthropic":
@@ -98,11 +117,12 @@ export class AudioHandler {
 				"temperature",
 				String(this.plugin.settings.temperature)
 			);
-		if (this.plugin.settings.responseFormat !== "json")
-			formData.append(
-				"response_format",
-				this.plugin.settings.responseFormat
-			);
+
+		const responseFormat = this.plugin.settings.includeTimestamps
+			? "verbose_json"
+			: this.plugin.settings.responseFormat;
+		if (responseFormat !== "json")
+			formData.append("response_format", responseFormat);
 
 		try {
 			// If the saveAudioFile setting is true, save the audio file
@@ -144,7 +164,11 @@ export class AudioHandler {
 				}
 			);
 
-			const originalText: string = response.data.text;
+			const originalText: string =
+				this.plugin.settings.includeTimestamps &&
+				Array.isArray(response.data.segments)
+					? this.formatSegments(response.data.segments)
+					: response.data.text;
 			let finalText = originalText;
 
 			// Post-process with LLM if enabled
