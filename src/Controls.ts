@@ -9,6 +9,8 @@ export class Controls extends Modal {
 	private stopButton: ButtonComponent;
 	private cancelButton: ButtonComponent;
 	private timerDisplay: HTMLElement;
+	private limitRow: HTMLElement;
+	private limitInput: HTMLInputElement;
 	private statusListener: () => void;
 
 	constructor(plugin: Whisper) {
@@ -23,6 +25,14 @@ export class Controls extends Modal {
 			this.updateTimerDisplay();
 		});
 
+		this.limitRow = this.contentEl.createEl("div", { cls: "limit-row" });
+		this.limitRow.createEl("label", { text: "Stop after (minutes, optional): " });
+		this.limitInput = this.limitRow.createEl("input");
+		this.limitInput.type = "number";
+		this.limitInput.min = "1";
+		this.limitInput.placeholder = "—";
+		this.limitInput.style.width = "60px";
+
 		const buttonGroupEl = this.contentEl.createEl("div", {
 			cls: "button-group",
 		});
@@ -31,7 +41,11 @@ export class Controls extends Modal {
 		this.startButton
 			.setIcon("circle")
 			.setButtonText(" Record")
-			.onClick(() => this.plugin.startRecording())
+			.onClick(() => {
+				const mins = parseFloat(this.limitInput.value);
+				const limitMs = isNaN(mins) || mins <= 0 ? undefined : mins * 60_000;
+				this.plugin.startRecording(limitMs);
+			})
 			.buttonEl.addClass("button-component");
 
 		this.pauseButton = new ButtonComponent(buttonGroupEl);
@@ -85,6 +99,8 @@ export class Controls extends Modal {
 		const status = this.plugin.statusBar.status;
 		const isIdle = status === RecordingStatus.Idle;
 		const isPaused = status === RecordingStatus.Paused;
+
+		this.limitRow.style.display = isIdle ? "" : "none";
 
 		this.startButton.buttonEl.style.display = isIdle ? "" : "none";
 		this.startButton.buttonEl.empty();
