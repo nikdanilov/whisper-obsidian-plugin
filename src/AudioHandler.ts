@@ -217,6 +217,8 @@ export class AudioHandler {
 					? `${finalText}\n\n---\n\n*Original transcription:*\n${originalText}`
 					: finalText;
 
+			let transcriptWritten = false;
+
 			if (this.plugin.settings.createNoteFile) {
 				await this.ensureFolderExists(
 					this.plugin.settings.noteSavePath
@@ -252,6 +254,7 @@ export class AudioHandler {
 					resolvedNoteFilePath,
 					noteContent
 				);
+				transcriptWritten = true;
 			}
 
 			// Paste at cursor if there's an active editor
@@ -268,11 +271,13 @@ export class AudioHandler {
 					ch: cursorPosition.ch + outputText.length,
 				};
 				editor.setCursor(newPosition);
+				transcriptWritten = true;
 			}
 
 			if (
 				this.plugin.settings.saveAudioFile &&
-				this.plugin.settings.deleteAudioAfterTranscription
+				this.plugin.settings.deleteAudioAfterTranscription &&
+				transcriptWritten
 			) {
 				try {
 					await this.plugin.app.vault.adapter.remove(audioFilePath);
