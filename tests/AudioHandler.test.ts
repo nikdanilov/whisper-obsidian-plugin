@@ -236,23 +236,33 @@ describe("isDefaultApi — API key requirement", () => {
 	});
 });
 
-describe("#115 — createNoteFile does not navigate away", () => {
-	// Simulates the output behavior of sendAudioData:
-	// - always paste at cursor in the active editor
-	// - optionally save a note file in the background (no navigation)
+describe("output mode: createNoteFile + pasteAtCursorWhenCreatingNote", () => {
+	// Output modes:
+	// - createNoteFile off: pure dictation — paste at the cursor in the active editor.
+	// - createNoteFile on, pasteAtCursorWhenCreatingNote off (default):
+	//     only write the new note. Don't touch the open editor.
+	// - createNoteFile on, pasteAtCursorWhenCreatingNote on:
+	//     write the new note AND also paste at cursor.
+	// The default avoids the transcript landing twice (in the new note AND in
+	// whatever note happens to be open), which is the bug from PR #115.
 
 	function simulateTranscriptionOutput(
-		settings: { createNoteFile: boolean },
+		settings: {
+			createNoteFile: boolean;
+			pasteAtCursorWhenCreatingNote: boolean;
+		},
 		hasActiveEditor: boolean
 	) {
 		const actions: string[] = [];
 
 		if (settings.createNoteFile) {
 			actions.push("create-note-file");
-			// openLinkText was removed — no navigation
 		}
 
-		if (hasActiveEditor) {
+		const shouldPaste =
+			!settings.createNoteFile ||
+			settings.pasteAtCursorWhenCreatingNote;
+		if (shouldPaste && hasActiveEditor) {
 			actions.push("paste-at-cursor");
 		}
 
@@ -261,34 +271,50 @@ describe("#115 — createNoteFile does not navigate away", () => {
 
 	it("pastes at cursor when createNoteFile is off", () => {
 		const actions = simulateTranscriptionOutput(
-			{ createNoteFile: false },
+			{ createNoteFile: false, pasteAtCursorWhenCreatingNote: false },
 			true
 		);
 		expect(actions).toEqual(["paste-at-cursor"]);
 	});
 
-	it("pastes at cursor AND creates note file when both enabled", () => {
+	it("only creates a note file by default when createNoteFile is on", () => {
 		const actions = simulateTranscriptionOutput(
-			{ createNoteFile: true },
+			{ createNoteFile: true, pasteAtCursorWhenCreatingNote: false },
+			true
+		);
+		expect(actions).toEqual(["create-note-file"]);
+	});
+
+	it("creates a note file AND pastes when the opt-in is on", () => {
+		const actions = simulateTranscriptionOutput(
+			{ createNoteFile: true, pasteAtCursorWhenCreatingNote: true },
 			true
 		);
 		expect(actions).toEqual(["create-note-file", "paste-at-cursor"]);
 	});
 
-	it("does not navigate away when creating note file", () => {
+	it("does not navigate away when creating a note file", () => {
 		const actions = simulateTranscriptionOutput(
-			{ createNoteFile: true },
+			{ createNoteFile: true, pasteAtCursorWhenCreatingNote: false },
 			true
 		);
 		expect(actions).not.toContain("navigate-to-note");
 	});
 
-	it("only creates note file when no active editor", () => {
+	it("only creates a note file when no active editor (paste opt-in has nowhere to go)", () => {
 		const actions = simulateTranscriptionOutput(
-			{ createNoteFile: true },
+			{ createNoteFile: true, pasteAtCursorWhenCreatingNote: true },
 			false
 		);
 		expect(actions).toEqual(["create-note-file"]);
+	});
+
+	it("does nothing visible when createNoteFile is off and no editor is open", () => {
+		const actions = simulateTranscriptionOutput(
+			{ createNoteFile: false, pasteAtCursorWhenCreatingNote: false },
+			false
+		);
+		expect(actions).toEqual([]);
 	});
 });
 

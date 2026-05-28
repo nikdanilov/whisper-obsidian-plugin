@@ -37,6 +37,16 @@ export class AudioHandler {
 	}
 
 	async sendAudioData(blob: Blob, fileName: string): Promise<void> {
+		// Capture the active editor once, up front, so the paste at the end of
+		// this flow lands in the editor that was foreground when the user
+		// stopped *this* recording. Without this, a second recording started
+		// while this one is post-processing can shift the workspace's active
+		// editor (e.g. user clicks a freshly created note) and re-route this
+		// recording's paste to the wrong note.
+		const targetEditor =
+			this.plugin.app.workspace.getActiveViewOfType(MarkdownView)
+				?.editor ?? null;
+
 		// Get the base file name without extension
 		const baseFileName = getBaseFileName(fileName);
 
@@ -81,15 +91,9 @@ export class AudioHandler {
 		}
 
 		let prompt = this.plugin.settings.prompt || "";
-		if (this.plugin.settings.cursorContext) {
-			const editor =
-				this.plugin.app.workspace.getActiveViewOfType(
-					MarkdownView
-				)?.editor;
-			if (editor) {
-				const context = getCursorContext(editor);
-				prompt = prompt ? `${prompt}\n${context}` : context;
-			}
+		if (this.plugin.settings.cursorContext && targetEditor) {
+			const context = getCursorContext(targetEditor);
+			prompt = prompt ? `${prompt}\n${context}` : context;
 		}
 		if (prompt) formData.append("prompt", prompt);
 
@@ -254,20 +258,27 @@ export class AudioHandler {
 				);
 			}
 
-			// Paste at cursor if there's an active editor
-			const editor =
-				this.plugin.app.workspace.getActiveViewOfType(
-					MarkdownView
-				)?.editor;
-			if (editor) {
-				const cursorPosition = editor.getCursor();
-				editor.replaceRange(outputText, cursorPosition);
+			// In dictation mode (createNoteFile off) the cursor paste is the
+			// only output. When createNoteFile is on, paste is opt-in via
+			// pasteAtCursorWhenCreatingNote — defaulting it off avoids the
+			// transcript landing twice (in the new note AND in whatever note
+			// happens to be open).
+			//
+			// The editor reference is the one captured at the start of this
+			// invocation, so a concurrent recording (or a manual click into
+			// another note) can't re-route this paste mid-flow.
+			const shouldPaste =
+				!this.plugin.settings.createNoteFile ||
+				this.plugin.settings.pasteAtCursorWhenCreatingNote;
+			if (shouldPaste && targetEditor) {
+				const cursorPosition = targetEditor.getCursor();
+				targetEditor.replaceRange(outputText, cursorPosition);
 
 				const newPosition = {
 					line: cursorPosition.line,
 					ch: cursorPosition.ch + outputText.length,
 				};
-				editor.setCursor(newPosition);
+				targetEditor.setCursor(newPosition);
 			}
 
 			new Notice("Transcription complete");

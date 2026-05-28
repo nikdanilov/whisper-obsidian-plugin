@@ -55,6 +55,7 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			this.createNewFilePathSetting();
 			this.createNoteFilenameTemplateSetting();
 			this.createNoteTemplateSetting();
+			this.createPasteAtCursorWhenCreatingNoteSetting();
 		}
 
 		// --- Post-Processing ---
@@ -406,6 +407,27 @@ export class WhisperSettingsTab extends PluginSettingTab {
 					});
 				text.inputEl.rows = 4;
 				text.inputEl.cols = 50;
+			});
+	}
+
+	private createPasteAtCursorWhenCreatingNoteSetting(): void {
+		new Setting(this.containerEl)
+			.setName("Also paste at cursor")
+			.setDesc(
+				"When creating a note file, also paste the transcript at the cursor in the active editor. Off by default to avoid duplicate output."
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(
+						this.plugin.settings.pasteAtCursorWhenCreatingNote
+					)
+					.onChange(async (value) => {
+						this.plugin.settings.pasteAtCursorWhenCreatingNote =
+							value;
+						await this.settingsManager.saveSettings(
+							this.plugin.settings
+						);
+					});
 			});
 	}
 
