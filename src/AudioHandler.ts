@@ -258,11 +258,19 @@ export class AudioHandler {
 				);
 			}
 
-			// Paste into the editor captured at the start of this invocation,
-			// not whichever editor happens to be active now — otherwise a
-			// concurrent recording (or a manual click on a freshly created
-			// note) would re-route this paste to the wrong note.
-			if (targetEditor) {
+			// In dictation mode (createNoteFile off) the cursor paste is the
+			// only output. When createNoteFile is on, paste is opt-in via
+			// pasteAtCursorWhenCreatingNote — defaulting it off avoids the
+			// transcript landing twice (in the new note AND in whatever note
+			// happens to be open).
+			//
+			// The editor reference is the one captured at the start of this
+			// invocation, so a concurrent recording (or a manual click into
+			// another note) can't re-route this paste mid-flow.
+			const shouldPaste =
+				!this.plugin.settings.createNoteFile ||
+				this.plugin.settings.pasteAtCursorWhenCreatingNote;
+			if (shouldPaste && targetEditor) {
 				const cursorPosition = targetEditor.getCursor();
 				targetEditor.replaceRange(outputText, cursorPosition);
 

@@ -46,6 +46,7 @@ export interface WhisperSettings {
 	noteSavePath: string;
 	noteFilenameTemplate: string;
 	noteTemplate: string;
+	pasteAtCursorWhenCreatingNote: boolean;
 	// Advanced
 	debugMode: boolean;
 }
@@ -87,6 +88,7 @@ export const DEFAULT_WHISPER: WhisperSettings = {
 	noteSavePath: "",
 	noteFilenameTemplate: "{{datetime}}",
 	noteTemplate: "![[{{audioFile}}]]\n{{transcription}}",
+	pasteAtCursorWhenCreatingNote: false,
 	debugMode: false,
 };
 
