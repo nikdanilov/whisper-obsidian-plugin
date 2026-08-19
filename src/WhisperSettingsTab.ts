@@ -254,10 +254,24 @@ export class WhisperSettingsTab extends PluginSettingTab {
 		// Get current value, defaulting to "default" if not set or device not found
 		let currentValue = this.plugin.settings.audioDeviceId || "default";
 		if (currentValue !== "default" && !options[currentValue]) {
-			// Device no longer available, reset to default
-			currentValue = "default";
-			this.plugin.settings.audioDeviceId = "default";
-			await this.settingsManager.saveSettings(this.plugin.settings);
+			const storedLabel = this.plugin.settings.audioDeviceLabel;
+			const relabeled = storedLabel
+				? devices.find((device) => device.label === storedLabel)
+				: undefined;
+
+			if (relabeled) {
+				currentValue = relabeled.deviceId;
+				this.plugin.settings.audioDeviceId = relabeled.deviceId;
+				await this.settingsManager.saveSettings(this.plugin.settings);
+				this.plugin.recorder.setDeviceId(relabeled.deviceId);
+			} else {
+				// Device no longer available, reset to default
+				currentValue = "default";
+				this.plugin.settings.audioDeviceId = "default";
+				this.plugin.settings.audioDeviceLabel = "";
+				await this.settingsManager.saveSettings(this.plugin.settings);
+				this.plugin.recorder.setDeviceId(null);
+			}
 		}
 
 		setting.addDropdown((dropdown) => {
@@ -267,6 +281,8 @@ export class WhisperSettingsTab extends PluginSettingTab {
 			dropdown.setValue(currentValue);
 			dropdown.onChange(async (value) => {
 				this.plugin.settings.audioDeviceId = value;
+				this.plugin.settings.audioDeviceLabel =
+					value === "default" ? "" : options[value];
 				await this.settingsManager.saveSettings(this.plugin.settings);
 				// Update recorder with new device ID
 				this.plugin.recorder.setDeviceId(
