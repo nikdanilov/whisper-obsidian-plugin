@@ -49,10 +49,10 @@ export class NativeAudioRecorder implements AudioRecorder {
 	async startRecording(): Promise<void> {
 		if (!this.recorder) {
 			try {
-				const audioConstraints =
+				const audioConstraints: MediaTrackConstraints =
 					this.deviceId && this.deviceId !== "default"
 						? { deviceId: { exact: this.deviceId } }
-						: true;
+						: {};
 				const stream = await navigator.mediaDevices.getUserMedia({
 					audio: audioConstraints,
 				});

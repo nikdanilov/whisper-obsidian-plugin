@@ -31,5 +31,6 @@ describe("DEFAULT_SETTINGS", () => {
 
 	it("defaults to system audio device", () => {
 		expect(DEFAULT_SETTINGS.audioDeviceId).toBe("default");
+		expect(DEFAULT_SETTINGS.audioDeviceLabel).toBe("");
 	});
 });
